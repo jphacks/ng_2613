@@ -18,6 +18,10 @@ export default function DiscussionApp() {
  const state = useDiscussionState();
  const { screen, accountScreen, notice, menuOpen } = state;
  return (
+  <div className="app-layout">
+   <aside className="desktop-sidebar desktop-brand" aria-label="ロゴ">
+    <button className="brand" onClick={() => state.navigate("home")}>アプリ名</button>
+   </aside>
   <main className={`app-shell screen-${screen}`}>
    {!accountScreen && screen !== "video" && screen !== "vote" && <AppHeader {...state} />}
    {notice && <p className="notice" role="status">{notice}</p>}
@@ -31,7 +35,11 @@ export default function DiscussionApp() {
    {screen === "login" && <LoginScreen {...state} />}
    {screen === "register" && <RegisterScreen {...state} />}
    {screen === "profile" && <ProfileScreen {...state} />}
-   {menuOpen && <AppMenu {...state} />}
+   {menuOpen && <div className="mobile-menu"><AppMenu {...state} /></div>}
   </main>
+   <aside className="desktop-sidebar desktop-navigation" aria-label="サイドメニュー">
+    <AppMenu {...state} persistent />
+   </aside>
+  </div>
  );
 }
