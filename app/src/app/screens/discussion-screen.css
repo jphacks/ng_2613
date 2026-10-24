@@ -33,3 +33,6 @@
   padding-inline:10px
 }
 }
+
+.discussion-list .summary-heading h1 { margin-bottom:0 }
+.discussion-opinions { margin-top:24px }
