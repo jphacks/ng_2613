@@ -3,7 +3,7 @@ begin;
 create extension if not exists pgtap with schema extensions;
 set search_path = public, extensions;
 
-select plan(49);
+select plan(59);
 
 select is(
   (select count(*)::integer
@@ -45,15 +45,30 @@ values
     '00000000-0000-0000-0000-000000000102', 'authenticated', 'authenticated',
     '+810000000102', now(), '{}'::jsonb, '{"username":"second-user"}'::jsonb,
     now(), now(), false, false
+  ),
+  (
+    '00000000-0000-0000-0000-000000000103', 'authenticated', 'authenticated',
+    '+810000000103', now(), '{}'::jsonb, '{}'::jsonb, now(), now(), false, false
+  ),
+  (
+    '00000000-0000-0000-0000-000000000104', 'authenticated', 'authenticated',
+    '+810000000104', now(), '{}'::jsonb, '{}'::jsonb, now(), now(), false, false
+  ),
+  (
+    '00000000-0000-0000-0000-000000000105', 'authenticated', 'authenticated',
+    '+810000000105', now(), '{}'::jsonb, '{}'::jsonb, now(), now(), false, false
   );
 
 select is(
   (select count(*)::integer from public.users
    where id in (
      '00000000-0000-0000-0000-000000000101',
-     '00000000-0000-0000-0000-000000000102'
+     '00000000-0000-0000-0000-000000000102',
+     '00000000-0000-0000-0000-000000000103',
+     '00000000-0000-0000-0000-000000000104',
+     '00000000-0000-0000-0000-000000000105'
    )),
-  2,
+  5,
   'auth.users trigger creates application profiles'
 );
 
@@ -143,6 +158,64 @@ select throws_ok(
   'question frames require question text'
 );
 
+select is(
+  (select data_type
+   from information_schema.columns
+   where table_schema = 'public'
+     and table_name = 'votes'
+     and column_name = 'value'),
+  'smallint',
+  'votes.value uses the smallint type'
+);
+
+select is(
+  (select count(*)::integer
+   from information_schema.columns
+   where table_schema = 'public'
+     and table_name = 'votes'
+     and column_name = 'stance'),
+  0,
+  'the binary votes.stance column no longer exists'
+);
+
+set local role authenticated;
+select set_config(
+  'request.jwt.claims',
+  '{"sub":"00000000-0000-0000-0000-000000000103","role":"authenticated"}',
+  true
+);
+
+select throws_ok(
+  $$insert into public.votes (frame_id, user_id, value)
+    values (
+      '00000000-0000-0000-0000-000000000401',
+      '00000000-0000-0000-0000-000000000103', 0
+    )$$,
+  '23514', null,
+  'vote value zero is rejected'
+);
+
+select throws_ok(
+  $$insert into public.votes (frame_id, user_id, value)
+    values (
+      '00000000-0000-0000-0000-000000000401',
+      '00000000-0000-0000-0000-000000000103', 6
+    )$$,
+  '23514', null,
+  'vote value six is rejected'
+);
+
+select throws_ok(
+  $$insert into public.votes (frame_id, user_id, value)
+    values (
+      '00000000-0000-0000-0000-000000000401',
+      '00000000-0000-0000-0000-000000000103', null
+    )$$,
+  '23502', null,
+  'null vote values are rejected'
+);
+
+reset role;
 set local role authenticated;
 select set_config(
   'request.jwt.claims',
@@ -151,19 +224,19 @@ select set_config(
 );
 
 select lives_ok(
-  $$insert into public.votes (frame_id, user_id, stance)
+  $$insert into public.votes (frame_id, user_id, value)
     values (
       '00000000-0000-0000-0000-000000000401',
-      '00000000-0000-0000-0000-000000000101', 'agree'
+      '00000000-0000-0000-0000-000000000101', 5
     )$$,
   'a user can cast an initial vote'
 );
 
 select throws_ok(
-  $$insert into public.votes (frame_id, user_id, stance)
+  $$insert into public.votes (frame_id, user_id, value)
     values (
       '00000000-0000-0000-0000-000000000401',
-      '00000000-0000-0000-0000-000000000101', 'agree'
+      '00000000-0000-0000-0000-000000000101', 5
     )$$,
   '23505', null,
   'one user cannot create duplicate votes for one frame'
@@ -190,26 +263,62 @@ select is(
 );
 
 select is_empty(
-  $$update public.votes set stance = 'disagree'
+  $$update public.votes set value = 1
     where user_id = '00000000-0000-0000-0000-000000000101'
     returning id$$,
   'a user cannot update another user vote'
 );
 
 select lives_ok(
-  $$insert into public.votes (frame_id, user_id, stance)
+  $$insert into public.votes (frame_id, user_id, value)
     values (
       '00000000-0000-0000-0000-000000000401',
-      '00000000-0000-0000-0000-000000000102', 'disagree'
+      '00000000-0000-0000-0000-000000000102', 1
     )$$,
   'a second user can vote independently'
 );
 
+reset role;
+insert into public.votes (frame_id, user_id, value)
+values
+  (
+    '00000000-0000-0000-0000-000000000401',
+    '00000000-0000-0000-0000-000000000103', 2
+  ),
+  (
+    '00000000-0000-0000-0000-000000000401',
+    '00000000-0000-0000-0000-000000000104', 3
+  ),
+  (
+    '00000000-0000-0000-0000-000000000401',
+    '00000000-0000-0000-0000-000000000105', 4
+  );
+
+set local role authenticated;
+select set_config(
+  'request.jwt.claims',
+  '{"sub":"00000000-0000-0000-0000-000000000102","role":"authenticated"}',
+  true
+);
+
 select results_eq(
-  $$select agree_count, disagree_count
+  $$select count_1, count_2, count_3, count_4, count_5, total_count
     from public.get_frame_vote_counts('00000000-0000-0000-0000-000000000401')$$,
-  $$values (1::bigint, 1::bigint)$$,
-  'vote RPC exposes aggregate counts only'
+  $$values (1::bigint, 1::bigint, 1::bigint, 1::bigint, 1::bigint, 5::bigint)$$,
+  'vote RPC counts every valid five-point value'
+);
+
+select results_eq(
+  $$select count_1, count_2, count_3, count_4, count_5, total_count
+    from public.get_frame_vote_counts('00000000-0000-0000-0000-000000000402')$$,
+  $$values (0::bigint, 0::bigint, 0::bigint, 0::bigint, 0::bigint, 0::bigint)$$,
+  'vote RPC returns zeroes for a visible frame without votes'
+);
+
+select is_empty(
+  $$select *
+    from public.get_frame_vote_counts('00000000-0000-0000-0000-000000000403')$$,
+  'vote RPC does not expose hidden-topic aggregates'
 );
 
 reset role;
@@ -221,7 +330,7 @@ select set_config(
 );
 
 select throws_ok(
-  $$update public.votes set stance = 'disagree'
+  $$update public.votes set value = 4
     where frame_id = '00000000-0000-0000-0000-000000000401'$$,
   'P0001', null,
   'vote changes are rejected during the seven-day cooldown'
@@ -243,7 +352,7 @@ select set_config(
 );
 
 select lives_ok(
-  $$update public.votes set stance = 'disagree'
+  $$update public.votes set value = 4
     where frame_id = '00000000-0000-0000-0000-000000000401'$$,
   'vote changes are allowed after seven days'
 );
@@ -254,6 +363,36 @@ select ok(
    where frame_id = '00000000-0000-0000-0000-000000000401'),
   'successful vote changes refresh updated_at'
 );
+
+reset role;
+alter table public.votes disable trigger enforce_votes;
+update public.votes
+set updated_at = statement_timestamp() - interval '8 days'
+where frame_id = '00000000-0000-0000-0000-000000000401'
+  and user_id = '00000000-0000-0000-0000-000000000101';
+alter table public.votes enable trigger enforce_votes;
+update public.periods
+set status = 'closed'
+where id = '00000000-0000-0000-0000-000000000301';
+
+set local role authenticated;
+select set_config(
+  'request.jwt.claims',
+  '{"sub":"00000000-0000-0000-0000-000000000101","role":"authenticated"}',
+  true
+);
+
+select throws_ok(
+  $$update public.votes set value = 5
+    where frame_id = '00000000-0000-0000-0000-000000000401'$$,
+  '23514', null,
+  'votes cannot be changed after the voting period closes'
+);
+
+reset role;
+update public.periods
+set status = 'active'
+where id = '00000000-0000-0000-0000-000000000301';
 
 reset role;
 grant update (role) on public.users to authenticated;
@@ -294,6 +433,12 @@ select lives_ok(
       '00000000-0000-0000-0000-000000000101', 'agree', 'Title', 'Body'
     )$$,
   'a user can create their own user thread'
+);
+
+select is(
+  (select stance from public.threads where title = 'Title'),
+  'agree',
+  'threads.stance retains the agree/disagree behavior'
 );
 
 reset role;
@@ -345,6 +490,12 @@ select lives_ok(
       '00000000-0000-0000-0000-000000000101', 'agree', 'Comment'
     )$$,
   'a user can create their own comment'
+);
+
+select is(
+  (select stance from public.comments where body = 'Comment'),
+  'agree',
+  'comments.stance retains the agree/disagree behavior'
 );
 
 reset role;
@@ -450,9 +601,9 @@ select throws_ok(
 );
 
 select results_eq(
-  $$select agree_count, disagree_count
+  $$select count_1, count_2, count_3, count_4, count_5, total_count
     from public.get_frame_vote_counts('00000000-0000-0000-0000-000000000401')$$,
-  $$values (0::bigint, 2::bigint)$$,
+  $$values (1::bigint, 1::bigint, 1::bigint, 2::bigint, 0::bigint, 5::bigint)$$,
   'aggregate counts reflect the allowed vote change'
 );
 
@@ -506,6 +657,22 @@ values
 update public.threads
 set deleted_at = now()
 where id = '00000000-0000-0000-0000-000000000504';
+
+-- Simulate a thread that received votes while open and was later locked.
+update public.topics
+set status = 'open'
+where id = '00000000-0000-0000-0000-000000000204';
+
+insert into public.votes (frame_id, user_id, value)
+values (
+  '00000000-0000-0000-0000-000000000402',
+  '00000000-0000-0000-0000-000000000101',
+  5
+);
+
+update public.topics
+set status = 'locked'
+where id = '00000000-0000-0000-0000-000000000204';
 
 select has_table(
   'public',
