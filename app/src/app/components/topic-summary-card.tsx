@@ -1,4 +1,4 @@
-import { useId, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { opinionColors, opinionLabels } from "../lib/demo-data";
 import type { TopicFrame } from "../lib/catalog/types";
 import type { ThreadSummary } from "../lib/threads/types";
@@ -79,11 +79,13 @@ export default function TopicSummaryCard({
   onThread,
 }: Props) {
   const [expanded, setExpanded] = useState(false);
+  const [voteCompleted, setVoteCompleted] = useState(false);
   const detailsId = useId();
   const titleId = useId();
   const dialogTitleId = useId();
   const dialogRef = useRef<HTMLDialogElement>(null);
   const { vote } = frame;
+  const hasVoted = vote.myValue !== null;
   // 5段階のうち「やや賛成」「賛成」を賛成、「反対」「やや反対」を反対として二分する。
   const agreeCount = vote.counts[3] + vote.counts[4];
   const disagreeCount = vote.counts[0] + vote.counts[1];
@@ -94,6 +96,11 @@ export default function TopicSummaryCard({
   const disagreeThreads = threads.filter((thread) => thread.stance === "disagree");
   const changeLocked = vote.myValue !== null && !vote.canChange;
   const voteDisabled = submitting || !vote.votingOpen || changeLocked;
+  useEffect(() => {
+    if (!voteCompleted || submitting || vote.myValue === null) return;
+    const timeoutId = window.setTimeout(() => dialogRef.current?.close(), 1000);
+    return () => window.clearTimeout(timeoutId);
+  }, [voteCompleted, submitting, vote.myValue]);
   function voteStatus() {
     if (submitting) return "送信中…";
     if (error) return error;
@@ -129,21 +136,27 @@ export default function TopicSummaryCard({
         <div
           className="pie"
           role="img"
-          aria-label={`賛成${agreePercent}%、反対${disagreePercent}%`}
-          style={stanceTotal ? {
+          aria-label={hasVoted ? `賛成${agreePercent}%、反対${disagreePercent}%` : "投票してください"}
+          style={!hasVoted ? { background: "#d9d9d9" } : stanceTotal ? {
             background: `linear-gradient(to right,var(--blue) ${agreePercent}%,var(--pink) ${agreePercent}%)`,
           } : undefined}
         >
-          <span>
-            賛成
-            <br />
-            {agreePercent}%
-          </span>
-          <span>
-            反対
-            <br />
-            {disagreePercent}%
-          </span>
+          {hasVoted ? (
+            <>
+              <span>
+                賛成
+                <br />
+                {agreePercent}%
+              </span>
+              <span>
+                反対
+                <br />
+                {disagreePercent}%
+              </span>
+            </>
+          ) : (
+            <span>投票してください</span>
+          )}
         </div>
         <table>
           <thead>
@@ -199,6 +212,7 @@ export default function TopicSummaryCard({
         ref={dialogRef}
         className="summary-vote-dialog"
         aria-labelledby={dialogTitleId}
+        onClose={() => setVoteCompleted(false)}
         onClick={(event) => {
           if (event.target === event.currentTarget) dialogRef.current?.close();
         }}
@@ -212,11 +226,11 @@ export default function TopicSummaryCard({
         </button>
         <h2 id={dialogTitleId}>Q{questionNumber}. {frame.question}</h2>
         <div className="dialog-vote-labels">
-          <span>賛成</span>
           <span>反対</span>
+          <span>賛成</span>
         </div>
         <div className="dialog-vote-options">
-          {[4, 3, 2, 1, 0].map((index) => (
+          {[0, 1, 2, 3, 4].map((index) => (
             <button
               key={index}
               className="dialog-vote-dot"
@@ -224,7 +238,11 @@ export default function TopicSummaryCard({
               aria-pressed={vote.myValue === index + 1}
               disabled={voteDisabled}
               style={{ background: opinionColors[index] }}
-              onClick={() => void onVote(frame.id, (index + 1) as VoteValue)}
+              onClick={async () => {
+                if (await onVote(frame.id, (index + 1) as VoteValue)) {
+                  setVoteCompleted(true);
+                }
+              }}
             />
           ))}
         </div>
