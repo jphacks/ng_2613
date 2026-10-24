@@ -242,7 +242,9 @@ h2 {
     width: 100%;
     max-width: 100%;
     height: auto;
-    clip-path: inset(7px 3px 3px);
+    /* 画像の上端4px・左端2pxに枠線が入っている。拡大表示でにじむ分も含め、
+       表示サイズに比例する割合で切り落とす */
+    clip-path: inset(3.5% 1.5% 1.5% 2.5%);
   }
 
   .app-shell {
