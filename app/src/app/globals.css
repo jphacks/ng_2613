@@ -88,6 +88,8 @@ button:hover {
 
 @media (width > 757px) {
   .app-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 420px minmax(0, 1fr);
     background-color: #fff;
     background-image: radial-gradient(
       ellipse 65% 70% at center,
@@ -113,8 +115,8 @@ button:hover {
   }
 
   .desktop-brand {
-    justify-content: center;
-    align-items: center;
+    display: grid;
+    place-items: center;
     height: 100dvh;
     padding: 16px;
     mix-blend-mode: multiply;
