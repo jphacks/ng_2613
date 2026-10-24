@@ -85,6 +85,8 @@ export default function AppHeader({
       </div>
       {screen === "home" ? (
         <nav className="category-nav" aria-label="カテゴリー">
+          {/* 元のデザインと同じく、専用のデータはまだないため先頭のカテゴリーを表示する */}
+          {genres[0] && <button onClick={() => selectGenre(genres[0].id)}>今日のテーマ</button>}
           {genres.map((genre) => (
             <button
               key={genre.id}
