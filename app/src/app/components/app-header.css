@@ -58,19 +58,20 @@
   display:flex;
   gap:16px;
   white-space:nowrap;
-  overflow:hidden;
+  overflow-x:auto;
+  scrollbar-width:none;
   font-size:15px;
   height:30px;
   align-items:center;
   color:#858585
 }
 
-.category-nav .active {
-  color:#111
+.category-nav::-webkit-scrollbar {
+  display:none
 }
 
-.category-nav button:last-child {
-  margin-left:auto
+.category-nav .active {
+  color:#111
 }
 
 .search-wrap {
@@ -109,9 +110,18 @@
 }
 
 .search-results button {
-  display:block;
+  display:flex;
+  flex-direction:column;
+  gap:2px;
   width:100%;
-  text-align:center
+  text-align:left;
+  padding:8px 10px;
+  border-bottom:1px solid #ddd
+}
+
+.search-results small {
+  color:#666;
+  font-size:10px
 }
 
 .search-results p {
@@ -125,8 +135,8 @@
   padding-left:14px;
   font-size:15px;
   white-space:nowrap;
-  height:30px;
-  overflow-x:auto
+  overflow-x:auto;
+  height:30px
 }
 
 .pills {

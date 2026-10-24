@@ -1,0 +1,15 @@
+.data-state {
+  margin:40px 20px;
+  padding:24px 18px;
+  border:1px solid #d7d7dc;
+  border-radius:12px;
+  color:var(--ink);
+  text-align:center;
+  line-height:1.6
+}
+
+.data-state .secondary {
+  min-height:42px;
+  margin-top:18px;
+  font-size:16px
+}

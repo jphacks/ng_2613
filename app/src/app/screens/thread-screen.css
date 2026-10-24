@@ -9,6 +9,13 @@
   margin-bottom: 26px;
 }
 
+.thread-body { margin:0 12px 24px; padding:18px; border:1px solid var(--blue); border-radius:16px; background:white }
+.thread-body.disagree { border-color:var(--pink) }
+.thread-body h1 { margin-bottom:12px }
+.thread-body p { white-space:pre-wrap; overflow-wrap:anywhere; line-height:1.6 }
+.thread-body small,.bubble small { display:block; margin-top:10px; color:#666; font-size:10px }
+.thread-empty { text-align:center; color:#666 }
+
 .message-list {
   display: flex;
   flex-direction: column;
@@ -90,6 +97,8 @@
     width: 420px;
   }
 }
+
+.composer-error { position:absolute; right:12px; bottom:2px; max-width:250px; color:#ffb4b4; font-size:10px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap }
 
 .stance-switch {
   display: flex;

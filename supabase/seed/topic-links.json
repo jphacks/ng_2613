@@ -1,0 +1,77 @@
+[
+  {
+    "topic": "外国人労働者の受け入れ",
+    "display_genre": "仕事",
+    "display_middle_topic": "雇用"
+  },
+  {
+    "topic": "年収の壁",
+    "display_genre": "仕事",
+    "display_middle_topic": "働き方"
+  },
+  {
+    "topic": "社会保険料",
+    "display_genre": "健康・福祉",
+    "display_middle_topic": "年金"
+  },
+  {
+    "topic": "社会保険料",
+    "display_genre": "健康・福祉",
+    "display_middle_topic": "医療"
+  },
+  {
+    "topic": "給付金",
+    "display_genre": "お金",
+    "display_middle_topic": "物価・賃金"
+  },
+  {
+    "topic": "米の価格・生産調整",
+    "display_genre": "お金",
+    "display_middle_topic": "物価・賃金"
+  },
+  {
+    "topic": "電気代",
+    "display_genre": "お金",
+    "display_middle_topic": "物価・賃金"
+  },
+  {
+    "topic": "子ども・子育て支援金",
+    "display_genre": "お金",
+    "display_middle_topic": "税金"
+  },
+  {
+    "topic": "育児休業",
+    "display_genre": "仕事",
+    "display_middle_topic": "働き方"
+  },
+  {
+    "topic": "オーバーツーリズム",
+    "display_genre": "仕事",
+    "display_middle_topic": "産業政策"
+  },
+  {
+    "topic": "日米の通商・関税",
+    "display_genre": "仕事",
+    "display_middle_topic": "産業政策"
+  },
+  {
+    "topic": "エネルギー安全保障",
+    "display_genre": "国と世界",
+    "display_middle_topic": "安全保障・防衛"
+  },
+  {
+    "topic": "外国人の土地取得",
+    "display_genre": "国と世界",
+    "display_middle_topic": "安全保障・防衛"
+  },
+  {
+    "topic": "処理水の海洋放出",
+    "display_genre": "暮らし・地域",
+    "display_middle_topic": "防災・復興"
+  },
+  {
+    "topic": "女性の政治参加",
+    "display_genre": "政治のしくみ",
+    "display_middle_topic": "国会・行政"
+  }
+]

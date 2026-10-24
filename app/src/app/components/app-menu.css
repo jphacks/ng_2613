@@ -25,6 +25,12 @@
   font-size:20px
 }
 
+.drawer button:disabled,.desktop-menu button:disabled {
+  cursor:not-allowed;
+  color:#888;
+  background:#f5f5f5
+}
+
 .desktop-menu {
   width:262px;
   max-width:100%;

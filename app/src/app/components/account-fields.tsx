@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import type { DiscussionState } from "../hooks/use-discussion-state";
 import "./account-form.css";
 
@@ -7,60 +10,104 @@ type Props = Pick<DiscussionState, "profile"> & {
 
 // 入力欄のみ共用し、フォーム送信・レイアウト・ボタンは各画面で管理する。
 export default function AccountFields({ mode, profile }: Props) {
-  const isLogin = mode === "login";
   const isProfile = mode === "profile";
+  const [passwordVisible, setPasswordVisible] = useState(false);
+  const [confirmationVisible, setConfirmationVisible] = useState(false);
 
-  if (!isLogin) {
-    return (
-      <>
-        <label className="account-field">
-          <span>ユーザー名（必須）</span>
-          <input name="username" aria-label="ユーザー名" autoComplete="nickname" defaultValue={isProfile ? profile.username : ""} required pattern=".*\S.*" />
-        </label>
-        <fieldset className="gender-field">
-          <legend>性別（任意）</legend>
-          {["男性", "女性", "その他", "回答しない"].map((label) => (
-            <label key={label}>
-              <input type="radio" name="gender" value={label === "回答しない" ? "" : label} defaultChecked={isProfile && profile.gender === (label === "回答しない" ? "" : label)} />
-              {label}
-            </label>
-          ))}
-        </fieldset>
-        <label className="account-field">
-          <span>生年月日（任意）</span>
-          <input name="birthDate" aria-label="生年月日" type="date" autoComplete="bday" defaultValue={isProfile ? profile.birthDate : ""} />
-        </label>
-      </>
-    );
-  }
-
-  return (
-    <>
-      <label className="account-field">
-        {!isLogin && <span>電話番号</span>}
+  return <>
+    <label className="account-field">
+      <span>メールアドレス</span>
+      <input
+        name="email"
+        aria-label="メールアドレス"
+        type="email"
+        autoComplete="email"
+        placeholder="name@example.com"
+        defaultValue={profile.email}
+        required
+        readOnly={isProfile}
+        maxLength={254}
+      />
+    </label>
+    {!isProfile && <div className="account-field">
+      <label htmlFor={`${mode}-password`}>パスワード</label>
+      <span className="password-input">
         <input
-          name="phone"
-          aria-label="電話番号"
-          type="tel"
-          autoComplete="tel"
-          placeholder="電話番号"
-          defaultValue={isProfile ? profile.phone : ""}
-          required
-          pattern="[0-9０-９+\- ()]{10,15}"
-        />
-      </label>
-      <label className="account-field">
-        {!isLogin && <span>パスワード</span>}
-        <input
+          id={`${mode}-password`}
           name="password"
           aria-label="パスワード"
-          type="password"
-          autoComplete="current-password"
-          placeholder="パスワード"
+          type={passwordVisible ? "text" : "password"}
+          autoComplete={mode === "register" ? "new-password" : "current-password"}
+          minLength={6}
           required
-          minLength={8}
+        />
+        <button
+          type="button"
+          aria-label={passwordVisible ? "パスワードを隠す" : "パスワードを表示"}
+          aria-pressed={passwordVisible}
+          onClick={() => setPasswordVisible((visible) => !visible)}
+        >
+          {passwordVisible ? "隠す" : "表示"}
+        </button>
+      </span>
+    </div>}
+    {mode === "register" && <div className="account-field">
+      <label htmlFor="register-password-confirmation">パスワード確認</label>
+      <span className="password-input">
+        <input
+          id="register-password-confirmation"
+          name="passwordConfirmation"
+          aria-label="パスワード確認"
+          type={confirmationVisible ? "text" : "password"}
+          autoComplete="new-password"
+          minLength={6}
+          required
+        />
+        <button
+          type="button"
+          aria-label={confirmationVisible ? "確認用パスワードを隠す" : "確認用パスワードを表示"}
+          aria-pressed={confirmationVisible}
+          onClick={() => setConfirmationVisible((visible) => !visible)}
+        >
+          {confirmationVisible ? "隠す" : "表示"}
+        </button>
+      </span>
+    </div>}
+    {isProfile && <>
+      <label className="account-field">
+        <span>ユーザー名</span>
+        <input
+          name="username"
+          aria-label="ユーザー名"
+          type="text"
+          autoComplete="nickname"
+          defaultValue={profile.username}
+          required
         />
       </label>
-    </>
-  );
+      <fieldset className="gender-field">
+        <legend>性別</legend>
+        {["男性", "女性", "その他"].map((label) => <label key={label}>
+          <input
+            type="radio"
+            name="gender"
+            value={label}
+            defaultChecked={profile.gender === label}
+            required
+          />
+          {label}
+        </label>)}
+      </fieldset>
+      <label className="year-field">
+        <span>生まれた年</span>
+        <select aria-label="生まれた年" name="year" defaultValue={profile.year} required>
+          <option value="" disabled />
+          {Array.from(
+            { length: new Date().getFullYear() - 1899 },
+            (_, index) => new Date().getFullYear() - index,
+          ).map((year) => <option value={year} key={year}>{year}年</option>)}
+        </select>
+      </label>
+    </>}
+  </>;
 }
