@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { useEffect, useLayoutEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { DiscussionState } from "../hooks/use-discussion-state";
 import "./app-header.css";
 type Props = Pick<
@@ -10,6 +10,8 @@ type Props = Pick<
   | "setSearch"
   | "menuOpen"
   | "setMenuOpen"
+  | "homeTab"
+  | "setHomeTab"
   | "genres"
   | "selectedGenre"
   | "selectedMiddleTopic"
@@ -27,6 +29,8 @@ export default function AppHeader({
   setSearch,
   menuOpen,
   setMenuOpen,
+  homeTab,
+  setHomeTab,
   genres,
   selectedGenre,
   selectedMiddleTopic,
@@ -38,13 +42,25 @@ export default function AppHeader({
   selectTopic,
 }: Props) {
   const categoryNavRef = useRef<HTMLElement>(null);
+  // トップは「今日のテーマ」と「カテゴリー」の2つに分け、カテゴリーを押すと下に一覧を開く
+  const [categoryMenuOpen, setCategoryMenuOpen] = useState(false);
 
-  // カテゴリーは横に並びきらず横スクロールになるため、選んだものが端で切れていたら見える位置まで寄せる
+  // 一覧の外を押すか Esc で閉じる
   useEffect(() => {
-    categoryNavRef.current
-      ?.querySelector(".active")
-      ?.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "nearest" });
-  }, [selectedGenre?.id]);
+    if (!categoryMenuOpen) return;
+    const onPointerDown = (event: PointerEvent) => {
+      if (!categoryNavRef.current?.parentElement?.contains(event.target as Node)) setCategoryMenuOpen(false);
+    };
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setCategoryMenuOpen(false);
+    };
+    window.addEventListener("pointerdown", onPointerDown);
+    window.addEventListener("keydown", onKeyDown);
+    return () => {
+      window.removeEventListener("pointerdown", onPointerDown);
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [categoryMenuOpen]);
 
   // 選択中のタブの下線を1本の線として描き、切り替えたときに前のタブから横にすべらせる
   const indicatorRef = useRef<HTMLSpanElement>(null);
@@ -69,68 +85,9 @@ export default function AppHeader({
       cancelAnimationFrame(frame);
       observer.disconnect();
     };
-  }, [selectedGenre?.id, genres, screen]);
+  }, [homeTab, screen]);
 
-  // スクロールバーは隠しているので、続きがある側の端を薄くして「まだ続く」ことを見せる。
-  // マウスでは横スクロールの手段がなくなるため、ホイールと、つかんで引っぱる操作でスクロールできるようにする。
-  useEffect(() => {
-    const nav = categoryNavRef.current;
-    if (!nav) return;
-    const updateFade = () => {
-      nav.toggleAttribute("data-fade-left", nav.scrollLeft > 1);
-      nav.toggleAttribute("data-fade-right", nav.scrollLeft + nav.clientWidth < nav.scrollWidth - 1);
-    };
-    let drag: { startX: number; startScroll: number; moved: boolean } | null = null;
-    const onPointerDown = (event: PointerEvent) => {
-      if (event.pointerType !== "mouse" || event.button !== 0) return;
-      drag = { startX: event.clientX, startScroll: nav.scrollLeft, moved: false };
-    };
-    const onPointerMove = (event: PointerEvent) => {
-      if (!drag) return;
-      const distance = event.clientX - drag.startX;
-      if (Math.abs(distance) > 4) {
-        drag.moved = true;
-        nav.classList.add("is-dragging");
-      }
-      if (drag.moved) nav.scrollLeft = drag.startScroll - distance;
-    };
-    const onPointerUp = () => {
-      nav.classList.remove("is-dragging");
-      // 引っぱったあとに指を離したときは、タブを押した扱いにしない
-      if (drag?.moved) nav.addEventListener("click", cancelClick, { capture: true, once: true });
-      drag = null;
-    };
-    // 縦ホイールを横スクロールに変える。端まで来たらページの縦スクロールに任せる
-    const onWheel = (event: WheelEvent) => {
-      if (Math.abs(event.deltaY) <= Math.abs(event.deltaX)) return;
-      const atStart = nav.scrollLeft <= 0 && event.deltaY < 0;
-      const atEnd = nav.scrollLeft + nav.clientWidth >= nav.scrollWidth - 1 && event.deltaY > 0;
-      if (atStart || atEnd) return;
-      event.preventDefault();
-      nav.scrollLeft += event.deltaY;
-    };
-    const cancelClick = (event: MouseEvent) => {
-      event.preventDefault();
-      event.stopPropagation();
-    };
-    updateFade();
-    const observer = new ResizeObserver(updateFade);
-    observer.observe(nav);
-    nav.addEventListener("scroll", updateFade, { passive: true });
-    nav.addEventListener("pointerdown", onPointerDown);
-    nav.addEventListener("wheel", onWheel, { passive: false });
-    window.addEventListener("pointermove", onPointerMove);
-    window.addEventListener("pointerup", onPointerUp);
-    return () => {
-      observer.disconnect();
-      nav.removeEventListener("scroll", updateFade);
-      nav.removeEventListener("pointerdown", onPointerDown);
-      nav.removeEventListener("wheel", onWheel);
-      nav.removeEventListener("click", cancelClick, { capture: true });
-      window.removeEventListener("pointermove", onPointerMove);
-      window.removeEventListener("pointerup", onPointerUp);
-    };
-  }, [screen, genres]);
+  const collapseMiddle = (screen === "discussion" || screen === "thread") && Boolean(selectedFrame);
 
   // 履歴ではなく階層で1つ上へ戻す。外から直接開いたときにアプリの外へ出ないようにするため。
   function goBack() {
@@ -180,21 +137,49 @@ export default function AppHeader({
         </button>
       </div>
       {screen === "home" ? (
-        <nav ref={categoryNavRef} className="category-nav" aria-label="カテゴリー">
-          {/* 末尾に置くと button:last-child の指定が外れるため先頭に置く */}
-          <span ref={indicatorRef} className="category-indicator" aria-hidden="true" />
-          {/* 元のデザインと同じく、専用のデータはまだないため先頭のカテゴリーを表示する */}
-          {genres[0] && <button onClick={() => selectGenre(genres[0].id)}>今日のテーマ</button>}
-          {genres.map((genre) => (
+        <div className="category-nav-wrap">
+          <nav ref={categoryNavRef} className="category-nav" aria-label="トップの表示切り替え">
+            {/* 末尾に置くと button:last-child の指定が外れるため先頭に置く */}
+            <span ref={indicatorRef} className="category-indicator" aria-hidden="true" />
+            {/* 今日のテーマは別のコンテンツ。今ある分類はすべてカテゴリーに入る */}
             <button
-              key={genre.id}
-              className={genre.id === selectedGenre?.id ? "active" : undefined}
-              onClick={() => selectGenre(genre.id)}
+              className={homeTab === "today" ? "active" : undefined}
+              onClick={() => {
+                setHomeTab("today");
+                setCategoryMenuOpen(false);
+              }}
             >
-              {genre.name}
+              今日のテーマ
             </button>
-          ))}
-        </nav>
+            <button
+              className={homeTab === "category" ? "active" : undefined}
+              aria-expanded={categoryMenuOpen}
+              aria-controls="category-menu"
+              onClick={() => setCategoryMenuOpen((open) => !open)}
+            >
+              カテゴリー
+              <span className={`category-caret${categoryMenuOpen ? " is-open" : ""}`} aria-hidden="true">▾</span>
+            </button>
+          </nav>
+          {categoryMenuOpen && (
+            <ul id="category-menu" className="category-menu" aria-label="カテゴリー">
+              {genres.map((genre) => (
+                <li key={genre.id}>
+                  <button
+                    aria-current={homeTab === "category" && genre.id === selectedGenre?.id ? "true" : undefined}
+                    onClick={() => {
+                      setHomeTab("category");
+                      setCategoryMenuOpen(false);
+                      selectGenre(genre.id);
+                    }}
+                  >
+                    {genre.name}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
       ) : (
         <nav
           className={`breadcrumbs ${screen === "discussion" || screen === "thread" ? "pills" : ""}`}
@@ -208,7 +193,22 @@ export default function AppHeader({
           {selectedGenre && (
             <button onClick={() => selectGenre(selectedGenre.id)}>{selectedGenre.name}</button>
           )}
-          {selectedMiddleTopic && (
+          {/* 設問の画面では設問の文が長く横にはみ出すため、間の「中分類 › トピック」を「…」にまとめる。
+              「…」を押すとトピック（設問一覧）へ戻る */}
+          {collapseMiddle && topicDetail && (
+            <>
+              <span>&gt;</span>
+              <button
+                className="crumb-ellipsis"
+                aria-label={`${selectedMiddleTopic ? `${selectedMiddleTopic.name} › ` : ""}${topicDetail.name}へ戻る`}
+                title={`${selectedMiddleTopic ? `${selectedMiddleTopic.name} › ` : ""}${topicDetail.name}`}
+                onClick={() => selectTopic(topicDetail.id)}
+              >
+                …
+              </button>
+            </>
+          )}
+          {!collapseMiddle && selectedMiddleTopic && (
             <>
               <span>&gt;</span>
               <button
@@ -219,7 +219,7 @@ export default function AppHeader({
               </button>
             </>
           )}
-          {screen !== "topics" && topicDetail && (
+          {!collapseMiddle && screen !== "topics" && topicDetail && (
             <>
               <span>&gt;</span>
               <button
@@ -234,7 +234,9 @@ export default function AppHeader({
             <>
               <span>&gt;</span>
               <button
+                className="crumb-question"
                 aria-current={screen === "discussion" ? "page" : undefined}
+                title={selectedFrame.question}
                 onClick={() => navigate("discussion")}
               >
                 {selectedFrame.question}

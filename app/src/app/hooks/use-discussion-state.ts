@@ -101,6 +101,8 @@ export function useDiscussionState() {
     threadId: null,
   });
   const [menuOpen, setMenuOpen] = useState(false);
+  // トップのタブ。「今日のテーマ」は別のコンテンツ（未実装）で、今ある分類はすべて「カテゴリー」に入る
+  const [homeTab, setHomeTab] = useState<"today" | "category">("category");
   const [search, setSearch] = useState("");
   const [notice, setNotice] = useState("");
   const [profile, setProfile] = useState<AccountProfile>({
@@ -418,6 +420,9 @@ export function useDiscussionState() {
     setTopicDetail(null);
     setTopicStatus("loading");
     setTopicError("");
+    // 今いるトピックをもう一度選んだときは topicId もアドレスも変わらず、取得が走らないまま
+    // 読み込み中で止まる。loading にするときは必ず取得も走らせる。
+    setTopicAttempt((attempt) => attempt + 1);
     setHash("summary", { genreId, middleTopicId, topicId, frameId: null, threadId: null });
   }
 
@@ -590,7 +595,7 @@ export function useDiscussionState() {
   const accountScreen = screen === "login" || screen === "register" || screen === "profile";
 
   return {
-    screen, menuOpen, setMenuOpen, search, setSearch, notice, setNotice, profile, navigate, submitAccount,
+    screen, menuOpen, setMenuOpen, homeTab, setHomeTab, search, setSearch, notice, setNotice, profile, navigate, submitAccount,
     accountScreen, authStatus, accountSubmitting, accountError, signOut, genres,
     selectedGenre, selectedMiddleTopic, topicDetail, selectedFrame, selectedFrameNumber, frameThreads,
     catalogStatus: authStatus === "unauthenticated"
