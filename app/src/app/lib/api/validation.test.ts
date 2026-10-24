@@ -6,11 +6,20 @@ import {
   validateOtpRequest,
   validateOtpVerification,
   validateProfileUpdate,
+  validateVoteRequest,
 } from "./validation.ts";
 
 test("UUID形式を検証する", () => {
   assert.equal(isUuid("00000000-0000-4000-8000-000000000001"), true);
   assert.equal(isUuid("not-a-uuid"), false);
+});
+
+test("投票値は1から5の整数だけを受け付ける", () => {
+  assert.equal(validateVoteRequest({ value: 1 }).ok, true);
+  assert.equal(validateVoteRequest({ value: 5 }).ok, true);
+  assert.equal(validateVoteRequest({ value: 0 }).ok, false);
+  assert.equal(validateVoteRequest({ value: 3.5 }).ok, false);
+  assert.equal(validateVoteRequest({ value: "3" }).ok, false);
 });
 
 test("電話番号の全角数字と区切り文字を正規化する", () => {

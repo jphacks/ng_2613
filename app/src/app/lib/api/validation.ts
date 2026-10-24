@@ -1,3 +1,5 @@
+import type { VoteValue } from "../votes/types";
+
 export type AuthFlow = "sign-in" | "sign-up";
 export type Gender = "男性" | "女性" | "その他";
 
@@ -22,6 +24,19 @@ export function normalizePhone(value: string) {
 
 export function isUuid(value: string) {
   return uuidPattern.test(value);
+}
+
+export function validateVoteRequest(value: unknown): ValidationResult<{ value: VoteValue }> {
+  if (
+    !isRecord(value)
+    || typeof value.value !== "number"
+    || !Number.isInteger(value.value)
+    || value.value < 1
+    || value.value > 5
+  ) {
+    return { ok: false, fields: { value: "投票値は1から5の整数で指定してください。" } };
+  }
+  return { ok: true, value: { value: value.value as VoteValue } };
 }
 
 export function validateOtpRequest(

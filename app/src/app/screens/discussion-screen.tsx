@@ -35,7 +35,7 @@ export default function DiscussionScreen({
     <article className="question-detail">
       <p className="question-topic">{topicDetail.name}</p>
       <h1>{selectedFrame.question}</h1>
-      <p className="feature-pending">投票機能はPhase 3、スレッド機能はPhase 4で利用可能になります。</p>
+      <p className="feature-pending">投票は設問一覧から行えます。スレッド機能はPhase 4で利用可能になります。</p>
     </article>
   </section>;
 }

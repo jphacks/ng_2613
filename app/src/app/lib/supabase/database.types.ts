@@ -75,6 +75,25 @@ export type Database = {
         Update: never;
         Relationships: [];
       };
+      votes: {
+        Row: {
+          id: string;
+          frame_id: string;
+          user_id: string;
+          value: number;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          frame_id: string;
+          user_id: string;
+          value: number;
+        };
+        Update: {
+          value?: number;
+        };
+        Relationships: [];
+      };
       users: {
         Row: {
           id: string;
@@ -107,7 +126,20 @@ export type Database = {
       };
     };
     Views: Record<string, never>;
-    Functions: Record<string, never>;
+    Functions: {
+      get_frame_vote_counts: {
+        Args: { target_frame_id: string };
+        Returns: {
+          frame_id: string;
+          count_1: number;
+          count_2: number;
+          count_3: number;
+          count_4: number;
+          count_5: number;
+          total_count: number;
+        }[];
+      };
+    };
     Enums: Record<string, never>;
     CompositeTypes: Record<string, never>;
   };

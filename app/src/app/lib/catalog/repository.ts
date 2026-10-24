@@ -1,6 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "../supabase/database.types";
 import type { Catalog, CatalogGenre, TopicDetail, TopicPeriod } from "./types";
+import { getFrameVoteStates, VoteRepositoryError } from "../votes/repository.ts";
 
 type GenreRow = Database["public"]["Tables"]["genres"]["Row"];
 type MiddleTopicRow = Database["public"]["Tables"]["middle_topics"]["Row"];
@@ -83,7 +84,12 @@ export async function getCatalog(client: SupabaseClient<Database>): Promise<Cata
   return buildCatalog(genresResult.data, middleTopicsResult.data, topicsResult.data);
 }
 
-function buildPeriods(periods: PeriodRow[], frames: FrameRow[]): TopicPeriod[] {
+function buildPeriods(
+  periods: PeriodRow[],
+  frames: FrameRow[],
+  voteStates: Awaited<ReturnType<typeof getFrameVoteStates>>,
+  topicStatus: TopicRow["status"],
+): TopicPeriod[] {
   const framesByPeriod = new Map<string, FrameRow[]>();
   for (const frame of frames) {
     const group = framesByPeriod.get(frame.period_id) ?? [];
@@ -110,6 +116,20 @@ function buildPeriods(periods: PeriodRow[], frames: FrameRow[]): TopicPeriod[] {
           id: frame.id,
           question: frame.question,
           sortOrder: frame.sort_order,
+          vote: {
+            ...(voteStates.get(frame.id) ?? {
+              counts: [0, 0, 0, 0, 0] as [number, number, number, number, number],
+              totalCount: 0,
+              myValue: null,
+              canChange: true,
+              canChangeAt: null,
+            }),
+            votingOpen:
+              topicStatus === "open"
+              && period.status === "active"
+              && period.start_date <= new Date().toISOString().slice(0, 10)
+              && new Date().toISOString().slice(0, 10) <= period.end_date,
+          },
         })),
     }));
 }
@@ -117,6 +137,7 @@ function buildPeriods(periods: PeriodRow[], frames: FrameRow[]): TopicPeriod[] {
 export async function getTopicDetail(
   client: SupabaseClient<Database>,
   topicId: string,
+  userId: string,
 ): Promise<TopicDetail | null> {
   const { data: topic, error: topicError } = await client
     .from("topics")
@@ -165,6 +186,20 @@ export async function getTopicDetail(
     periods = periodsResult.data;
   }
 
+  let voteStates: Awaited<ReturnType<typeof getFrameVoteStates>>;
+  try {
+    voteStates = await getFrameVoteStates(
+      client,
+      framesResult.data.map((frame) => frame.id),
+      userId,
+    );
+  } catch (error) {
+    if (error instanceof VoteRepositoryError) {
+      throw new CatalogRepositoryError(error.message);
+    }
+    throw error;
+  }
+
   return {
     id: topic.id,
     name: topic.name,
@@ -175,6 +210,6 @@ export async function getTopicDetail(
       name: middleTopic.name,
       genre: { id: genreResult.data.id, name: genreResult.data.name },
     },
-    periods: buildPeriods(periods, framesResult.data),
+    periods: buildPeriods(periods, framesResult.data, voteStates, topic.status),
   };
 }

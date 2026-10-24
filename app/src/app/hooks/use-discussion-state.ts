@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import type { Catalog, CatalogTopic, TopicDetail } from "../lib/catalog/types";
 import { screens, type Screen } from "../lib/demo-data";
+import type { FrameVoteState, VoteValue } from "../lib/votes/types";
 
 type AuthStatus = "loading" | "authenticated" | "unauthenticated";
 export type DataStatus = "idle" | "loading" | "success" | "empty" | "unauthenticated" | "error";
@@ -102,6 +103,8 @@ export function useDiscussionState() {
   const [topicStatus, setTopicStatus] = useState<DataStatus>("idle");
   const [topicError, setTopicError] = useState("");
   const [topicAttempt, setTopicAttempt] = useState(0);
+  const [voteSubmittingFrameId, setVoteSubmittingFrameId] = useState<string | null>(null);
+  const [voteErrors, setVoteErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
     const syncScreen = () => {
@@ -306,6 +309,40 @@ export function useDiscussionState() {
     setHash("discussion", { ...selection, frameId });
   }
 
+  async function submitVote(frameId: string, value: VoteValue) {
+    if (voteSubmittingFrameId) return false;
+    setVoteSubmittingFrameId(frameId);
+    setVoteErrors((current) => ({ ...current, [frameId]: "" }));
+    try {
+      const voteState = await requestApi<FrameVoteState>(
+        `/api/frames/${encodeURIComponent(frameId)}/vote`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ value }),
+        },
+      );
+      setTopicDetail((current) => current ? {
+        ...current,
+        periods: current.periods.map((period) => ({
+          ...period,
+          frames: period.frames.map((frame) =>
+            frame.id === frameId ? { ...frame, vote: voteState } : frame,
+          ),
+        })),
+      } : current);
+      return true;
+    } catch (error) {
+      setVoteErrors((current) => ({
+        ...current,
+        [frameId]: error instanceof Error ? error.message : "投票に失敗しました。",
+      }));
+      return false;
+    } finally {
+      setVoteSubmittingFrameId(null);
+    }
+  }
+
   async function submitAccount(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setAccountSubmitting(true);
@@ -401,6 +438,7 @@ export function useDiscussionState() {
       ? "unauthenticated" as const
       : topicStatus,
     topicError, searchResults, selectGenre, selectMiddleTopic, selectTopic, selectFrame,
+    voteSubmittingFrameId, voteErrors, submitVote,
     retryCatalog: () => {
       setCatalogStatus("loading");
       setCatalogError("");

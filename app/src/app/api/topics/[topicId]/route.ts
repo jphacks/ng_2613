@@ -21,7 +21,7 @@ export async function GET(_request: Request, context: TopicRouteContext) {
       return failure("UNAUTHENTICATED", "ログインが必要です。", 401);
     }
 
-    const topic = await getTopicDetail(supabase, topicId);
+    const topic = await getTopicDetail(supabase, topicId, user.id);
     if (!topic) {
       return failure("TOPIC_NOT_FOUND", "指定されたトピックは見つかりません。", 404);
     }

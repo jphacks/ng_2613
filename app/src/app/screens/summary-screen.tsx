@@ -5,7 +5,15 @@ import "./summary-screen.css";
 
 type Props = Pick<
   DiscussionState,
-  "topicDetail" | "topicStatus" | "topicError" | "retryTopic" | "navigate" | "selectFrame"
+  | "topicDetail"
+  | "topicStatus"
+  | "topicError"
+  | "retryTopic"
+  | "navigate"
+  | "selectFrame"
+  | "voteSubmittingFrameId"
+  | "voteErrors"
+  | "submitVote"
 >;
 const colors = ["cream", "white", "blue"];
 
@@ -16,6 +24,9 @@ export default function SummaryScreen({
   retryTopic,
   navigate,
   selectFrame,
+  voteSubmittingFrameId,
+  voteErrors,
+  submitVote,
 }: Props) {
   if (topicStatus !== "success" || !topicDetail) {
     return <DataState
@@ -43,6 +54,11 @@ export default function SummaryScreen({
           color={colors[(questionNumber - 1) % colors.length]}
           questionNumber={questionNumber}
           question={frame.question}
+          frameId={frame.id}
+          vote={frame.vote}
+          submitting={voteSubmittingFrameId === frame.id}
+          error={voteErrors[frame.id] ?? ""}
+          onVote={submitVote}
           onDetail={() => selectFrame(frame.id)}
         />;
       })}

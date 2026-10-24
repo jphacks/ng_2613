@@ -12,7 +12,7 @@ export default function AppMenu({ navigate, setMenuOpen, authStatus, signOut, ac
       <button onClick={() => navigate("login")}>ログイン</button>
       <button onClick={() => navigate("register")}>新規登録</button>
     </>}
-    <button disabled>動画・投票（準備中）</button>
+    <button disabled>動画（準備中）</button>
     <button onClick={() => navigate("home")}>ホームへ</button>
     </nav>
     </>);

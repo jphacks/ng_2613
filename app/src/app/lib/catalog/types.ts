@@ -1,3 +1,5 @@
+import type { FrameVoteState } from "../votes/types";
+
 export type CatalogTopic = {
   id: string;
   name: string;
@@ -30,6 +32,7 @@ export type TopicFrame = {
   id: string;
   question: string;
   sortOrder: number | null;
+  vote: FrameVoteState;
 };
 
 export type TopicPeriod = {

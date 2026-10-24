@@ -139,6 +139,12 @@
 .summary-vote:disabled { opacity:.55; cursor:not-allowed }
 .summary-detail { border:1px solid var(--line); background:white; color:var(--ink) }
 .summary-pending { padding:24px 16px; border-radius:11px; background:#fff9; color:#666; font-size:13px; line-height:1.8 }
+.vote-results { padding:14px 16px; border-radius:11px; background:#fff9; color:#555; font-size:12px }
+.vote-result-row { display:grid; grid-template-columns:12px 1fr auto; align-items:center; gap:7px; margin-bottom:6px }
+.vote-result-key { width:10px; height:10px; border-radius:50% }
+.vote-results > p { margin-top:8px }
+.vote-error { color:#b42318; font-size:12px; line-height:1.5; text-align:center }
+.vote-submit { width:100%; min-height:44px; margin-top:14px; font-size:16px }
 .topic-description { padding:10px 4px; color:#555; line-height:1.6 }
 .period-group { display:flex; flex-direction:column; gap:14px }
 .period-heading { margin:6px 4px 0; font-size:14px; font-weight:400; color:#666 }
