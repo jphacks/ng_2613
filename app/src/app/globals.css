@@ -8,6 +8,14 @@
   --pale-blue: #d8e8ef;
   --pale-pink: #f6cdd6;
   --cream: #fafaf0;
+  /* 手ざわりの共通値。色は変えず、影・動き・押し込みだけをそろえる */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --duration-fast: 120ms;
+  --duration: 200ms;
+  --shadow-sm: 0 1px 2px #4645540f;
+  --shadow-md: 0 2px 4px #46455408, 0 6px 16px #4645541a;
+  --shadow-lg: 0 12px 32px #4645542e;
+  --ring: 0 0 0 3px #299ded33;
 }
 
 * {
@@ -20,6 +28,17 @@ body {
   color: #080808;
   font-family: Arial, "Noto Sans JP", sans-serif;
   font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+}
+
+h1,
+h2 {
+  text-wrap: balance;
+}
+
+p {
+  text-wrap: pretty;
 }
 
 button,
@@ -31,6 +50,32 @@ select {
 button {
   cursor: pointer;
   color: inherit;
+  transition:
+    background-color var(--duration) var(--ease-out),
+    border-color var(--duration) var(--ease-out),
+    color var(--duration) var(--ease-out),
+    box-shadow var(--duration) var(--ease-out),
+    transform var(--duration-fast) var(--ease-out),
+    opacity var(--duration) var(--ease-out),
+    filter var(--duration) var(--ease-out);
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
+input,
+select,
+textarea {
+  transition:
+    border-color var(--duration) var(--ease-out),
+    box-shadow var(--duration) var(--ease-out);
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  box-shadow: var(--ring);
 }
 
 button {
@@ -61,8 +106,48 @@ h1 {
   font-weight: 400;
 }
 
-button:hover {
-  filter: brightness(0.97);
+/* タッチ端末でホバーが押しっぱなしに見えないよう、ホバーできる端末だけに付ける */
+@media (hover: hover) {
+  button:hover:not(:disabled) {
+    filter: brightness(0.97);
+  }
+}
+
+/* 押した瞬間にわずかに沈ませて、タップが効いたことを伝える */
+.press:active:not(:disabled),
+.primary:active:not(:disabled),
+.secondary:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+  }
 }
 
 .app-layout {
@@ -196,6 +281,7 @@ button:hover {
 .primary {
   background: var(--ink);
   color: #fff;
+  box-shadow: var(--shadow-sm);
 }
 
 .secondary {
@@ -204,13 +290,27 @@ button:hover {
   color: var(--ink);
 }
 
+@media (hover: hover) {
+  .primary:hover:not(:disabled),
+  .secondary:hover:not(:disabled) {
+    box-shadow: var(--shadow-md);
+  }
+}
+
+.primary:disabled,
+.secondary:disabled {
+  opacity: 0.6;
+}
+
 .notice {
   margin: 10px;
-  padding: 10px;
+  padding: 10px 12px;
   border: 1px solid #c6d9e2;
-  border-radius: 8px;
+  border-radius: 10px;
   background: #edf7fb;
   font-size: 14px;
+  line-height: 1.6;
+  animation: rise-in var(--duration) var(--ease-out);
 }
 
 @media (min-width: 600px) {

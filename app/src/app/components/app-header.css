@@ -181,3 +181,14 @@
   padding-left:0
 }
 }
+
+/* --- 手ざわり --- */
+.search-wrap input:focus { border-color:#299ded }
+.search-results { border-radius:12px; overflow:hidden; box-shadow:var(--shadow-lg); animation:pop-in var(--duration) var(--ease-out); transform-origin:top center }
+.search-results button { padding:10px 12px; line-height:1.4 }
+.search-results button + button { border-top:1px solid #e6e6e6 }
+@media (hover:hover) {
+  .search-results button:hover { background:#ebebeb; filter:none }
+}
+.search-results p { color:#777; text-align:center }
+.breadcrumbs button:active { transform:scale(.96) }
