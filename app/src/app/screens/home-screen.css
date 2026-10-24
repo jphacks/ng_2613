@@ -14,7 +14,9 @@
   align-items:center;
   flex-direction:column;
   gap:15px;
-  font-size:15px
+  font-size:15px;
+  /* 和文フォントが細めなので、選ぶ項目は本文より少し太くする */
+  font-weight:500
 }
 
 .topic-tile img {
