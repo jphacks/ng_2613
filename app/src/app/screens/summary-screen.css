@@ -136,21 +136,10 @@
 .summary-buttons { display:flex; gap:8px; margin-left:auto }
 .summary-buttons button { min-width:56px; min-height:26px; border-radius:20px; font-size:11px; padding:4px 12px }
 .summary-vote { background:var(--ink); color:white }
-.summary-vote:disabled { opacity:.55; cursor:not-allowed }
 .summary-detail { border:1px solid var(--line); background:white; color:var(--ink) }
-.summary-pending { padding:24px 16px; border-radius:11px; background:#fff9; color:#666; font-size:13px; line-height:1.8 }
-.vote-results { padding:14px 16px; border-radius:11px; background:#fff9; color:#555; font-size:12px }
-.vote-result-row { display:grid; grid-template-columns:12px 1fr auto; align-items:center; gap:7px; margin-bottom:6px }
-.vote-result-key { width:10px; height:10px; border-radius:50% }
-.vote-results > p { margin-top:8px }
-.vote-error { color:#b42318; font-size:12px; line-height:1.5; text-align:center }
-.vote-submit { width:100%; min-height:44px; margin-top:14px; font-size:16px }
-.topic-description { padding:10px 4px; color:#555; line-height:1.6 }
-.period-group { display:flex; flex-direction:column; gap:14px }
-.period-heading { margin:6px 4px 0; font-size:14px; font-weight:400; color:#666 }
-.period-heading span { margin-left:8px; padding:2px 7px; border:1px solid #aaa; border-radius:10px; font-size:10px }
 .summary-content { gap:16px }
-.summary-content table { flex:1; min-width:0 }
+.summary-content table { flex:1; min-width:0; table-layout:fixed }
+.summary-content td button { padding:0 6px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap }
 .summary-toggle { display:block; margin:16px 0 0 auto; padding:6px 2px; font-size:11px }
 .demographic-note { margin:22px 0 14px; color:var(--ink); font-size:11px }
 .demographic-charts { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:20px }

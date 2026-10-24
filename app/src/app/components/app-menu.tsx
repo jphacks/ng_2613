@@ -1,12 +1,12 @@
 import type { DiscussionState } from "../hooks/use-discussion-state";
 import "./app-menu.css";
 
-type Props = Pick<DiscussionState, "navigate" | "setMenuOpen" | "authStatus" | "signOut" | "accountSubmitting"> & {
+type Props = Pick<DiscussionState, "navigate" | "setMenuOpen" | "authStatus" | "signOut" | "accountSubmitting" | "selectedFrame"> & {
   persistent?: boolean;
 };
 
 export default function AppMenu({
-  navigate, setMenuOpen, authStatus, signOut, accountSubmitting, persistent = false,
+  navigate, setMenuOpen, authStatus, signOut, accountSubmitting, selectedFrame, persistent = false,
 }: Props) {
   return <>
     {!persistent && <button className="menu-scrim" aria-label="メニューを閉じる" onClick={() => setMenuOpen(false)} />}
@@ -18,7 +18,7 @@ export default function AppMenu({
         <button onClick={() => navigate("login")}>ログイン</button>
         <button onClick={() => navigate("register")}>新規登録</button>
       </>}
-      <button disabled>動画（準備中）</button>
+      <button disabled={!selectedFrame} onClick={() => navigate("video")}>動画・投票</button>
       <button onClick={() => navigate("home")}>ホームへ</button>
     </nav>
   </>;

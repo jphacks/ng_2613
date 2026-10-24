@@ -1,94 +1,57 @@
-"use client";
-
-import { useState, type FormEvent } from "react";
+import { useState } from "react";
 import DataState from "../components/data-state";
 import { DictionaryText } from "../components/dictionary";
 import type { DiscussionState } from "../hooks/use-discussion-state";
-import { avatarColors, usernameInitial } from "../lib/avatar";
-import type { PostStance } from "../lib/threads/types";
+import type { PostAuthor, PostStance } from "../lib/threads/types";
 import "./thread-screen.css";
-
-type Props = Pick<DiscussionState,
-  | "threadDetail" | "threadDetailStatus" | "threadDetailError" | "retryThreadDetail"
-  | "commentSubmitting" | "commentSubmitError" | "submitComment" | "navigate"
->;
-
+import { avatarColors, usernameInitial } from "../lib/avatar";
+type Message = { id: string; body: string; stance: PostStance | null; author: PostAuthor };
+type ThreadViewProps = Pick<DiscussionState, "profile" | "selectedFrame" | "selectedFrameNumber"> & {
+    messages: Message[];
+    submitting: boolean;
+    error: string;
+    onSend: (text: string, stance: PostStance) => Promise<boolean>;
+};
+type Props = Pick<DiscussionState, "profile" | "selectedFrame" | "selectedFrameNumber" | "navigate" | "threadDetail" | "threadDetailStatus" | "threadDetailError" | "retryThreadDetail" | "commentSubmitting" | "commentSubmitError" | "submitComment">;
+// 同じ人は常に同じ色になるよう、ユーザー ID から色を決める。
 function avatarColor(id: string) {
-  const total = Array.from(id).reduce((sum, character) => sum + character.codePointAt(0)!, 0);
-  return avatarColors[total % avatarColors.length];
+    const total = Array.from(id).reduce((sum, character) => sum + character.codePointAt(0)!, 0);
+    return avatarColors[total % avatarColors.length];
 }
-
-export default function ThreadScreen(props: Props) {
-  const [message, setMessage] = useState("");
-  const [stance, setStance] = useState<PostStance>("agree");
-
-  if (props.threadDetailStatus !== "success" || !props.threadDetail) {
-    return <DataState
-      status={props.threadDetailStatus}
-      error={props.threadDetailError}
-      emptyMessage="スレッドが見つかりません。"
-      onRetry={props.retryThreadDetail}
-      onLogin={() => props.navigate("login")}
-    />;
-  }
-
-  async function submit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    if (await props.submitComment({ body: message, stance })) setMessage("");
-  }
-
-  const thread = props.threadDetail;
-  return <section className="thread">
-    <article className={`thread-body ${thread.stance}`}>
-      <h1>{thread.title}</h1>
-      <p>{thread.body}</p>
-      <small>{thread.author.username}・{new Date(thread.createdAt).toLocaleString("ja-JP")}</small>
-    </article>
+export function ThreadView({ profile, selectedFrame, selectedFrameNumber, messages, submitting, error, onSend }: ThreadViewProps) {
+    const [message, setMessage] = useState("");
+    const [stance, setStance] = useState("賛成");
+    return (<section className="thread">
+    {selectedFrame && <h1>Q{selectedFrameNumber}. {selectedFrame.question}</h1>}
     <div className="message-list">
-      {thread.comments.length === 0 && <p className="thread-empty">まだコメントはありません。</p>}
-      {thread.comments.map((comment) => <article className="message-row" key={comment.id}>
-        <span
-          className="sender-avatar"
-          style={{ backgroundColor: avatarColor(comment.author.id) }}
-          role="img"
-          aria-label={`${comment.author.username}のアイコン`}
-        >{usernameInitial(comment.author.username)}</span>
-        <div className="message-content">
-          <span className="sender-name">{comment.author.username}</span>
-          <div className={`bubble ${comment.stance ?? ""}`}>
-            <p><DictionaryText>{comment.body}</DictionaryText></p>
-            <small>{new Date(comment.createdAt).toLocaleString("ja-JP")}</small>
-          </div>
-        </div>
-      </article>)}
-    </div>
-    <button className="definition" onClick={() => props.navigate("video")}>
-      <span>解説動画</span>
-      <small>設問を動画で確認する</small>
-    </button>
-    <form className="composer" onSubmit={(event) => void submit(event)}>
-      <div className="stance-switch">
-        {(["agree", "disagree"] as const).map((value) => <button
-          type="button"
-          key={value}
-          className={stance === value ? `selected ${value}` : ""}
-          aria-pressed={stance === value}
-          onClick={() => setStance(value)}
-        >{value === "agree" ? "賛成" : "反対"}</button>)}
-      </div>
-      <input
-        aria-label="コメントを入力"
-        maxLength={2000}
-        value={message}
-        onChange={(event) => setMessage(event.target.value)}
-        required
-      />
-      <button className="send" aria-label="コメントを送信" disabled={props.commentSubmitting}>
-        <svg viewBox="0 0 24 24" width="33" height="33" fill="currentColor" aria-hidden="true">
-          <path d="M2.01 21 23 12 2.01 3 2 10l15 2-15 2z" />
+    {messages.map(item => {
+        const own = item.author.id === profile.id;
+        return <div key={item.id} className={`message-row${own ? " own" : ""}`}>
+            <span className="sender-avatar" style={{ backgroundColor: avatarColor(item.author.id) }} role="img" aria-label={`${item.author.username}のアイコン`}>{usernameInitial(item.author.username)}</span>
+            <div className="message-content">
+                <span className="sender-name">{item.author.username}</span>
+                <p className={`bubble ${item.stance ?? ""}`}><DictionaryText>{item.body}</DictionaryText></p>
+            </div>
+        </div>;
+    })}</div>
+    <form className="composer" onSubmit={async event => { event.preventDefault(); if (message.trim() && !submitting) {
+        if (await onSend(message.trim(), stance === "賛成" ? "agree" : "disagree")) setMessage("");
+    } }}>
+    <div className="stance-switch">{["賛成", "反対"].map(label => <button type="button" key={label} className={stance === label ? `selected ${label === "賛成" ? "agree" : "disagree"}` : ""} aria-pressed={stance === label} onClick={() => setStance(label)}>{label}</button>)}</div>
+    <input aria-label="意見を入力" value={message} onChange={event => setMessage(event.target.value)} required/>
+    <button className="send" aria-label="意見を送信" type="submit" disabled={submitting}>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="33" height="33" fill="currentColor" aria-hidden="true" focusable="false">
+            <path d="M2.01 21 23 12 2.01 3 2 10l15 2-15 2z" />
         </svg>
-      </button>
-      {props.commentSubmitError && <p className="composer-error" role="alert">{props.commentSubmitError}</p>}
+    </button>
+    {error && <p className="composer-error" role="alert">{error}</p>}
     </form>
-  </section>;
+    </section>);
+}
+export default function ThreadScreen(props: Props) {
+    if (props.threadDetailStatus !== "success" || !props.threadDetail) {
+        return <DataState status={props.threadDetailStatus} error={props.threadDetailError} emptyMessage="スレッドが見つかりません。" onRetry={props.retryThreadDetail} onLogin={() => props.navigate("login")}/>;
+    }
+    const thread = props.threadDetail;
+    return <ThreadView profile={props.profile} selectedFrame={props.selectedFrame} selectedFrameNumber={props.selectedFrameNumber} messages={[{ id: thread.id, body: thread.body, stance: thread.stance, author: thread.author }, ...thread.comments]} submitting={props.commentSubmitting} error={props.commentSubmitError} onSend={(body, stance) => props.submitComment({ body, stance })} />;
 }

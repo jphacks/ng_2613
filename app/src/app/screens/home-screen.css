@@ -24,18 +24,6 @@
   object-fit:contain
 }
 
-.topic-image-placeholder {
-  width:150px;
-  height:150px;
-  max-width:100%;
-  display:grid;
-  place-items:center;
-  border-radius:50%;
-  background:#eef3f5;
-  color:var(--blue);
-  font-size:52px
-}
-
 @media(max-width:390px) {
 .topic-grid {
   --topic-column-gap:25px
@@ -47,4 +35,12 @@
   --topic-column-gap:22px;
   padding-inline:18px
 }
+}
+
+.topic-image-placeholder {
+  width:150px;
+  height:150px;
+  max-width:100%;
+  border-radius:50%;
+  background:#eef3f5
 }
