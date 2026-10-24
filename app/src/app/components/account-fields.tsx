@@ -3,10 +3,11 @@ import "./account-form.css";
 
 type Props = Pick<DiscussionState, "profile"> & {
   mode: "login" | "register" | "profile";
+  otpSent?: boolean;
 };
 
 // 入力欄のみ共用し、フォーム送信・レイアウト・ボタンは各画面で管理する。
-export default function AccountFields({ mode, profile }: Props) {
+export default function AccountFields({ mode, profile, otpSent = false }: Props) {
   const isLogin = mode === "login";
   const isProfile = mode === "profile";
 
@@ -19,24 +20,28 @@ export default function AccountFields({ mode, profile }: Props) {
           aria-label="電話番号"
           type="tel"
           autoComplete="tel"
-          placeholder={isLogin ? "電話番号" : ""}
-          defaultValue={isProfile ? profile.phone : ""}
+          placeholder={isLogin ? "+819012345678" : ""}
+          defaultValue={profile.phone}
           required
-          pattern="[0-9０-９+\- ()]{10,15}"
+          readOnly={isProfile || otpSent}
+          pattern="\+[0-9０-９\- ()]{8,18}"
         />
       </label>
-      <label className="account-field">
-        {!isLogin && <span>パスワード</span>}
-        <input
-          name="password"
-          aria-label="パスワード"
-          type="password"
-          autoComplete={mode === "register" ? "new-password" : "current-password"}
-          placeholder={isLogin ? "パスワード" : ""}
-          required={!isProfile}
-          minLength={8}
-        />
-      </label>
+      {otpSent && !isProfile && (
+        <label className="account-field">
+          <span>認証コード</span>
+          <input
+            name="token"
+            aria-label="SMS認証コード"
+            inputMode="numeric"
+            autoComplete="one-time-code"
+            pattern="[0-9０-９]{6}"
+            maxLength={6}
+            placeholder="6桁のコード"
+            required
+          />
+        </label>
+      )}
       {!isLogin && (
         <>
           <fieldset className="gender-field">
@@ -63,7 +68,7 @@ export default function AccountFields({ mode, profile }: Props) {
               required
             >
               <option value="" disabled />
-              {Array.from({ length: 127 }, (_, index) => 2026 - index).map((year) => (
+              {Array.from({ length: new Date().getFullYear() - 1899 }, (_, index) => new Date().getFullYear() - index).map((year) => (
                 <option value={year} key={year}>{year}年</option>
               ))}
             </select>

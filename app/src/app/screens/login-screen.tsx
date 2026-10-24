@@ -2,22 +2,24 @@ import AccountFields from "../components/account-fields";
 import type { DiscussionState } from "../hooks/use-discussion-state";
 import "./login-screen.css";
 
-type Props = Pick<DiscussionState, "profile" | "navigate" | "submitAccount" | "setNotice">;
+type Props = Pick<DiscussionState, "profile" | "navigate" | "submitAccount" | "otpSent" | "accountSubmitting" | "accountError">;
 
-export default function LoginScreen({ profile, navigate, submitAccount, setNotice }: Props) {
+export default function LoginScreen({ profile, navigate, submitAccount, otpSent, accountSubmitting, accountError }: Props) {
   return (
     <section className="account-screen login-screen">
       <div className="avatar-placeholder" />
       <h1>ログイン</h1>
       <form onSubmit={submitAccount}>
-        <AccountFields mode="login" profile={profile} />
+        <AccountFields mode="login" profile={profile} otpSent={otpSent} />
+        {accountError && <p className="account-error" role="alert">{accountError}</p>}
         <div className="account-actions">
-          <button className="primary" type="submit">ログイン</button>
+          <button className="primary" type="submit" disabled={accountSubmitting}>
+            {accountSubmitting ? "処理中…" : otpSent ? "コードを確認" : "SMSを送信"}
+          </button>
         </div>
       </form>
       <div className="login-links">
         <button onClick={() => navigate("register")}>新規登録はこちら</button>
-        <button onClick={() => setNotice("パスワード再設定はデモでは利用できません。")}>パスワードを忘れた方</button>
       </div>
     </section>
   );

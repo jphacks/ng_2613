@@ -1,15 +1,18 @@
 import AccountFields from "../components/account-fields";
 import type { DiscussionState } from "../hooks/use-discussion-state";
 
-type Props = Pick<DiscussionState, "profile" | "submitAccount">;
+type Props = Pick<DiscussionState, "profile" | "submitAccount" | "otpSent" | "accountSubmitting" | "accountError">;
 
-export default function RegisterScreen({ profile, submitAccount }: Props) {
+export default function RegisterScreen({ profile, submitAccount, otpSent, accountSubmitting, accountError }: Props) {
   return (
     <section className="account-screen">
       <form onSubmit={submitAccount}>
-        <AccountFields mode="register" profile={profile} />
+        <AccountFields mode="register" profile={profile} otpSent={otpSent} />
+        {accountError && <p className="account-error" role="alert">{accountError}</p>}
         <div className="account-actions">
-          <button className="primary" type="submit">新規登録</button>
+          <button className="primary" type="submit" disabled={accountSubmitting}>
+            {accountSubmitting ? "処理中…" : otpSent ? "コードを確認" : "SMSを送信"}
+          </button>
         </div>
       </form>
     </section>

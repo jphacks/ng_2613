@@ -29,6 +29,30 @@
   color:#cecece
 }
 
+.account-field input[readonly] {
+  background:#f3f3f3;
+  color:#666
+}
+
+.account-error {
+  color:#b42318;
+  font-size:14px;
+  line-height:1.5;
+  margin-top:18px
+}
+
+.account-help {
+  color:#666;
+  font-size:12px;
+  line-height:1.5;
+  margin-top:-20px
+}
+
+.account-actions button:disabled {
+  cursor:wait;
+  opacity:.65
+}
+
 .gender-field {
   border:0;
   margin:30px 0 53px;
