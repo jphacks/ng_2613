@@ -14,9 +14,21 @@
 }
 
 .brand {
-  font-size:16px;
+  display:inline-flex;
+  align-items:center;
+  flex-shrink:0;
+  font-size:25px;
+  font-weight:800;
+  letter-spacing:-1px;
+  color:#3e3e50;
   white-space:nowrap;
   text-align:left
+}
+
+.brand-mark {
+  width:30px;
+  height:auto;
+  margin-right:-2px;
 }
 
 .menu-button {
