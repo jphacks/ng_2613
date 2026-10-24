@@ -11,6 +11,10 @@ const DictionaryContext = createContext<(term: string, anchor: HTMLElement) => v
 type Popover = { term: string; definition: string; top: number; left: number; placement: "below" | "above" };
 
 const lensSize = 48;
+// 虫眼鏡の下に出す一言の高さ。画面からはみ出さないよう位置の計算に含める
+const captionHeight = 30;
+// 一言は虫眼鏡より横に広く、左右に少しはみ出す。その分も画面内に収める
+const captionOverhang = 18;
 const margin = 8;
 // 解説の吹き出しの幅。画面の端からはみ出さないよう位置の計算にも使う
 const popoverWidth = 220;
@@ -49,7 +53,6 @@ function popoverFor(term: string, anchor: HTMLElement): Popover | null {
 // visible が false のあいだは虫眼鏡を出さない。
 export function DictionaryProvider({ children, visible = true }: { children: ReactNode; visible?: boolean }) {
   const [popover, setPopover] = useState<Popover | null>(null);
-  const [hint, setHint] = useState(false);
   const lensRef = useRef<HTMLButtonElement>(null);
   const popoverRef = useRef<HTMLDivElement>(null);
   const positionRef = useRef<{ x: number; y: number } | null>(null);
@@ -61,10 +64,11 @@ export function DictionaryProvider({ children, visible = true }: { children: Rea
   function moveLens(x: number, y: number) {
     const lens = lensRef.current;
     if (!lens) return;
-    const maxX = Math.max(margin, window.innerWidth - lensSize - margin);
-    const maxY = Math.max(margin, window.innerHeight - lensSize - margin);
-    const clamp = (value: number, max: number) => Math.min(max, Math.max(margin, value));
-    let next = { x: clamp(x, maxX), y: clamp(y, maxY) };
+    const minX = margin + captionOverhang;
+    const maxX = Math.max(minX, window.innerWidth - lensSize - margin - captionOverhang);
+    const maxY = Math.max(margin, window.innerHeight - lensSize - captionHeight - margin);
+    const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
+    let next = { x: clamp(x, minX, maxX), y: clamp(y, margin, maxY) };
     // 置いたまま意見追加ボタンに重ならないよう、近い空き位置へずらす
     const addButton = document.querySelector(".add-opinion")?.getBoundingClientRect();
     if (addButton && !dragRef.current) {
@@ -73,7 +77,8 @@ export function DictionaryProvider({ children, visible = true }: { children: Rea
         const candidates = [
           { x: next.x, y: addButton.top - lensSize - margin },
           { x: addButton.left - lensSize - margin, y: next.y },
-        ].map((point) => ({ x: clamp(point.x, maxX), y: clamp(point.y, maxY) }))
+        ]
+          .map((point) => ({ x: clamp(point.x, minX, maxX), y: clamp(point.y, margin, maxY) }))
           .filter((point) => !overlaps(point));
         if (candidates[0]) next = candidates[0];
       }
@@ -115,13 +120,6 @@ export function DictionaryProvider({ children, visible = true }: { children: Rea
     };
   }, [popover]);
 
-  // 押しただけでは何も起きないと分かりにくいため、使い方を少しだけ表示する
-  useEffect(() => {
-    if (!hint) return;
-    const timer = window.setTimeout(() => setHint(false), 2400);
-    return () => window.clearTimeout(timer);
-  }, [hint]);
-
   function setTarget(next: HTMLElement | null) {
     if (targetRef.current === next) return;
     targetRef.current?.classList.remove("is-targeted");
@@ -130,7 +128,6 @@ export function DictionaryProvider({ children, visible = true }: { children: Rea
   }
 
   function openTerm(term: string, anchor: HTMLElement) {
-    setHint(false);
     setPopover(popoverFor(term, anchor));
   }
 
@@ -163,7 +160,7 @@ export function DictionaryProvider({ children, visible = true }: { children: Rea
         if (draggedRef.current && event.detail !== 0) return;
         checkLensTarget();
         // クリックやキーボードでは虫眼鏡を動かしていないので、元の位置へは戻さない
-        if (!dropOnTerm(false)) setHint(true);
+        dropOnTerm(false);
       }}
       onPointerDown={(event) => {
         if (event.button !== 0) return;
@@ -172,7 +169,6 @@ export function DictionaryProvider({ children, visible = true }: { children: Rea
         draggedRef.current = false;
         restRef.current = positionRef.current;
         setPopover(null);
-        setHint(false);
         dragRef.current = { pointerId: event.pointerId, x: event.clientX - rect.left, y: event.clientY - rect.top, startX: event.clientX, startY: event.clientY };
         event.currentTarget.setPointerCapture(event.pointerId);
       }}
@@ -215,8 +211,8 @@ export function DictionaryProvider({ children, visible = true }: { children: Rea
         <circle cx="20" cy="20" r="14" fill="#fff" stroke="var(--ink)" strokeWidth="3.5" />
         <text x="20" y="20" textAnchor="middle" dominantBaseline="central" fontSize="17" fontWeight="700" fill="var(--ink)">?</text>
       </svg>
+      <span className="dictionary-lens-caption" aria-hidden="true">わからない言葉に<br />移動させよう</span>
     </button>}
-    {visible && hint && <p className="dictionary-hint" role="status">青い言葉に重ねると解説が出ます</p>}
     {popover && <div
       ref={popoverRef}
       className={`dictionary-popover ${popover.placement}`}

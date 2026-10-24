@@ -1,7 +1,7 @@
 /* 虫眼鏡。ドラッグして言葉に重ねると解説を出す */
 .dictionary-lens {
   position: fixed;
-  right: max(16px, calc((100vw - 420px) / 2 + 16px));
+  right: max(34px, calc((100vw - 420px) / 2 + 34px));
   bottom: calc(85px + env(safe-area-inset-bottom));
   z-index: 5;
   display: grid;
@@ -41,18 +41,25 @@
   }
 }
 
-.dictionary-hint {
-  position: fixed;
-  right: max(16px, calc((100vw - 420px) / 2 + 16px));
-  bottom: calc(141px + env(safe-area-inset-bottom));
-  z-index: 5;
-  padding: 6px 10px;
-  border-radius: 8px;
-  background: var(--ink);
-  color: #fff;
-  font-size: 12px;
+/* 使い方の一言。虫眼鏡のボタンの外へはみ出させて真下に置く */
+.dictionary-lens-caption {
+  position: absolute;
+  top: calc(100% + 2px);
+  left: 50%;
+  transform: translateX(-50%);
+  color: var(--ink);
+  font-size: 10px;
+  line-height: 1.35;
+  font-weight: 500;
+  text-align: center;
   white-space: nowrap;
-  animation: rise-in var(--duration) var(--ease-out);
+  text-shadow: 0 0 3px #fff, 0 0 3px #fff;
+  transition: opacity var(--duration) var(--ease-out);
+}
+
+/* ドラッグ中は言葉が見えにくくならないよう隠す */
+.dictionary-lens.is-dragging .dictionary-lens-caption {
+  opacity: 0;
 }
 
 .dictionary-term {
