@@ -1,0 +1,1010 @@
+[
+  {
+    "genre": "お金",
+    "middle_topic": "税金",
+    "topic": "消費税",
+    "question": "消費税率を引き上げるべきか"
+  },
+  {
+    "genre": "お金",
+    "middle_topic": "税金",
+    "topic": "消費税",
+    "question": "食料品の消費税率を下げるべきか"
+  },
+  {
+    "genre": "お金",
+    "middle_topic": "税金",
+    "topic": "所得税",
+    "question": "高所得者の所得税率を引き上げるべきか"
+  },
+  {
+    "genre": "お金",
+    "middle_topic": "税金",
+    "topic": "所得税",
+    "question": "所得税の基礎控除を引き上げるべきか"
+  },
+  {
+    "genre": "お金",
+    "middle_topic": "税金",
+    "topic": "法人税",
+    "question": "法人税率を引き上げるべきか"
+  },
+  {
+    "genre": "お金",
+    "middle_topic": "税金",
+    "topic": "法人税",
+    "question": "賃上げした企業の法人税を優遇すべきか"
+  },
+  {
+    "genre": "お金",
+    "middle_topic": "税金",
+    "topic": "相続税・贈与税",
+    "question": "相続税を強化すべきか"
+  },
+  {
+    "genre": "お金",
+    "middle_topic": "税金",
+    "topic": "相続税・贈与税",
+    "question": "子や孫への贈与の非課税枠を広げるべきか"
+  },
+  {
+    "genre": "お金",
+    "middle_topic": "税金",
+    "topic": "ガソリン税",
+    "question": "ガソリン税を引き下げるべきか"
+  },
+  {
+    "genre": "お金",
+    "middle_topic": "税金",
+    "topic": "インボイス制度",
+    "question": "インボイス制度を廃止すべきか"
+  },
+  {
+    "genre": "お金",
+    "middle_topic": "税金",
+    "topic": "ふるさと納税",
+    "question": "ふるさと納税の制度を続けるべきか"
+  },
+  {
+    "genre": "お金",
+    "middle_topic": "税金",
+    "topic": "ふるさと納税",
+    "question": "返礼品の規制を強めるべきか"
+  },
+  {
+    "genre": "お金",
+    "middle_topic": "物価・賃金",
+    "topic": "物価高対策",
+    "question": "物価高対策は給付より減税で行うべきか"
+  },
+  {
+    "genre": "お金",
+    "middle_topic": "物価・賃金",
+    "topic": "最低賃金",
+    "question": "最低賃金を全国一律にすべきか"
+  },
+  {
+    "genre": "お金",
+    "middle_topic": "物価・賃金",
+    "topic": "最低賃金",
+    "question": "最低賃金の引き上げを加速すべきか"
+  },
+  {
+    "genre": "お金",
+    "middle_topic": "物価・賃金",
+    "topic": "賃上げ",
+    "question": "政府が企業に賃上げを促すべきか"
+  },
+  {
+    "genre": "お金",
+    "middle_topic": "物価・賃金",
+    "topic": "年収の壁",
+    "question": "年収の壁をなくすべきか"
+  },
+  {
+    "genre": "お金",
+    "middle_topic": "物価・賃金",
+    "topic": "社会保険料",
+    "question": "現役世代の社会保険料を下げるべきか"
+  },
+  {
+    "genre": "お金",
+    "middle_topic": "国の財政",
+    "topic": "国の予算",
+    "question": "国の予算規模を縮小すべきか"
+  },
+  {
+    "genre": "お金",
+    "middle_topic": "国の財政",
+    "topic": "国債（国の借金）",
+    "question": "国債の発行を増やしてもよいか"
+  },
+  {
+    "genre": "お金",
+    "middle_topic": "国の財政",
+    "topic": "財政健全化目標",
+    "question": "財政健全化の目標を維持すべきか"
+  },
+  {
+    "genre": "お金",
+    "middle_topic": "国の財政",
+    "topic": "給付金",
+    "question": "給付金には所得制限を設けるべきか"
+  },
+  {
+    "genre": "お金",
+    "middle_topic": "金融・投資",
+    "topic": "金利",
+    "question": "金利の引き上げを進めるべきか"
+  },
+  {
+    "genre": "お金",
+    "middle_topic": "金融・投資",
+    "topic": "NISA・資産形成",
+    "question": "NISAの非課税枠をさらに広げるべきか"
+  },
+  {
+    "genre": "お金",
+    "middle_topic": "金融・投資",
+    "topic": "円安・為替",
+    "question": "円安を止めるために政府が為替介入すべきか"
+  },
+  {
+    "genre": "お金",
+    "middle_topic": "金融・投資",
+    "topic": "暗号資産",
+    "question": "暗号資産の税率を株式と同じにすべきか"
+  },
+  {
+    "genre": "仕事",
+    "middle_topic": "働き方",
+    "topic": "長時間労働",
+    "question": "残業の上限規制を強めるべきか"
+  },
+  {
+    "genre": "仕事",
+    "middle_topic": "働き方",
+    "topic": "副業・兼業",
+    "question": "企業は副業を原則として認めるべきか"
+  },
+  {
+    "genre": "仕事",
+    "middle_topic": "働き方",
+    "topic": "テレワーク",
+    "question": "テレワークを国として推進すべきか"
+  },
+  {
+    "genre": "仕事",
+    "middle_topic": "働き方",
+    "topic": "ハラスメント対策",
+    "question": "カスタマーハラスメントに罰則を設けるべきか"
+  },
+  {
+    "genre": "仕事",
+    "middle_topic": "働き方",
+    "topic": "解雇のルール",
+    "question": "お金を払って解雇する「金銭解決」を認めるべきか"
+  },
+  {
+    "genre": "仕事",
+    "middle_topic": "雇用",
+    "topic": "非正規雇用",
+    "question": "非正規雇用を減らすための規制を強めるべきか"
+  },
+  {
+    "genre": "仕事",
+    "middle_topic": "雇用",
+    "topic": "同一労働同一賃金",
+    "question": "同一労働同一賃金を守らない企業に罰則を設けるべきか"
+  },
+  {
+    "genre": "仕事",
+    "middle_topic": "雇用",
+    "topic": "高齢者の就労",
+    "question": "定年を70歳まで引き上げるべきか"
+  },
+  {
+    "genre": "仕事",
+    "middle_topic": "雇用",
+    "topic": "男女の賃金格差",
+    "question": "男女の賃金差を公表する義務を中小企業にも広げるべきか"
+  },
+  {
+    "genre": "仕事",
+    "middle_topic": "産業政策",
+    "topic": "中小企業支援",
+    "question": "経営が苦しい中小企業への支援を続けるべきか"
+  },
+  {
+    "genre": "仕事",
+    "middle_topic": "産業政策",
+    "topic": "半導体・先端技術",
+    "question": "国が半導体産業に大規模な支援をすべきか"
+  },
+  {
+    "genre": "仕事",
+    "middle_topic": "産業政策",
+    "topic": "AIの規制と活用",
+    "question": "AIの開発や利用を法律で規制すべきか"
+  },
+  {
+    "genre": "仕事",
+    "middle_topic": "産業政策",
+    "topic": "スタートアップ支援",
+    "question": "税金でスタートアップを支援すべきか"
+  },
+  {
+    "genre": "仕事",
+    "middle_topic": "産業政策",
+    "topic": "観光",
+    "question": "外国人観光客をさらに増やすべきか"
+  },
+  {
+    "genre": "仕事",
+    "middle_topic": "農林水産",
+    "topic": "米の価格・生産調整",
+    "question": "米の生産調整をやめて増産すべきか"
+  },
+  {
+    "genre": "仕事",
+    "middle_topic": "農林水産",
+    "topic": "米の価格・生産調整",
+    "question": "米の輸入を増やすべきか"
+  },
+  {
+    "genre": "仕事",
+    "middle_topic": "農林水産",
+    "topic": "食料自給率",
+    "question": "食料自給率の目標を引き上げるべきか"
+  },
+  {
+    "genre": "仕事",
+    "middle_topic": "農林水産",
+    "topic": "農業の担い手",
+    "question": "企業の農業参入を進めるべきか"
+  },
+  {
+    "genre": "仕事",
+    "middle_topic": "農林水産",
+    "topic": "漁業",
+    "question": "漁獲量の規制を強めるべきか"
+  },
+  {
+    "genre": "子ども",
+    "middle_topic": "子育て支援",
+    "topic": "児童手当",
+    "question": "児童手当の支給額を増やすべきか"
+  },
+  {
+    "genre": "子ども",
+    "middle_topic": "子育て支援",
+    "topic": "児童手当",
+    "question": "児童手当に所得制限を設けるべきか"
+  },
+  {
+    "genre": "子ども",
+    "middle_topic": "子育て支援",
+    "topic": "保育園・待機児童",
+    "question": "保育の無償化を0〜2歳児にも広げるべきか"
+  },
+  {
+    "genre": "子ども",
+    "middle_topic": "子育て支援",
+    "topic": "育児休業",
+    "question": "男性の育休取得を義務化すべきか"
+  },
+  {
+    "genre": "子ども",
+    "middle_topic": "子育て支援",
+    "topic": "子育て世帯の負担",
+    "question": "子どもの数に応じて税負担を軽くすべきか"
+  },
+  {
+    "genre": "子ども",
+    "middle_topic": "少子化",
+    "topic": "子ども・子育て支援金",
+    "question": "医療保険料に上乗せする子ども・子育て支援金を続けるべきか"
+  },
+  {
+    "genre": "子ども",
+    "middle_topic": "少子化",
+    "topic": "結婚支援",
+    "question": "国や自治体が結婚支援を行うべきか"
+  },
+  {
+    "genre": "子ども",
+    "middle_topic": "少子化",
+    "topic": "不妊治療の支援",
+    "question": "不妊治療の保険適用を広げるべきか"
+  },
+  {
+    "genre": "子ども",
+    "middle_topic": "学校教育",
+    "topic": "教員不足・教員の働き方",
+    "question": "教員の給与を大幅に引き上げるべきか"
+  },
+  {
+    "genre": "子ども",
+    "middle_topic": "学校教育",
+    "topic": "不登校",
+    "question": "フリースクールに公費で支援すべきか"
+  },
+  {
+    "genre": "子ども",
+    "middle_topic": "学校教育",
+    "topic": "いじめ対策",
+    "question": "重大ないじめは警察への通報を義務化すべきか"
+  },
+  {
+    "genre": "子ども",
+    "middle_topic": "学校教育",
+    "topic": "給食費",
+    "question": "給食費を全国で無償化すべきか"
+  },
+  {
+    "genre": "子ども",
+    "middle_topic": "学校教育",
+    "topic": "部活動の地域移行",
+    "question": "部活動の地域移行を進めるべきか"
+  },
+  {
+    "genre": "子ども",
+    "middle_topic": "学校教育",
+    "topic": "高校の学費",
+    "question": "高校の授業料無償化に所得制限を設けるべきか"
+  },
+  {
+    "genre": "子ども",
+    "middle_topic": "高等教育",
+    "topic": "大学の学費",
+    "question": "大学の学費を無償化すべきか"
+  },
+  {
+    "genre": "子ども",
+    "middle_topic": "高等教育",
+    "topic": "奨学金",
+    "question": "奨学金の返済を減免すべきか"
+  },
+  {
+    "genre": "子ども",
+    "middle_topic": "高等教育",
+    "topic": "大学の統廃合",
+    "question": "定員割れが続く大学の統廃合を進めるべきか"
+  },
+  {
+    "genre": "子ども",
+    "middle_topic": "高等教育",
+    "topic": "研究力",
+    "question": "大学の研究予算を増やすべきか"
+  },
+  {
+    "genre": "健康・福祉",
+    "middle_topic": "年金",
+    "topic": "年金の受給開始年齢",
+    "question": "年金の受給開始年齢を引き上げるべきか"
+  },
+  {
+    "genre": "健康・福祉",
+    "middle_topic": "年金",
+    "topic": "年金額の水準",
+    "question": "年金額を物価の上昇に合わせて増やすべきか"
+  },
+  {
+    "genre": "健康・福祉",
+    "middle_topic": "年金",
+    "topic": "厚生年金の適用拡大",
+    "question": "パートなど短時間で働く人にも厚生年金を広げるべきか"
+  },
+  {
+    "genre": "健康・福祉",
+    "middle_topic": "医療",
+    "topic": "医療費の自己負担",
+    "question": "高齢者の医療費の窓口負担を引き上げるべきか"
+  },
+  {
+    "genre": "健康・福祉",
+    "middle_topic": "医療",
+    "topic": "医師不足・偏在",
+    "question": "医師が働く地域や診療科を規制すべきか"
+  },
+  {
+    "genre": "健康・福祉",
+    "middle_topic": "医療",
+    "topic": "マイナ保険証",
+    "question": "健康保険証をマイナ保険証に一本化すべきか"
+  },
+  {
+    "genre": "健康・福祉",
+    "middle_topic": "医療",
+    "topic": "薬の保険適用範囲",
+    "question": "市販薬と似た薬を保険の対象から外すべきか"
+  },
+  {
+    "genre": "健康・福祉",
+    "middle_topic": "医療",
+    "topic": "尊厳死・安楽死",
+    "question": "安楽死を法律で認めるべきか"
+  },
+  {
+    "genre": "健康・福祉",
+    "middle_topic": "介護",
+    "topic": "介護人材の確保",
+    "question": "介護職の給与を国の負担で引き上げるべきか"
+  },
+  {
+    "genre": "健康・福祉",
+    "middle_topic": "介護",
+    "topic": "介護保険料",
+    "question": "介護保険料を40歳未満からも集めるべきか"
+  },
+  {
+    "genre": "健康・福祉",
+    "middle_topic": "介護",
+    "topic": "家族の介護負担",
+    "question": "家族を介護する人に手当を支給すべきか"
+  },
+  {
+    "genre": "健康・福祉",
+    "middle_topic": "生活支援",
+    "topic": "生活保護",
+    "question": "生活保護の基準額を引き上げるべきか"
+  },
+  {
+    "genre": "健康・福祉",
+    "middle_topic": "生活支援",
+    "topic": "ベーシックインカム",
+    "question": "ベーシックインカムを導入すべきか"
+  },
+  {
+    "genre": "健康・福祉",
+    "middle_topic": "生活支援",
+    "topic": "障害者支援",
+    "question": "企業の障害者雇用の義務割合を引き上げるべきか"
+  },
+  {
+    "genre": "健康・福祉",
+    "middle_topic": "生活支援",
+    "topic": "孤独・孤立対策",
+    "question": "孤独・孤立対策の予算を増やすべきか"
+  },
+  {
+    "genre": "暮らし・地域",
+    "middle_topic": "住まい・交通",
+    "topic": "家賃・住宅価格",
+    "question": "若者向けの家賃補助を作るべきか"
+  },
+  {
+    "genre": "暮らし・地域",
+    "middle_topic": "住まい・交通",
+    "topic": "空き家",
+    "question": "空き家への課税を強めるべきか"
+  },
+  {
+    "genre": "暮らし・地域",
+    "middle_topic": "住まい・交通",
+    "topic": "ライドシェア",
+    "question": "一般ドライバーによるライドシェアを全面的に解禁すべきか"
+  },
+  {
+    "genre": "暮らし・地域",
+    "middle_topic": "住まい・交通",
+    "topic": "地方の公共交通",
+    "question": "赤字のローカル線を税金で維持すべきか"
+  },
+  {
+    "genre": "暮らし・地域",
+    "middle_topic": "住まい・交通",
+    "topic": "高齢者の運転免許",
+    "question": "一定の年齢で運転免許の返納を義務化すべきか"
+  },
+  {
+    "genre": "暮らし・地域",
+    "middle_topic": "地方",
+    "topic": "人口減少と地方創生",
+    "question": "地方への移住者への補助を増やすべきか"
+  },
+  {
+    "genre": "暮らし・地域",
+    "middle_topic": "地方",
+    "topic": "東京一極集中",
+    "question": "首都機能の一部を地方に移すべきか"
+  },
+  {
+    "genre": "暮らし・地域",
+    "middle_topic": "地方",
+    "topic": "自治体の財政",
+    "question": "市町村の合併を進めるべきか"
+  },
+  {
+    "genre": "暮らし・地域",
+    "middle_topic": "地方",
+    "topic": "オーバーツーリズム",
+    "question": "観光客への宿泊税などの負担を広げるべきか"
+  },
+  {
+    "genre": "暮らし・地域",
+    "middle_topic": "地方",
+    "topic": "オーバーツーリズム",
+    "question": "外国人観光客向けの二重価格を認めるべきか"
+  },
+  {
+    "genre": "暮らし・地域",
+    "middle_topic": "防災・復興",
+    "topic": "大規模地震への備え",
+    "question": "防災対策の予算を増やすべきか"
+  },
+  {
+    "genre": "暮らし・地域",
+    "middle_topic": "防災・復興",
+    "topic": "被災地の復興",
+    "question": "人口が減った被災地も元の場所に復興すべきか"
+  },
+  {
+    "genre": "暮らし・地域",
+    "middle_topic": "防災・復興",
+    "topic": "避難所の環境",
+    "question": "避難所の環境基準を法律で義務化すべきか"
+  },
+  {
+    "genre": "暮らし・地域",
+    "middle_topic": "デジタル",
+    "topic": "マイナンバーカード",
+    "question": "マイナンバーカードの取得を義務化すべきか"
+  },
+  {
+    "genre": "暮らし・地域",
+    "middle_topic": "デジタル",
+    "topic": "行政のデジタル化",
+    "question": "行政手続きを原則オンラインにすべきか"
+  },
+  {
+    "genre": "暮らし・地域",
+    "middle_topic": "デジタル",
+    "topic": "個人情報保護",
+    "question": "行政が持つ個人データの活用を進めるべきか"
+  },
+  {
+    "genre": "暮らし・地域",
+    "middle_topic": "デジタル",
+    "topic": "通信インフラ",
+    "question": "携帯電話料金の引き下げを政府が促すべきか"
+  },
+  {
+    "genre": "安全・法律",
+    "middle_topic": "治安",
+    "topic": "闇バイト・特殊詐欺",
+    "question": "捜査のために警察の権限を強めるべきか"
+  },
+  {
+    "genre": "安全・法律",
+    "middle_topic": "治安",
+    "topic": "オンラインカジノ",
+    "question": "海外のオンラインカジノサイトへの接続を遮断すべきか"
+  },
+  {
+    "genre": "安全・法律",
+    "middle_topic": "治安",
+    "topic": "薬物対策",
+    "question": "薬物の使用者には刑罰より治療を優先すべきか"
+  },
+  {
+    "genre": "安全・法律",
+    "middle_topic": "治安",
+    "topic": "防犯カメラ",
+    "question": "街中の防犯カメラに顔認証を使うべきか"
+  },
+  {
+    "genre": "安全・法律",
+    "middle_topic": "司法",
+    "topic": "死刑制度",
+    "question": "死刑制度を維持すべきか"
+  },
+  {
+    "genre": "安全・法律",
+    "middle_topic": "司法",
+    "topic": "再審制度",
+    "question": "再審開始の決定に検察が不服を申し立てることを禁止すべきか"
+  },
+  {
+    "genre": "安全・法律",
+    "middle_topic": "司法",
+    "topic": "取り調べの可視化",
+    "question": "すべての事件で取り調べの録音・録画を義務化すべきか"
+  },
+  {
+    "genre": "安全・法律",
+    "middle_topic": "司法",
+    "topic": "裁判員制度",
+    "question": "裁判員制度を続けるべきか"
+  },
+  {
+    "genre": "安全・法律",
+    "middle_topic": "司法",
+    "topic": "少年法",
+    "question": "少年法の対象年齢を引き下げるべきか"
+  },
+  {
+    "genre": "安全・法律",
+    "middle_topic": "消費者保護",
+    "topic": "悪質商法",
+    "question": "霊感商法などの規制を強めるべきか"
+  },
+  {
+    "genre": "安全・法律",
+    "middle_topic": "消費者保護",
+    "topic": "ネット通販のトラブル",
+    "question": "海外の通販サイトにも日本の規制を適用すべきか"
+  },
+  {
+    "genre": "安全・法律",
+    "middle_topic": "消費者保護",
+    "topic": "食品表示",
+    "question": "食品添加物の表示を厳しくすべきか"
+  },
+  {
+    "genre": "安全・法律",
+    "middle_topic": "人権・多様性",
+    "topic": "選択的夫婦別姓",
+    "question": "選択的夫婦別姓を導入すべきか"
+  },
+  {
+    "genre": "安全・法律",
+    "middle_topic": "人権・多様性",
+    "topic": "同性カップルの婚姻制度",
+    "question": "同性カップルの結婚を法律で認めるべきか"
+  },
+  {
+    "genre": "安全・法律",
+    "middle_topic": "人権・多様性",
+    "topic": "性的少数者の権利",
+    "question": "性的指向や性自認による差別を法律で禁止すべきか"
+  },
+  {
+    "genre": "安全・法律",
+    "middle_topic": "人権・多様性",
+    "topic": "女性の政治参加",
+    "question": "議員の一定割合を女性にするクオータ制を導入すべきか"
+  },
+  {
+    "genre": "安全・法律",
+    "middle_topic": "人権・多様性",
+    "topic": "共同親権",
+    "question": "離婚後の共同親権は父母が合意した場合に限るべきか"
+  },
+  {
+    "genre": "安全・法律",
+    "middle_topic": "人権・多様性",
+    "topic": "SNS上の誹謗中傷",
+    "question": "SNSでの誹謗中傷への罰則をさらに強めるべきか"
+  },
+  {
+    "genre": "国と世界",
+    "middle_topic": "外交",
+    "topic": "日米関係",
+    "question": "日米同盟をさらに強めるべきか"
+  },
+  {
+    "genre": "国と世界",
+    "middle_topic": "外交",
+    "topic": "日中関係",
+    "question": "中国との首脳対話を増やすべきか"
+  },
+  {
+    "genre": "国と世界",
+    "middle_topic": "外交",
+    "topic": "日韓関係",
+    "question": "韓国との協力をさらに深めるべきか"
+  },
+  {
+    "genre": "国と世界",
+    "middle_topic": "外交",
+    "topic": "北朝鮮・拉致問題",
+    "question": "拉致問題の解決を最優先に北朝鮮と交渉すべきか"
+  },
+  {
+    "genre": "国と世界",
+    "middle_topic": "外交",
+    "topic": "ロシア・ウクライナ",
+    "question": "ウクライナへの支援を続けるべきか"
+  },
+  {
+    "genre": "国と世界",
+    "middle_topic": "外交",
+    "topic": "ロシア・ウクライナ",
+    "question": "ロシアへの制裁を続けるべきか"
+  },
+  {
+    "genre": "国と世界",
+    "middle_topic": "外交",
+    "topic": "中東情勢",
+    "question": "中東の紛争地への人道支援を増やすべきか"
+  },
+  {
+    "genre": "国と世界",
+    "middle_topic": "外交",
+    "topic": "ODA（政府開発援助）",
+    "question": "ODAの予算を増やすべきか"
+  },
+  {
+    "genre": "国と世界",
+    "middle_topic": "外交",
+    "topic": "日米の通商・関税",
+    "question": "米国の関税に対抗措置をとるべきか"
+  },
+  {
+    "genre": "国と世界",
+    "middle_topic": "安全保障・防衛",
+    "topic": "防衛費",
+    "question": "防衛費をさらに増やすべきか"
+  },
+  {
+    "genre": "国と世界",
+    "middle_topic": "安全保障・防衛",
+    "topic": "防衛費",
+    "question": "防衛費の財源のために増税すべきか"
+  },
+  {
+    "genre": "国と世界",
+    "middle_topic": "安全保障・防衛",
+    "topic": "自衛隊の活動範囲",
+    "question": "自衛隊の海外での活動範囲を広げるべきか"
+  },
+  {
+    "genre": "国と世界",
+    "middle_topic": "安全保障・防衛",
+    "topic": "非核三原則",
+    "question": "非核三原則を見直すべきか"
+  },
+  {
+    "genre": "国と世界",
+    "middle_topic": "安全保障・防衛",
+    "topic": "在日米軍基地",
+    "question": "沖縄の米軍基地を減らすべきか"
+  },
+  {
+    "genre": "国と世界",
+    "middle_topic": "安全保障・防衛",
+    "topic": "スパイ防止法",
+    "question": "スパイ防止法を作るべきか"
+  },
+  {
+    "genre": "国と世界",
+    "middle_topic": "安全保障・防衛",
+    "topic": "サイバー防衛",
+    "question": "サイバー攻撃を防ぐために政府が通信を監視することを認めるべきか"
+  },
+  {
+    "genre": "国と世界",
+    "middle_topic": "安全保障・防衛",
+    "topic": "防衛装備の輸出",
+    "question": "防衛装備の輸出の制限を緩めるべきか"
+  },
+  {
+    "genre": "国と世界",
+    "middle_topic": "外国人政策",
+    "topic": "外国人労働者の受け入れ",
+    "question": "外国人労働者の受け入れを増やすべきか"
+  },
+  {
+    "genre": "国と世界",
+    "middle_topic": "外国人政策",
+    "topic": "技能実習・育成就労",
+    "question": "外国人労働者の転職の自由を広げるべきか"
+  },
+  {
+    "genre": "国と世界",
+    "middle_topic": "外国人政策",
+    "topic": "永住許可",
+    "question": "永住許可の条件を厳しくすべきか"
+  },
+  {
+    "genre": "国と世界",
+    "middle_topic": "外国人政策",
+    "topic": "難民認定",
+    "question": "難民の受け入れを増やすべきか"
+  },
+  {
+    "genre": "国と世界",
+    "middle_topic": "外国人政策",
+    "topic": "外国人の土地取得",
+    "question": "外国人による土地の購入を規制すべきか"
+  },
+  {
+    "genre": "国と世界",
+    "middle_topic": "外国人政策",
+    "topic": "多文化共生",
+    "question": "外国人住民への日本語教育を公費で行うべきか"
+  },
+  {
+    "genre": "国と世界",
+    "middle_topic": "外国人政策",
+    "topic": "多文化共生",
+    "question": "外国人に地方選挙の投票権を認めるべきか"
+  },
+  {
+    "genre": "環境・エネルギー",
+    "middle_topic": "エネルギー",
+    "topic": "原子力発電",
+    "question": "原発の再稼働を進めるべきか"
+  },
+  {
+    "genre": "環境・エネルギー",
+    "middle_topic": "エネルギー",
+    "topic": "原子力発電",
+    "question": "原発を新しく建てるべきか"
+  },
+  {
+    "genre": "環境・エネルギー",
+    "middle_topic": "エネルギー",
+    "topic": "再生可能エネルギー",
+    "question": "再生可能エネルギーの割合を増やすべきか"
+  },
+  {
+    "genre": "環境・エネルギー",
+    "middle_topic": "エネルギー",
+    "topic": "再生可能エネルギー",
+    "question": "大規模太陽光発電の規制を強めるべきか"
+  },
+  {
+    "genre": "環境・エネルギー",
+    "middle_topic": "エネルギー",
+    "topic": "電気代",
+    "question": "電気代への補助を続けるべきか"
+  },
+  {
+    "genre": "環境・エネルギー",
+    "middle_topic": "エネルギー",
+    "topic": "エネルギー安全保障",
+    "question": "エネルギーの自給率を上げることを最優先にすべきか"
+  },
+  {
+    "genre": "環境・エネルギー",
+    "middle_topic": "気候変動",
+    "topic": "温室効果ガスの削減目標",
+    "question": "温室効果ガスの削減目標を引き上げるべきか"
+  },
+  {
+    "genre": "環境・エネルギー",
+    "middle_topic": "気候変動",
+    "topic": "炭素税・排出量取引",
+    "question": "炭素税を導入すべきか"
+  },
+  {
+    "genre": "環境・エネルギー",
+    "middle_topic": "気候変動",
+    "topic": "電気自動車（EV）",
+    "question": "将来ガソリン車の新車販売を禁止すべきか"
+  },
+  {
+    "genre": "環境・エネルギー",
+    "middle_topic": "自然環境",
+    "topic": "プラスチックごみ",
+    "question": "レジ袋以外のプラスチック製品も有料化すべきか"
+  },
+  {
+    "genre": "環境・エネルギー",
+    "middle_topic": "自然環境",
+    "topic": "生物多様性",
+    "question": "開発より自然保護を優先すべきか"
+  },
+  {
+    "genre": "環境・エネルギー",
+    "middle_topic": "自然環境",
+    "topic": "クマなど野生動物の被害",
+    "question": "人里に出た野生動物の駆除を積極的に進めるべきか"
+  },
+  {
+    "genre": "環境・エネルギー",
+    "middle_topic": "自然環境",
+    "topic": "処理水の海洋放出",
+    "question": "処理水の海洋放出を続けるべきか"
+  },
+  {
+    "genre": "政治のしくみ",
+    "middle_topic": "選挙制度",
+    "topic": "投票率",
+    "question": "投票を義務化すべきか"
+  },
+  {
+    "genre": "政治のしくみ",
+    "middle_topic": "選挙制度",
+    "topic": "ネット投票",
+    "question": "ネット投票を導入すべきか"
+  },
+  {
+    "genre": "政治のしくみ",
+    "middle_topic": "選挙制度",
+    "topic": "選挙権・被選挙権の年齢",
+    "question": "選挙権を16歳に引き下げるべきか"
+  },
+  {
+    "genre": "政治のしくみ",
+    "middle_topic": "選挙制度",
+    "topic": "選挙権・被選挙権の年齢",
+    "question": "被選挙権の年齢を引き下げるべきか"
+  },
+  {
+    "genre": "政治のしくみ",
+    "middle_topic": "選挙制度",
+    "topic": "一票の格差",
+    "question": "人口が少ない地方の議席数を確保すべきか"
+  },
+  {
+    "genre": "政治のしくみ",
+    "middle_topic": "選挙制度",
+    "topic": "選挙運動のルール",
+    "question": "選挙ポスターの掲示板を廃止すべきか"
+  },
+  {
+    "genre": "政治のしくみ",
+    "middle_topic": "選挙制度",
+    "topic": "選挙運動のルール",
+    "question": "戸別訪問を解禁すべきか"
+  },
+  {
+    "genre": "政治のしくみ",
+    "middle_topic": "政治とカネ",
+    "topic": "政治資金",
+    "question": "政治資金の収支をすべてネットで公開すべきか"
+  },
+  {
+    "genre": "政治のしくみ",
+    "middle_topic": "政治とカネ",
+    "topic": "企業・団体献金",
+    "question": "企業・団体献金を禁止すべきか"
+  },
+  {
+    "genre": "政治のしくみ",
+    "middle_topic": "政治とカネ",
+    "topic": "政策活動費",
+    "question": "使い道を公開しない政党の支出をすべて禁止すべきか"
+  },
+  {
+    "genre": "政治のしくみ",
+    "middle_topic": "政治とカネ",
+    "topic": "議員の報酬",
+    "question": "国会議員の報酬を減らすべきか"
+  },
+  {
+    "genre": "政治のしくみ",
+    "middle_topic": "憲法",
+    "topic": "憲法9条",
+    "question": "憲法9条に自衛隊を明記すべきか"
+  },
+  {
+    "genre": "政治のしくみ",
+    "middle_topic": "憲法",
+    "topic": "緊急事態条項",
+    "question": "憲法に緊急事態条項を設けるべきか"
+  },
+  {
+    "genre": "政治のしくみ",
+    "middle_topic": "憲法",
+    "topic": "憲法改正の手続き",
+    "question": "憲法改正の国民投票でネット広告を規制すべきか"
+  },
+  {
+    "genre": "政治のしくみ",
+    "middle_topic": "国会・行政",
+    "topic": "議員定数",
+    "question": "国会議員の定数を削減すべきか"
+  },
+  {
+    "genre": "政治のしくみ",
+    "middle_topic": "国会・行政",
+    "topic": "世襲議員",
+    "question": "親族と同じ選挙区からの立候補を制限すべきか"
+  },
+  {
+    "genre": "政治のしくみ",
+    "middle_topic": "国会・行政",
+    "topic": "皇位継承",
+    "question": "女性天皇を認めるべきか"
+  },
+  {
+    "genre": "政治のしくみ",
+    "middle_topic": "国会・行政",
+    "topic": "政治家と官僚の関係",
+    "question": "幹部官僚の人事を内閣が決める仕組みを見直すべきか"
+  }
+]

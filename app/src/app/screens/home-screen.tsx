@@ -1,16 +1,20 @@
 import Image from "next/image";
-import { topics } from "../lib/demo-data";
+import DataState from "../components/data-state";
+import { getMiddleTopicImage } from "../lib/demo-data";
 import type { DiscussionState } from "../hooks/use-discussion-state";
 import "./home-screen.css";
-type Props = Pick<DiscussionState, "setCategory" | "navigate">;
-export default function HomeScreen({ setCategory, navigate }: Props) {
+type Props = Pick<DiscussionState, "selectedGenre" | "catalogStatus" | "catalogError" | "retryCatalog" | "navigate" | "selectMiddleTopic">;
+export default function HomeScreen({ selectedGenre, catalogStatus, catalogError, retryCatalog, navigate, selectMiddleTopic }: Props) {
+    if (catalogStatus !== "success" || !selectedGenre) {
+        return <DataState status={catalogStatus} error={catalogError} emptyMessage="表示できる分類がありません。" onRetry={retryCatalog} onLogin={() => navigate("login")}/>;
+    }
     return (<div className="topic-grid">
-      {topics.map((topic, index) => (<button className="topic-tile" key={topic.label} onClick={() => {
-                setCategory(index);
-                navigate("topics");
-            }}>
-          <Image src={topic.image} alt="" width={150} height={150} priority/>
-          <span>{topic.label}</span>
-        </button>))}
+      {selectedGenre.middleTopics.map((middleTopic) => {
+            const image = getMiddleTopicImage(middleTopic.name);
+            return (<button className="topic-tile" key={middleTopic.id} onClick={() => selectMiddleTopic(middleTopic.id)}>
+          {image ? <Image src={image} alt="" width={150} height={150} priority/> : <span className="topic-image-placeholder" aria-hidden="true"/>}
+          <span>{middleTopic.name}</span>
+        </button>);
+        })}
     </div>);
 }

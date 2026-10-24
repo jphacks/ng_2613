@@ -7,22 +7,34 @@ type Props = Pick<
   | "screen"
   | "search"
   | "setSearch"
-  | "selectedTopic"
   | "menuOpen"
   | "setMenuOpen"
-  | "setCategory"
-  | "setNotice"
+  | "genres"
+  | "selectedGenre"
+  | "selectedMiddleTopic"
+  | "topicDetail"
+  | "selectedFrame"
+  | "searchResults"
+  | "selectGenre"
+  | "selectMiddleTopic"
+  | "selectTopic"
 >;
 export default function AppHeader({
   navigate,
   screen,
   search,
   setSearch,
-  selectedTopic,
   menuOpen,
   setMenuOpen,
-  setCategory,
-  setNotice,
+  genres,
+  selectedGenre,
+  selectedMiddleTopic,
+  topicDetail,
+  selectedFrame,
+  searchResults,
+  selectGenre,
+  selectMiddleTopic,
+  selectTopic,
 }: Props) {
   return (
     <header className="app-header">
@@ -42,21 +54,12 @@ export default function AppHeader({
             <span aria-hidden="true">⌕</span>
             {search && (
               <div className="search-results">
-                {[selectedTopic.label, "消費税"]
-                  .filter((label) => label.includes(search))
-                  .map((label) => (
-                    <button
-                      key={label}
-                      onClick={() =>
-                        navigate(label === "消費税" ? "summary" : "topics")
-                      }
-                    >
-                      {label}　&gt;
-                    </button>
-                  ))}
-                {![selectedTopic.label, "消費税"].some((label) =>
-                  label.includes(search),
-                ) && <p>該当するトピックはありません</p>}
+                {searchResults.map((result) => (
+                  <button key={result.id} onClick={() => selectTopic(result.id)}>
+                    {result.name}　&gt;
+                  </button>
+                ))}
+                {searchResults.length === 0 && <p>該当するトピックはありません</p>}
               </div>
             )}
           </div>
@@ -74,50 +77,54 @@ export default function AppHeader({
       </div>
       {screen === "home" ? (
         <nav className="category-nav" aria-label="カテゴリー">
-          <button onClick={() => setCategory(0)}>今日のテーマ</button>
-          <button className="active" onClick={() => setCategory(0)}>
-            お金
-          </button>
-          <button
-            onClick={() =>
-              setNotice("このデモでは「お金」のトピックを表示しています。")
-            }
-          >
-            健康・福祉
-          </button>
+          {genres.map((genre) => (
+            <button
+              key={genre.id}
+              className={genre.id === selectedGenre?.id ? "active" : undefined}
+              onClick={() => selectGenre(genre.id)}
+            >
+              {genre.name}
+            </button>
+          ))}
         </nav>
       ) : (
         <nav
           className={`breadcrumbs ${screen === "discussion" || screen === "thread" ? "pills" : ""}`}
           aria-label="現在の位置"
         >
-          <button onClick={() => navigate("home")}>お金</button>
-          <span>&gt;</span>
-          <button
-            aria-current={screen === "topics" ? "page" : undefined}
-            onClick={() => navigate("topics")}
-          >
-            {selectedTopic.label}
-          </button>
-          {screen !== "topics" && (
+          {selectedGenre && (
+            <button onClick={() => selectGenre(selectedGenre.id)}>{selectedGenre.name}</button>
+          )}
+          {selectedMiddleTopic && (
+            <>
+              <span>&gt;</span>
+              <button
+                aria-current={screen === "topics" ? "page" : undefined}
+                onClick={() => selectMiddleTopic(selectedMiddleTopic.id)}
+              >
+                {selectedMiddleTopic.name}
+              </button>
+            </>
+          )}
+          {screen !== "topics" && topicDetail && (
             <>
               <span>&gt;</span>
               <button
                 aria-current={screen === "summary" ? "page" : undefined}
-                onClick={() => navigate("summary")}
+                onClick={() => selectTopic(topicDetail.id)}
               >
-                消費税
+                {topicDetail.name}
               </button>
             </>
           )}
-          {(screen === "discussion" || screen === "thread") && (
+          {(screen === "discussion" || screen === "thread") && selectedFrame && (
             <>
               <span>&gt;</span>
               <button
                 aria-current={screen === "discussion" ? "page" : undefined}
                 onClick={() => navigate("discussion")}
               >
-                増税するべきか
+                {selectedFrame.question}
               </button>
             </>
           )}

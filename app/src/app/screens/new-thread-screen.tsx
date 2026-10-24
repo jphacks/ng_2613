@@ -1,13 +1,9 @@
-import { useState } from "react";
 import type { DiscussionState } from "../hooks/use-discussion-state";
-import ThreadScreen from "./thread-screen";
+import { ThreadView } from "./thread-screen";
 
-type Props = Pick<DiscussionState, "navigate" | "profile">;
+type Props = Pick<DiscussionState, "profile" | "selectedFrame" | "selectedFrameNumber" | "threadSubmitting" | "threadSubmitError" | "createDiscussionThread">;
 
-export default function NewThreadScreen({ navigate, profile }: Props) {
-    const [messages, setMessages] = useState<DiscussionState["messages"]>([]);
-    const [message, setMessage] = useState("");
-    const [stance, setStance] = useState("賛成");
-
-    return <ThreadScreen {...{ messages, setMessages, message, setMessage, stance, setStance, navigate, profile }} showDemoMessages={false} />;
+// 最初の意見を送るとスレッドを作る。一覧に出すタイトルは本文の1行目から取る。
+export default function NewThreadScreen({ profile, selectedFrame, selectedFrameNumber, threadSubmitting, threadSubmitError, createDiscussionThread }: Props) {
+    return <ThreadView {...{ profile, selectedFrame, selectedFrameNumber }} messages={[]} submitting={threadSubmitting} error={threadSubmitError} onSend={(body, stance) => createDiscussionThread({ title: body.split("\n")[0].slice(0, 40), body, stance })} />;
 }

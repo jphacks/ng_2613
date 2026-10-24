@@ -79,6 +79,12 @@
   }
 }
 
+.opinion-text {
+  min-width:0;
+  overflow:hidden;
+  text-overflow:ellipsis
+}
+
 @media(max-width:390px) {
 .opinion-row {
   font-size:19px;

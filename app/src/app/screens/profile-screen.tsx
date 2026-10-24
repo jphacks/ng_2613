@@ -2,16 +2,22 @@ import AccountFields from "../components/account-fields";
 import type { DiscussionState } from "../hooks/use-discussion-state";
 import "./profile-screen.css";
 
-type Props = Pick<DiscussionState, "profile" | "navigate" | "submitAccount">;
+type Props = Pick<DiscussionState, "profile" | "navigate" | "submitAccount" | "accountSubmitting" | "accountError">;
 
-export default function ProfileScreen({ profile, navigate, submitAccount }: Props) {
+export default function ProfileScreen({ profile, navigate, submitAccount, accountSubmitting, accountError }: Props) {
   return (
     <section className="account-screen">
-      <form onSubmit={submitAccount}>
+      <form key={`${profile.email}-${profile.username}-${profile.gender}-${profile.year}`} onSubmit={submitAccount}>
         <AccountFields mode="profile" profile={profile} />
+        <p className="account-help">メールアドレスは認証済みのアドレスです。</p>
+        {accountError && <p className="account-error" role="alert">{accountError}</p>}
         <div className="account-actions">
-          <button className="primary" type="submit">変更</button>
-          <button type="button" className="secondary" onClick={() => navigate("home")}>キャンセル</button>
+          <button className="primary" type="submit" disabled={accountSubmitting}>
+            {accountSubmitting ? "処理中…" : "変更"}
+          </button>
+          {profile.complete && (
+            <button type="button" className="secondary" onClick={() => navigate("home")}>キャンセル</button>
+          )}
         </div>
       </form>
     </section>

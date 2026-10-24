@@ -36,3 +36,11 @@
   padding-inline:18px
 }
 }
+
+.topic-image-placeholder {
+  width:150px;
+  height:150px;
+  max-width:100%;
+  border-radius:50%;
+  background:#eef3f5
+}

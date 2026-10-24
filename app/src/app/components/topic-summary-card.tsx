@@ -1,11 +1,20 @@
 import { useId, useRef, useState } from "react";
-import type { DiscussionState } from "../hooks/use-discussion-state";
 import { opinionColors, opinionLabels } from "../lib/demo-data";
+import type { TopicFrame } from "../lib/catalog/types";
+import type { ThreadSummary } from "../lib/threads/types";
+import type { VoteValue } from "../lib/votes/types";
 import "../screens/summary-screen.css";
 
-type Props = Pick<DiscussionState, "navigate" | "vote" | "setVote"> & {
+type Props = {
   color?: string;
   questionNumber?: number;
+  frame: TopicFrame;
+  threads: ThreadSummary[];
+  submitting: boolean;
+  error: string;
+  onVote: (frameId: string, value: VoteValue) => Promise<boolean>;
+  onDetail: () => void;
+  onThread: (threadId: string) => void;
 };
 type Segment = { label: string; value: number; color: string };
 const ageGroups: Segment[] = [
@@ -51,22 +60,54 @@ function DemographicChart({ title, data }: { title: string; data: Segment[] }) {
     </figure>
   );
 }
+function formatChangeDate(value: string) {
+  return new Intl.DateTimeFormat("ja-JP", {
+    month: "numeric",
+    day: "numeric",
+    timeZone: "Asia/Tokyo",
+  }).format(new Date(value));
+}
 export default function TopicSummaryCard({
-  navigate,
-  vote,
-  setVote,
   color = "cream",
   questionNumber = 1,
+  frame,
+  threads,
+  submitting,
+  error,
+  onVote,
+  onDetail,
+  onThread,
 }: Props) {
   const [expanded, setExpanded] = useState(false);
   const detailsId = useId();
   const titleId = useId();
   const dialogTitleId = useId();
   const dialogRef = useRef<HTMLDialogElement>(null);
+  const { vote } = frame;
+  // 5段階のうち「やや賛成」「賛成」を賛成、「反対」「やや反対」を反対として二分する。
+  const agreeCount = vote.counts[3] + vote.counts[4];
+  const disagreeCount = vote.counts[0] + vote.counts[1];
+  const stanceTotal = agreeCount + disagreeCount;
+  const agreePercent = stanceTotal ? Math.round((agreeCount / stanceTotal) * 100) : 0;
+  const disagreePercent = stanceTotal ? 100 - agreePercent : 0;
+  const agreeThreads = threads.filter((thread) => thread.stance === "agree");
+  const disagreeThreads = threads.filter((thread) => thread.stance === "disagree");
+  const changeLocked = vote.myValue !== null && !vote.canChange;
+  const voteDisabled = submitting || !vote.votingOpen || changeLocked;
+  function voteStatus() {
+    if (submitting) return "送信中…";
+    if (error) return error;
+    if (!vote.votingOpen) return "この設問は投票を受け付けていません";
+    if (changeLocked && vote.canChangeAt) {
+      return `「${opinionLabels[vote.myValue! - 1]}」に投票済み（${formatChangeDate(vote.canChangeAt)} 変更可能）`;
+    }
+    if (vote.myValue !== null) return `「${opinionLabels[vote.myValue - 1]}」に投票しました`;
+    return "あなたの意見を選んでください";
+  }
   return (
     <article className={`summary-card ${color}`} aria-labelledby={titleId}>
       <div className="summary-heading">
-        <h1 id={titleId}>Q{questionNumber}. 増税するべきか</h1>
+        <h1 id={titleId}>Q{questionNumber}. {frame.question}</h1>
         <div className="summary-buttons">
           <button
             className="summary-vote"
@@ -76,7 +117,7 @@ export default function TopicSummaryCard({
           </button>
           <button
             className="summary-detail"
-            onClick={() => navigate("discussion")}
+            onClick={onDetail}
           >
             詳細
           </button>
@@ -86,17 +127,20 @@ export default function TopicSummaryCard({
         <div
           className="pie"
           role="img"
-          aria-label="賛成50%、反対50%（デモデータ）"
+          aria-label={`賛成${agreePercent}%、反対${disagreePercent}%`}
+          style={stanceTotal ? {
+            background: `linear-gradient(to right,var(--blue) ${agreePercent}%,var(--pink) ${agreePercent}%)`,
+          } : undefined}
         >
           <span>
             賛成
             <br />
-            50%
+            {agreePercent}%
           </span>
           <span>
             反対
             <br />
-            50%
+            {disagreePercent}%
           </span>
         </div>
         <table>
@@ -110,20 +154,24 @@ export default function TopicSummaryCard({
             {[0, 1, 2].map((row) => (
               <tr key={row}>
                 <td>
-                  <button
-                    aria-label={`議題${questionNumber}の賛成意見${row + 1}`}
-                    onClick={() => navigate("thread")}
-                  >
-                    いいと思う！！
-                  </button>
+                  {agreeThreads[row] && (
+                    <button
+                      aria-label={`議題${questionNumber}の賛成意見${row + 1}`}
+                      onClick={() => onThread(agreeThreads[row].id)}
+                    >
+                      {agreeThreads[row].title}
+                    </button>
+                  )}
                 </td>
                 <td>
-                  <button
-                    aria-label={`議題${questionNumber}の反対意見${row + 1}`}
-                    onClick={() => navigate("thread")}
-                  >
-                    良くないと思う
-                  </button>
+                  {disagreeThreads[row] && (
+                    <button
+                      aria-label={`議題${questionNumber}の反対意見${row + 1}`}
+                      onClick={() => onThread(disagreeThreads[row].id)}
+                    >
+                      {disagreeThreads[row].title}
+                    </button>
+                  )}
                 </td>
               </tr>
             ))}
@@ -160,7 +208,7 @@ export default function TopicSummaryCard({
         >
           ×
         </button>
-        <h2 id={dialogTitleId}>Q{questionNumber}. 増税するべきか</h2>
+        <h2 id={dialogTitleId}>Q{questionNumber}. {frame.question}</h2>
         <div className="dialog-vote-labels">
           <span>賛成</span>
           <span>反対</span>
@@ -171,16 +219,15 @@ export default function TopicSummaryCard({
               key={index}
               className="dialog-vote-dot"
               aria-label={opinionLabels[index]}
-              aria-pressed={vote === index}
+              aria-pressed={vote.myValue === index + 1}
+              disabled={voteDisabled}
               style={{ background: opinionColors[index] }}
-              onClick={() => setVote(index)}
+              onClick={() => void onVote(frame.id, (index + 1) as VoteValue)}
             />
           ))}
         </div>
         <p className="dialog-vote-status" role="status">
-          {vote === null
-            ? "あなたの意見を選んでください"
-            : `「${opinionLabels[vote]}」を選択しました（デモ）`}
+          {voteStatus()}
         </p>
       </dialog>
     </article>

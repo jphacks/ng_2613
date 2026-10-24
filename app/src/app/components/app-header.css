@@ -58,11 +58,16 @@
   display:flex;
   gap:16px;
   white-space:nowrap;
-  overflow:hidden;
+  overflow-x:auto;
+  scrollbar-width:none;
   font-size:15px;
   height:30px;
   align-items:center;
   color:#858585
+}
+
+.category-nav::-webkit-scrollbar {
+  display:none
 }
 
 .category-nav .active {
