@@ -70,25 +70,6 @@
   border-color: #ff4c73;
 }
 
-.definition {
-  display: flex;
-  flex-direction: column;
-  text-align: left;
-  background: white;
-  border: 1px solid var(--line);
-  border-radius: 20px;
-  width: 172px;
-  min-height: 159px;
-  padding: 18px 20px;
-  margin: 190px 16px 0 auto;
-  gap: 15px;
-}
-
-.definition small {
-  font-size: 10px;
-  white-space: nowrap;
-}
-
 .composer {
   position: fixed;
   bottom: 0;
