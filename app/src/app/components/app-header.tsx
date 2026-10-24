@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { useEffect, useRef } from "react";
 import type { DiscussionState } from "../hooks/use-discussion-state";
 import "./app-header.css";
 type Props = Pick<
@@ -36,6 +37,15 @@ export default function AppHeader({
   selectMiddleTopic,
   selectTopic,
 }: Props) {
+  const categoryNavRef = useRef<HTMLElement>(null);
+
+  // カテゴリーは横に並びきらず横スクロールになるため、選んだものが端で切れていたら見える位置まで寄せる
+  useEffect(() => {
+    categoryNavRef.current
+      ?.querySelector(".active")
+      ?.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "nearest" });
+  }, [selectedGenre?.id]);
+
   // 履歴ではなく階層で1つ上へ戻す。外から直接開いたときにアプリの外へ出ないようにするため。
   function goBack() {
     if (screen === "thread" || screen === "new-thread") navigate("discussion");
@@ -84,7 +94,7 @@ export default function AppHeader({
         </button>
       </div>
       {screen === "home" ? (
-        <nav className="category-nav" aria-label="カテゴリー">
+        <nav ref={categoryNavRef} className="category-nav" aria-label="カテゴリー">
           {/* 元のデザインと同じく、専用のデータはまだないため先頭のカテゴリーを表示する */}
           {genres[0] && <button onClick={() => selectGenre(genres[0].id)}>今日のテーマ</button>}
           {genres.map((genre) => (
