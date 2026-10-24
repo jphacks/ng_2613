@@ -1,0 +1,23 @@
+.screen-profile .account-actions {
+  width:338px;
+  margin-left:-39px
+}
+
+.screen-profile .account-actions button {
+  width:156px;
+  flex-shrink:0
+}
+
+@media(max-width:350px) {
+.screen-profile .account-actions {
+  width:284px;
+  margin-left:-12px;
+  gap:12px
+}
+
+.screen-profile .account-actions button {
+  width:136px;
+  min-width:0
+}
+}
+

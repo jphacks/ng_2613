@@ -1,0 +1,10 @@
+.video-screen {
+  padding-top:242px
+}
+
+.close-video {
+  display:block;
+  margin:0 4px 6px auto;
+  font-size:45px;
+  line-height:42px
+}
