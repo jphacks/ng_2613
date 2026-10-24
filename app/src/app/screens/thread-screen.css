@@ -72,6 +72,12 @@
   z-index: 4;
 }
 
+@media (width > 757px) {
+  .composer {
+    width: 420px;
+  }
+}
+
 .stance-switch {
   display: flex;
   border-radius: 20px;
