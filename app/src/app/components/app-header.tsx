@@ -1,3 +1,4 @@
+import Image from "next/image";
 import type { DiscussionState } from "../hooks/use-discussion-state";
 import "./app-header.css";
 type Props = Pick<
@@ -26,8 +27,9 @@ export default function AppHeader({
   return (
     <header className="app-header">
       <div className="header-top">
-        <button className="brand" onClick={() => navigate("home")}>
-          アプリ名
+        <button className="brand" aria-label="Rights ホームへ" onClick={() => navigate("home")}>
+          <Image src="/rights-mark.png" alt="" width={117} height={103} className="brand-mark" />
+          <span aria-hidden="true">ights</span>
         </button>
         {screen === "home" && (
           <div className="search-wrap">

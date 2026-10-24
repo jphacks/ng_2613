@@ -2,6 +2,7 @@
 
 import { DictionaryProvider } from "./components/dictionary";
 import AppHeader from "./components/app-header";
+import Image from "next/image";
 import AppMenu from "./components/app-menu";
 import { useDiscussionState } from "./hooks/use-discussion-state";
 import HomeScreen from "./screens/home-screen";
@@ -23,7 +24,9 @@ export default function DiscussionApp() {
   <DictionaryProvider>
   <div className="app-layout">
    <aside className="desktop-sidebar desktop-brand" aria-label="ロゴ">
-    <button className="brand" onClick={() => state.navigate("home")}>アプリ名</button>
+    <button className="desktop-logo-button" aria-label="Rights ホームへ" onClick={() => state.navigate("home")}>
+     <Image src="/rights-logo.png" alt="Rights" width={186} height={190} className="desktop-logo" />
+    </button>
    </aside>
   <main className={`app-shell screen-${screen}`}>
    {!accountScreen && screen !== "video" && screen !== "vote" && <AppHeader {...state} />}
