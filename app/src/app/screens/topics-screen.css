@@ -11,10 +11,31 @@
 }
 
 .topic-row {
+  position:relative;
+  display:flex;
+  align-items:center;
+  justify-content:center;
   height:70px;
   width:100%;
   border:1px solid var(--line);
   border-radius:16px;
   margin-bottom:14px;
   font-size:21px
+}
+
+.topic-row-navigation {
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  border-radius:inherit;
+}
+
+.topic-row-term {
+  position:relative;
+  pointer-events:none;
+}
+
+.topic-row-term .dictionary-term {
+  pointer-events:auto;
 }

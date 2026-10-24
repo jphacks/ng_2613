@@ -1,8 +1,9 @@
+import { DictionaryText } from "../components/dictionary";
 import type { DiscussionState } from "../hooks/use-discussion-state";
 import "./thread-screen.css";
 import { avatarColors, randomAvatarColor, usernameInitial } from "../lib/avatar";
 type Props = Pick<DiscussionState, "profile" | "messages" | "message" | "stance" | "setStance" | "setMessages" | "setMessage" | "navigate"> & { showDemoMessages?: boolean };
-export default function ThreadScreen({ profile, messages, message, stance, setStance, setMessages, setMessage, navigate, showDemoMessages = true }: Props) {
+export default function ThreadScreen({ profile, messages, message, stance, setStance, setMessages, setMessage, showDemoMessages = true }: Props) {
     const username = profile.username || "ゲスト";
     const guestColor = messages[0]?.avatarColor || avatarColors[0];
     function renderMessage(item: DiscussionState["messages"][number], key: string | number, own = false) {
@@ -10,7 +11,7 @@ export default function ThreadScreen({ profile, messages, message, stance, setSt
             <span className="sender-avatar" style={{ backgroundColor: item.avatarColor }} role="img" aria-label={`${item.username}のアイコン`}>{usernameInitial(item.username)}</span>
             <div className="message-content">
                 <span className="sender-name">{item.username}</span>
-                <p className={`bubble ${item.stance === "賛成" ? "agree" : "disagree"}`}>{item.text}</p>
+                <p className={`bubble ${item.stance === "賛成" ? "agree" : "disagree"}`}><DictionaryText>{item.text}</DictionaryText></p>
             </div>
         </div>;
     }
@@ -22,10 +23,6 @@ export default function ThreadScreen({ profile, messages, message, stance, setSt
         {renderMessage({ text: "私もそう思います。", stance: "賛成", username, avatarColor: profile.avatarColor || guestColor }, "demo-2", true)}
         {renderMessage({ text: "私は反対です。", stance: "反対", username: "たろう", avatarColor: avatarColors[1] }, "demo-3")}
     </>}{messages.map((item, index) => renderMessage(item, index, true))}</div>
-    <button className="definition" onClick={() => navigate("video")}>
-    <span>消費税</span>
-    <small>商品を買うとかかるお金です</small>
-    </button>
     <form className="composer" onSubmit={event => { event.preventDefault(); if (message.trim()) {
         setMessages([...messages, { text: message.trim(), stance, username, avatarColor: profile.avatarColor || messages[0]?.avatarColor || randomAvatarColor() }]);
         setMessage("");

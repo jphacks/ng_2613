@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" fill="none">
+  <title>本を検索</title>
+  <g stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M30 17C23 12 15 11 6 14V46C15 43 23 44 30 49C34 46 38 45 42 45V14C38 13 34 14 30 17Z"/>
+    <path d="M30 17V49M12 21C16 20 20 21 24 23M12 28C16 27 20 28 24 30M12 35C16 34 20 35 24 37"/>
+  </g>
+  <circle cx="43" cy="31" r="13" fill="white"/>
+  <g stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="43" cy="31" r="10"/>
+    <path d="M50.2 38.2L59 47"/>
+  </g>
+</svg>

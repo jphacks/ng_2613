@@ -1,5 +1,6 @@
 "use client";
 
+import { DictionaryProvider } from "./components/dictionary";
 import AppHeader from "./components/app-header";
 import Image from "next/image";
 import AppMenu from "./components/app-menu";
@@ -20,6 +21,7 @@ export default function DiscussionApp() {
  const state = useDiscussionState();
  const { screen, accountScreen, notice, menuOpen } = state;
  return (
+  <DictionaryProvider>
   <div className="app-layout">
    <aside className="desktop-sidebar desktop-brand" aria-label="ロゴ">
     <button className="desktop-logo-button" aria-label="Rights ホームへ" onClick={() => state.navigate("home")}>
@@ -46,5 +48,6 @@ export default function DiscussionApp() {
     <AppMenu {...state} persistent />
    </aside>
   </div>
+  </DictionaryProvider>
  );
 }
