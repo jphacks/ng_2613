@@ -10,6 +10,7 @@ import disasterImage from "../images/disaster-prevention-recovery.svg";
 import nursingImage from "../images/elderly-care.svg";
 import electionImage from "../images/electoral-system.svg";
 import employmentImage from "../images/employment.svg";
+import energyImage from "../images/energy.svg";
 import financeImage from "../images/finance-investment.svg";
 import foreignResidentsImage from "../images/foreign-resident-policy.svg";
 import medicalImage from "../images/healthcare.svg";
@@ -71,6 +72,7 @@ const middleTopicImages: Record<string, StaticImageData> = {
   "安全保障・防衛": defenseImage,
   "外国人政策": foreignResidentsImage,
   "気候変動": climateImage,
+  "エネルギー": energyImage,
   "自然環境": natureImage,
   "選挙制度": electionImage,
   "政治とカネ": politicalMoneyImage,
