@@ -15,6 +15,7 @@ type AccountProfile = {
   username: string;
   gender: string;
   year: string;
+  birthDate: string;
   complete: boolean;
 };
 type ApiErrorBody = { error?: { code?: string; message?: string; fields?: Record<string, string> } };
@@ -108,6 +109,7 @@ export function useDiscussionState() {
     username: "",
     gender: "",
     year: "",
+    birthDate: "",
     complete: false,
   });
   const [authStatus, setAuthStatus] = useState<AuthStatus>("loading");
@@ -522,7 +524,7 @@ export function useDiscussionState() {
           body: JSON.stringify({
             username: String(formData.get("username") ?? ""),
             gender: String(formData.get("gender") ?? ""),
-            year: String(formData.get("year") ?? ""),
+            birthDate: String(formData.get("birthDate") ?? ""),
           }),
         });
         setProfile(updatedProfile);
@@ -555,7 +557,8 @@ export function useDiscussionState() {
       );
       setProfile(result.profile);
       setAuthStatus("authenticated");
-      setHash(getPostAuthScreen(result.profile), {
+      // 登録直後のユーザー名は仮の名前なので、登録時だけは会員情報変更へ案内する。
+      setHash(screen === "register" ? "profile" : getPostAuthScreen(result.profile), {
         genreId: null, middleTopicId: null, topicId: null, frameId: null, threadId: null,
       });
       setNotice(screen === "register"
@@ -574,7 +577,7 @@ export function useDiscussionState() {
     try {
       await requestApi<{ authenticated: false }>("/api/auth/sign-out", { method: "POST" });
       setAuthStatus("unauthenticated");
-      setProfile({ id: "", email: "", username: "", gender: "", year: "", complete: false });
+      setProfile({ id: "", email: "", username: "", gender: "", year: "", birthDate: "", complete: false });
       setHash("home", { genreId: null, middleTopicId: null, topicId: null, frameId: null, threadId: null });
       setNotice("ログアウトしました。");
     } catch (error) {
