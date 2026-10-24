@@ -121,6 +121,7 @@
   line-height: 1;
 }
 
-.screen-thread .app-header {
+.screen-thread .app-header,
+.screen-new-thread .app-header {
   margin-bottom: 0;
 }

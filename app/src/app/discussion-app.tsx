@@ -8,6 +8,7 @@ import TopicsScreen from "./screens/topics-screen";
 import SummaryScreen from "./screens/summary-screen";
 import DiscussionScreen from "./screens/discussion-screen";
 import ThreadScreen from "./screens/thread-screen";
+import NewThreadScreen from "./screens/new-thread-screen";
 import VideoScreen from "./screens/video-screen";
 import VoteScreen from "./screens/vote-screen";
 import LoginScreen from "./screens/login-screen";
@@ -30,6 +31,7 @@ export default function DiscussionApp() {
    {screen === "summary" && <SummaryScreen {...state} />}
    {screen === "discussion" && <DiscussionScreen {...state} />}
    {screen === "thread" && <ThreadScreen {...state} />}
+   {screen === "new-thread" && <NewThreadScreen navigate={state.navigate} />}
    {screen === "video" && <VideoScreen {...state} />}
    {screen === "vote" && <VoteScreen {...state} />}
    {screen === "login" && <LoginScreen {...state} />}

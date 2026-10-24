@@ -2,8 +2,8 @@ import taxImage from "../images/tax.svg";
 import pricesImage from "../images/prices-wages.svg";
 import budgetImage from "../images/national-budget.svg";
 import financeImage from "../images/finance-investment.svg";
-export type Screen = "home" | "topics" | "summary" | "discussion" | "thread" | "vote" | "video" | "login" | "register" | "profile";
-export const screens: Screen[] = ["home", "topics", "summary", "discussion", "thread", "vote", "video", "login", "register", "profile"];
+export type Screen = "home" | "topics" | "summary" | "discussion" | "thread" | "new-thread" | "vote" | "video" | "login" | "register" | "profile";
+export const screens: Screen[] = ["home", "topics", "summary", "discussion", "thread", "new-thread", "vote", "video", "login", "register", "profile"];
 export const topics = [
     { label: "税金", image: taxImage },
     { label: "物価・賃金", image: pricesImage },
