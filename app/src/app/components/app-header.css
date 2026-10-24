@@ -1,12 +1,14 @@
 .app-header {
   /* 画面の上端に詰まりすぎないよう、上に1行分ほどの余白を取る */
   height:95px;
-  /* 区切り線より上をグレーで塗る。画面の端まで塗るよう、左右は外側ではなく内側の余白にする */
-  --header-bg:#f3f3f5;
-  background:var(--header-bg);
+  /* 区切り線より上を塗る。重く見えないよう、上から下へ白に近づく軽いグラデーションにする。
+     画面の端まで塗るよう、左右は外側ではなく内側の余白にする。
+     --header-bg はパンくずの段（下側）の色で、戻るボタンの左の帯に使う */
+  --header-bg:#fbfbfc;
+  background:linear-gradient(to bottom, #f5f6f8, var(--header-bg));
   padding:20px 10px 0;
-  /* 本文との区切りは強すぎないよう、少し濃いめの薄いグレーにする */
-  border-bottom:1px solid #d0d0d6;
+  /* 本文との区切りは強すぎないよう、薄いグレーにする */
+  border-bottom:1px solid #dedee3;
   position:relative;
   z-index:2
 }
