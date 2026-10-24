@@ -129,3 +129,44 @@
   font-size:16px
 }
 }
+
+.summary-card { height:auto; padding:28px 12px 10px 24px }
+.summary-heading { gap:10px; margin-bottom:18px; flex-wrap:wrap }
+.summary-heading h1 { white-space:normal; flex:1; min-width:160px }
+.summary-buttons { display:flex; gap:8px; margin-left:auto }
+.summary-buttons button { min-width:56px; min-height:26px; border-radius:20px; font-size:11px; padding:4px 12px }
+.summary-vote { background:var(--ink); color:white }
+.summary-detail { border:1px solid var(--line); background:white; color:var(--ink) }
+.summary-content { gap:16px }
+.summary-content table { flex:1; min-width:0 }
+.summary-toggle { display:block; margin:16px 0 0 auto; padding:6px 2px; font-size:11px }
+.demographic-note { margin:22px 0 14px; color:var(--ink); font-size:11px }
+.demographic-charts { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:20px }
+.demographic-chart { margin:0; min-width:0 }
+.demographic-chart figcaption { font-size:14px; margin-bottom:12px; text-align:center }
+.demographic-pie { width:140px; max-width:100%; aspect-ratio:1; border-radius:50%; margin:0 auto 14px }
+.demographic-chart ul { list-style:none; margin:0; padding:0; font-size:11px }
+.demographic-chart li { display:flex; align-items:center; gap:5px; margin-bottom:7px }
+.demographic-chart li > span:last-child { margin-left:auto }
+.chart-key { width:10px; height:10px; border-radius:50%; flex-shrink:0 }
+.summary-vote-dialog { position:fixed; inset:0; margin:auto; width:290px; max-width:calc(100vw - 32px); border:1px solid #e8e7ed; border-radius:14px; padding:32px 20px 18px; color:var(--ink); background:white; box-shadow:0 12px 48px #24233326 }
+.summary-vote-dialog::backdrop { background:#24233345 }
+.vote-dialog-close { position:absolute; top:6px; right:8px; width:28px; height:28px; font-size:18px }
+.summary-vote-dialog h2 { font-weight:400; font-size:15px; margin:0 0 20px }
+.dialog-vote-labels { display:flex; justify-content:space-between; font-size:14px; margin-bottom:10px }
+.dialog-vote-options { display:flex; justify-content:space-between; gap:10px; padding:3px }
+.dialog-vote-dot { width:28px; height:28px; border-radius:50%; flex-shrink:0 }
+.dialog-vote-dot[aria-pressed="true"] { outline:2px solid var(--ink); outline-offset:3px }
+.dialog-vote-status { margin-top:18px; font-size:11px; min-height:16px; text-align:center }
+@media(max-width:390px) {
+  .summary-card { padding-left:15px }
+  .summary-content { gap:12px }
+  .summary-heading h1 { min-width:140px }
+  .summary-buttons { gap:5px }
+  .summary-buttons button { min-width:48px; padding-inline:8px }
+  .demographic-charts { gap:14px }
+}
+@media(max-width:350px) {
+  .summary-card { padding-inline:10px }
+  .summary-content { gap:8px }
+}
