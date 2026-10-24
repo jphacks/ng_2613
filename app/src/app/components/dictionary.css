@@ -2,7 +2,8 @@
 .dictionary-lens {
   position: fixed;
   right: max(34px, calc((100vw - 420px) / 2 + 34px));
-  bottom: calc(85px + env(safe-area-inset-bottom));
+  /* 最初はヘッダー（高さ95px）のすぐ下、右上に置く */
+  top: calc(95px + 12px);
   z-index: 5;
   display: grid;
   place-items: center;

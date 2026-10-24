@@ -10,6 +10,10 @@ const entries = [
 type Popover = { term: string; definition: string; top: number; left: number; placement: "below" | "above" };
 
 const lensSize = 48;
+// レンズの丸の中心（SVG の circle の cx, cy）
+const lensCenter = 20;
+// 指で動かすとき、レンズの丸を指からどれだけ上に出すか
+const touchLift = 50;
 // 虫眼鏡の下に出す一言の高さ。画面からはみ出さないよう位置の計算に含める
 const captionHeight = 30;
 // 一言は虫眼鏡より横に広く、左右に少しはみ出す。その分も画面内に収める
@@ -180,9 +184,17 @@ export function DictionaryProvider({ children, visible = true }: { children: Rea
         dismissCaption();
         const rect = lensRef.current?.getBoundingClientRect();
         if (!rect) return;
-        dragRef.current = { pointerId: event.pointerId, x: event.clientX - rect.left, y: event.clientY - rect.top };
+        // 指で動かすと虫眼鏡と下の言葉が指で隠れるため、タッチのときはレンズの丸の中心を指の少し上に出す
+        const touch = event.pointerType === "touch";
+        dragRef.current = touch
+          ? { pointerId: event.pointerId, x: lensCenter, y: lensCenter + touchLift }
+          : { pointerId: event.pointerId, x: event.clientX - rect.left, y: event.clientY - rect.top };
         lensRef.current?.classList.add("is-dragging");
         event.currentTarget.setPointerCapture(event.pointerId);
+        if (touch) {
+          moveLens(event.clientX - dragRef.current.x, event.clientY - dragRef.current.y);
+          updateTarget();
+        }
       }}
       onPointerMove={(event) => {
         const drag = dragRef.current;
