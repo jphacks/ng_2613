@@ -13,7 +13,7 @@ type Props = {
   submitting: boolean;
   error: string;
   onVote: (frameId: string, value: VoteValue) => Promise<boolean>;
-  onDetail: () => void;
+  onDetail?: () => void;
   onThread: (threadId: string) => void;
 };
 type Segment = { label: string; value: number; color: string };
@@ -115,12 +115,14 @@ export default function TopicSummaryCard({
           >
             投票
           </button>
-          <button
-            className="summary-detail"
-            onClick={onDetail}
-          >
-            詳細
-          </button>
+          {onDetail && (
+            <button
+              className="summary-detail"
+              onClick={onDetail}
+            >
+              議論
+            </button>
+          )}
         </div>
       </div>
       <div className="summary-content">

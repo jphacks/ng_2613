@@ -46,7 +46,7 @@ export default function DiscussionScreen(props: Props) {
     const frame = props.selectedFrame;
     const threads = props.threadsStatus === "success" ? props.threads : [];
     return <section className="discussion-list">
-        <TopicSummaryCard frame={frame} questionNumber={props.selectedFrameNumber} threads={threads} submitting={props.voteSubmittingFrameId === frame.id} error={props.voteErrors[frame.id] ?? ""} onVote={props.submitVote} onDetail={() => props.navigate("discussion")} onThread={threadId => props.selectThread(threadId)} />
+        <TopicSummaryCard frame={frame} questionNumber={props.selectedFrameNumber} threads={threads} submitting={props.voteSubmittingFrameId === frame.id} error={props.voteErrors[frame.id] ?? ""} onVote={props.submitVote} onThread={threadId => props.selectThread(threadId)} />
         <div className="discussion-opinions" aria-labelledby="discussion-opinions-heading">
             <h2 id="discussion-opinions-heading">みんなの意見</h2>
             {props.threadsStatus === "error" && <DataState status="error" error={props.threadsError} emptyMessage="" onRetry={props.retryThreads}/>}
