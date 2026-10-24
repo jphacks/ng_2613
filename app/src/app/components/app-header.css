@@ -192,3 +192,23 @@
 }
 .search-results p { color:#777; text-align:center }
 .breadcrumbs button:active { transform:scale(.96) }
+
+/* 戻るボタン。パンくずが横に長くスクロールしても左端に残す */
+.breadcrumbs .back-button {
+  position:sticky;
+  left:0;
+  z-index:1;
+  display:grid;
+  place-items:center;
+  width:26px;
+  height:26px;
+  padding:0;
+  margin-right:4px;
+  border-color:var(--line);
+  background:#fff;
+  box-shadow:-14px 0 0 #fff
+}
+@media (hover:hover) {
+  .breadcrumbs .back-button:hover svg { transform:translateX(-2px) }
+}
+.breadcrumbs .back-button svg { transition:transform var(--duration) var(--ease-out) }

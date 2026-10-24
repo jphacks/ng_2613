@@ -36,6 +36,14 @@ export default function AppHeader({
   selectMiddleTopic,
   selectTopic,
 }: Props) {
+  // 履歴ではなく階層で1つ上へ戻す。外から直接開いたときにアプリの外へ出ないようにするため。
+  function goBack() {
+    if (screen === "thread" || screen === "new-thread") navigate("discussion");
+    else if (screen === "discussion" && topicDetail) selectTopic(topicDetail.id);
+    else if (screen === "summary" && selectedMiddleTopic) selectMiddleTopic(selectedMiddleTopic.id);
+    else if (selectedGenre) selectGenre(selectedGenre.id);
+    else navigate("home");
+  }
   return (
     <header className="app-header">
       <div className="header-top">
@@ -92,6 +100,11 @@ export default function AppHeader({
           className={`breadcrumbs ${screen === "discussion" || screen === "thread" ? "pills" : ""}`}
           aria-label="現在の位置"
         >
+          <button className="back-button" aria-label="1つ前の階層へ戻る" onClick={goBack}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M15 18l-6-6 6-6" />
+            </svg>
+          </button>
           {selectedGenre && (
             <button onClick={() => selectGenre(selectedGenre.id)}>{selectedGenre.name}</button>
           )}
