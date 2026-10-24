@@ -69,8 +69,8 @@
   transition: opacity 600ms var(--ease-out), transform 600ms var(--ease-out);
 }
 
+/* 文字の色は周りと同じにし、辞書にある言葉だと分かるよう下線だけ残す */
 .dictionary-term {
-  color: #299ded;
   text-decoration: underline;
   text-underline-offset: 3px;
   border-radius: 4px;
