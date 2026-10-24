@@ -46,7 +46,7 @@
 
 .add-opinion {
   position:fixed;
-  right:calc(max(0px, (100vw - 420px) / 2) + 16px);
+  right:16px;
   bottom:calc(24px + env(safe-area-inset-bottom, 0px));
   z-index:4;
   display:flex;
@@ -57,4 +57,10 @@
   border-radius:50%;
   background:var(--ink);
   color:#fff;
+}
+
+@media (width > 757px) {
+  .add-opinion {
+    right:calc((100% - 420px) / 2 + 16px)
+  }
 }
