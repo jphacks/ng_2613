@@ -19,7 +19,7 @@ export async function GET(_request: Request, context: ThreadsRouteContext) {
     const supabase = await createClient();
     const user = await getAuthenticatedUser(supabase);
     if (!user) return failure("UNAUTHENTICATED", "ログインが必要です。", 401);
-    return success(await getThreads(supabase, frameId));
+    return success(await getThreads(supabase, frameId, user.id));
   } catch (error) {
     return error instanceof ThreadRepositoryError
       ? repositoryFailure(error)

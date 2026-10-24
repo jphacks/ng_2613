@@ -54,6 +54,8 @@
 }
 
 .opinion-reaction.is-reacted { color:#a76500 }
+.opinion-reaction.is-reacted .reaction-bulb { fill:#ffe16b }
+.opinion-reaction:disabled { cursor:wait; opacity:0.65 }
 
 .reaction-bulb { flex-shrink:0 }
 .reaction-bulb.is-flashing {
