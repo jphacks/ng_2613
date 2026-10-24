@@ -1,7 +1,6 @@
 import type { VoteValue } from "../votes/types";
 import type { PostStance } from "../threads/types";
 
-export type AuthFlow = "sign-in" | "sign-up";
 export type Gender = "男性" | "女性" | "その他";
 
 type ValidationResult<T> =
@@ -9,7 +8,7 @@ type ValidationResult<T> =
   | { ok: false; fields: Record<string, string> };
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const otpPattern = /^\d{6}$/;
+export const PASSWORD_MIN_LENGTH = 6;
 const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const genders: Gender[] = ["男性", "女性", "その他"];
 
@@ -72,56 +71,54 @@ export function validateCommentRequest(
     : { ok: true, value: { body, stance: validatePostStance(value.stance) ? value.stance : null } };
 }
 
-export function validateOtpRequest(
+function validateEmailAndPassword(
   value: unknown,
-): ValidationResult<{ email: string; flow: AuthFlow }> {
+): ValidationResult<{ email: string; password: string }> {
   if (!isRecord(value)) {
     return { ok: false, fields: { request: "リクエスト形式が正しくありません。" } };
   }
 
   const email = typeof value.email === "string" ? value.email.trim().toLowerCase() : "";
-  const flow = value.flow;
+  const password = typeof value.password === "string" ? value.password : "";
   const fields: Record<string, string> = {};
 
   if (!email || email.length > 254 || !emailPattern.test(email)) {
     fields.email = "メールアドレスを正しく入力してください。";
   }
-  if (flow !== "sign-in" && flow !== "sign-up") {
-    fields.flow = "認証処理の種類が正しくありません。";
+  if (!password) {
+    fields.password = "パスワードを入力してください。";
+  } else if (password.length < PASSWORD_MIN_LENGTH) {
+    fields.password = `パスワードは${PASSWORD_MIN_LENGTH}文字以上で入力してください。`;
   }
 
   return Object.keys(fields).length > 0
     ? { ok: false, fields }
-    : { ok: true, value: { email, flow: flow as AuthFlow } };
+    : { ok: true, value: { email, password } };
 }
 
-export function validateOtpVerification(
+export function validateSignInRequest(
   value: unknown,
-): ValidationResult<{
-  email: string;
-  token: string;
-  flow: AuthFlow;
-}> {
-  const base = validateOtpRequest(value);
-  if (!base.ok) {
-    return { ok: false, fields: base.fields };
-  }
+): ValidationResult<{ email: string; password: string }> {
+  return validateEmailAndPassword(value);
+}
+
+export function validateSignUpRequest(
+  value: unknown,
+): ValidationResult<{ email: string; password: string }> {
+  const credentials = validateEmailAndPassword(value);
+  if (!credentials.ok) return credentials;
   if (!isRecord(value)) {
     return { ok: false, fields: { request: "リクエスト形式が正しくありません。" } };
   }
 
-  const token = typeof value.token === "string"
-    ? value.token.trim().replace(/[０-９]/g, (character) => String(character.charCodeAt(0) - 0xff10))
+  const passwordConfirmation = typeof value.passwordConfirmation === "string"
+    ? value.passwordConfirmation
     : "";
-  const fields: Record<string, string> = {};
-
-  if (!otpPattern.test(token)) {
-    fields.token = "メールに記載された6桁の認証コードを入力してください。";
+  if (passwordConfirmation !== credentials.value.password) {
+    return { ok: false, fields: { passwordConfirmation: "パスワードが一致しません。" } };
   }
 
-  return Object.keys(fields).length > 0
-    ? { ok: false, fields }
-    : { ok: true, value: { ...base.value, token } };
+  return credentials;
 }
 
 export function validateProfileUpdate(

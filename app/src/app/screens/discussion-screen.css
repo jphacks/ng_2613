@@ -1,5 +1,5 @@
 .discussion-list {
-  padding:31px 10px
+  padding:31px 10px calc(110px + env(safe-area-inset-bottom, 0px))
 }
 
 .discussion-list h1 {
@@ -76,3 +76,25 @@
 .post-error { color:#b42318; font-size:12px }
 .discussion-threads h2 { margin-bottom:14px }
 .discussion-threads .data-state { margin:18px 0 }
+
+.discussion-opinions h2 {
+  margin:0 0 14px;
+  padding-left:10px;
+  font-size:20px;
+  font-weight:400
+}
+
+.add-opinion {
+  position:fixed;
+  right:calc(max(0px, (100vw - 420px) / 2) + 16px);
+  bottom:calc(24px + env(safe-area-inset-bottom, 0px));
+  z-index:4;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:48px;
+  height:48px;
+  border-radius:50%;
+  background:var(--ink);
+  color:#fff;
+}

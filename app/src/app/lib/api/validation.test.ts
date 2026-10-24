@@ -2,8 +2,8 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import {
   isUuid,
-  validateOtpRequest,
-  validateOtpVerification,
+  validateSignInRequest,
+  validateSignUpRequest,
   validateProfileUpdate,
   validateVoteRequest,
   validateThreadRequest,
@@ -30,31 +30,21 @@ test("スレッドとコメントの空白投稿を拒否する", () => {
   assert.equal(validateCommentRequest({ body: "コメント", stance: "disagree" }).ok, true);
 });
 
-test("OTP送信はメールアドレスの形式と長さを検証する", () => {
-  assert.equal(validateOtpRequest({ email: " USER@example.com ", flow: "sign-in" }).ok, true);
-  assert.equal(validateOtpRequest({ email: "invalid", flow: "sign-in" }).ok, false);
-  assert.equal(validateOtpRequest({ email: `${"a".repeat(250)}@x.jp`, flow: "sign-in" }).ok, false);
+test("ログインはメールアドレスの形式とパスワードを検証する", () => {
+  assert.equal(validateSignInRequest({ email: " USER@example.com ", password: "secret" }).ok, true);
+  assert.equal(validateSignInRequest({ email: "invalid", password: "secret" }).ok, false);
+  assert.equal(validateSignInRequest({ email: `${"a".repeat(250)}@x.jp`, password: "secret" }).ok, false);
+  assert.equal(validateSignInRequest({ email: "user@example.com", password: "" }).ok, false);
+  assert.equal(validateSignInRequest({ email: "user@example.com", password: "12345" }).ok, false);
 });
 
-test("OTP検証は6桁コードを要求する", () => {
-  assert.equal(
-    validateOtpVerification({ email: "user@example.com", flow: "sign-in", token: "12345" }).ok,
-    false,
-  );
-  assert.equal(
-    validateOtpVerification({ email: "user@example.com", flow: "sign-in", token: "123456" }).ok,
-    true,
-  );
-  assert.equal(
-    validateOtpVerification({ email: "user@example.com", flow: "sign-in", token: "１２３４５６" }).ok,
-    true,
-  );
-});
-
-test("新規登録のOTP検証後にプロフィールを別途設定できる", () => {
-  assert.equal(validateOtpVerification({
-    email: "user@example.com", flow: "sign-up", token: "123456",
+test("新規登録はパスワード確認の一致を要求する", () => {
+  assert.equal(validateSignUpRequest({
+    email: "user@example.com", password: "secret", passwordConfirmation: "secret",
   }).ok, true);
+  assert.equal(validateSignUpRequest({
+    email: "user@example.com", password: "secret", passwordConfirmation: "different",
+  }).ok, false);
 });
 
 test("プロフィール更新は許可された性別と生年だけを受け付ける", () => {

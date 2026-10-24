@@ -1,12 +1,12 @@
 .thread {
-  min-height:calc(100dvh - 75px);
-  background:#f8f8f8;
-  position:relative;
-  padding:16px 0 90px
+  min-height: calc(100dvh - 75px);
+  background: #f8f8f8;
+  position: relative;
+  padding: 16px 0 90px;
 }
 
 .thread h1 {
-  margin-bottom:26px
+  margin-bottom: 26px;
 }
 
 .thread-body { margin:0 12px 24px; padding:18px; border:1px solid var(--blue); border-radius:16px; background:white }
@@ -17,110 +17,152 @@
 .thread-empty { text-align:center; color:#666 }
 
 .message-list {
-  display:flex;
-  flex-direction:column;
-  gap:20px;
-  padding:0 12px 0 1px
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 0 12px;
+}
+
+.message-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.message-row.own {
+  flex-direction: row-reverse;
+}
+
+.sender-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 36px;
+  height: 36px;
+  border-radius: 50%;
+  color: #464554;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.message-content {
+  max-width: calc(100% - 44px);
+  min-width: 0;
+}
+
+.sender-name {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+
+.own .sender-name {
+  text-align: right;
 }
 
 .bubble {
-  border:1px solid #399ff1;
-  border-radius:21px;
-  padding:19px 10px;
-  min-height:59px;
-  width:200px;
-  max-width:75%;
-  font-size:14px;
-  background:#fff;
-  overflow-wrap:anywhere
-}
-
-.bubble.own {
-  align-self:flex-end;
-  margin:0 16px 22px 0
+  border: 1px solid #399ff1;
+  border-radius: 21px;
+  padding: 19px 10px;
+  min-height: 59px;
+  width: 200px;
+  max-width: 100%;
+  font-size: 14px;
+  background: #fff;
+  overflow-wrap: anywhere;
 }
 
 .bubble.disagree {
-  border-color:#ff4c73;
-  margin-left:11px
+  border-color: #ff4c73;
 }
 
 .definition {
-  display:flex;
-  flex-direction:column;
-  text-align:left;
-  background:white;
-  border:1px solid var(--line);
-  border-radius:20px;
-  width:172px;
-  min-height:159px;
-  padding:18px 20px;
-  margin:190px 16px 0 auto;
-  gap:15px
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  width: 172px;
+  min-height: 159px;
+  padding: 18px 20px;
+  margin: 190px 16px 0 auto;
+  gap: 15px;
 }
 
 .definition small {
-  font-size:10px;
-  white-space:nowrap
+  font-size: 10px;
+  white-space: nowrap;
 }
 
 .composer {
-  position:fixed;
-  bottom:0;
-  left:50%;
-  transform:translateX(-50%);
-  width:min(100%,420px);
-  height:69px;
-  background:var(--ink);
-  display:flex;
-  align-items:center;
-  gap:10px;
-  padding:0 16px 10px 2px;
-  z-index:4
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(100%, 757px);
+  height: 69px;
+  background: var(--ink);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 16px 10px 2px;
+  z-index: 4;
+}
+
+@media (width > 757px) {
+  .composer {
+    width: 420px;
+  }
 }
 
 .composer-error { position:absolute; right:12px; bottom:2px; max-width:250px; color:#ffb4b4; font-size:10px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap }
 
 .stance-switch {
-  display:flex;
-  border-radius:20px;
-  background:white;
-  padding:2px;
-  flex-shrink:0
+  display: flex;
+  border-radius: 20px;
+  background: white;
+  padding: 2px;
+  flex-shrink: 0;
 }
 
 .stance-switch button {
-  font-size:10px;
-  padding:2px 10px;
-  border-radius:20px
+  font-size: 10px;
+  padding: 2px 10px;
+  border-radius: 20px;
 }
 
 .stance-switch .selected {
-  background:var(--blue);
-  color:#fff
+  background: var(--blue);
+  color: #fff;
 }
 
 .stance-switch .disagree {
-  background:var(--pink)
+  background: var(--pink);
 }
 
 .composer input {
-  width:0;
-  flex:1;
-  border:0;
-  border-radius:20px;
-  height:24px;
-  background:white;
-  padding:0 10px;
-  font-size:14px
+  width: 0;
+  flex: 1;
+  border: 0;
+  border-radius: 20px;
+  height: 24px;
+  background: white;
+  padding: 0 10px;
+  font-size: 14px;
 }
 
 .send {
-  color:#ddd;
-  font-size:33px;
-  line-height:1
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  line-height: 1;
 }
 
-.screen-thread .app-header {
-  margin-bottom:0
+.screen-thread .app-header,
+.screen-new-thread .app-header {
+  margin-bottom: 0;
 }

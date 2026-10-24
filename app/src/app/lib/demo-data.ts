@@ -1,40 +1,46 @@
-import taxImage from "../images/税金.svg";
-import pricesImage from "../images/物価賃金.svg";
-import budgetImage from "../images/国の財政.svg";
-import financeImage from "../images/金融投資.svg";
-import workStyleImage from "../images/働き方.svg";
-import employmentImage from "../images/雇用.svg";
-import industryImage from "../images/産業政策.svg";
-import agricultureImage from "../images/農林水産.svg";
-import childcareImage from "../images/子育て支援.svg";
-import birthrateImage from "../images/少子化.svg";
-import schoolImage from "../images/学校教育.svg";
-import higherEducationImage from "../images/高等教育.svg";
-import pensionImage from "../images/年金.svg";
-import medicalImage from "../images/医療.svg";
-import nursingImage from "../images/介護.svg";
-import welfareImage from "../images/生活支援.svg";
-import housingImage from "../images/住まい交通.svg";
-import localImage from "../images/地方.svg";
-import disasterImage from "../images/防災復興.svg";
-import digitalImage from "../images/デジタル.svg";
-import securityImage from "../images/治安.svg";
-import justiceImage from "../images/司法.svg";
-import consumerImage from "../images/消費者保護.svg";
-import rightsImage from "../images/人権多様性.svg";
-import diplomacyImage from "../images/外交.svg";
-import defenseImage from "../images/安全保障防衛.svg";
-import foreignResidentsImage from "../images/外国人政策.svg";
-import climateImage from "../images/気候変動.svg";
-import natureImage from "../images/自然環境.svg";
-import electionImage from "../images/選挙制度.svg";
-import politicalMoneyImage from "../images/政治と金.svg";
-import constitutionImage from "../images/憲法.svg";
-import administrationImage from "../images/国会行政.svg";
 import type { StaticImageData } from "next/image";
+import agricultureImage from "../images/agriculture-forestry-fisheries.svg";
+import climateImage from "../images/climate-change.svg";
+import constitutionImage from "../images/constitution.svg";
+import consumerImage from "../images/consumer-protection.svg";
+import birthrateImage from "../images/declining-birthrate.svg";
+import digitalImage from "../images/digital.svg";
+import diplomacyImage from "../images/diplomacy.svg";
+import disasterImage from "../images/disaster-prevention-recovery.svg";
+import nursingImage from "../images/elderly-care.svg";
+import electionImage from "../images/electoral-system.svg";
+import employmentImage from "../images/employment.svg";
+import financeImage from "../images/finance-investment.svg";
+import foreignResidentsImage from "../images/foreign-resident-policy.svg";
+import medicalImage from "../images/healthcare.svg";
+import higherEducationImage from "../images/higher-education.svg";
+import housingImage from "../images/housing-transport.svg";
+import rightsImage from "../images/human-rights-diversity.svg";
+import industryImage from "../images/industrial-policy.svg";
+import justiceImage from "../images/judiciary.svg";
+import welfareImage from "../images/livelihood-support.svg";
+import localImage from "../images/local-government.svg";
+import budgetImage from "../images/national-budget.svg";
+import natureImage from "../images/natural-environment.svg";
+import childcareImage from "../images/parenting-support.svg";
+import administrationImage from "../images/parliament-administration.svg";
+import pensionImage from "../images/pensions.svg";
+import politicalMoneyImage from "../images/political-funding.svg";
+import pricesImage from "../images/prices-wages.svg";
+import securityImage from "../images/public-safety.svg";
+import schoolImage from "../images/school-education.svg";
+import defenseImage from "../images/security-defense.svg";
+import taxImage from "../images/tax.svg";
+import workStyleImage from "../images/work-styles.svg";
 
-export type Screen = "home" | "topics" | "summary" | "discussion" | "thread" | "vote" | "video" | "login" | "register" | "profile";
-export const screens: Screen[] = ["home", "topics", "summary", "discussion", "thread", "vote", "video", "login", "register", "profile"];
+export type Screen =
+  | "home" | "topics" | "summary" | "discussion" | "thread" | "new-thread"
+  | "vote" | "video" | "login" | "register" | "profile";
+
+export const screens: Screen[] = [
+  "home", "topics", "summary", "discussion", "thread", "new-thread",
+  "vote", "video", "login", "register", "profile",
+];
 
 const middleTopicImages: Record<string, StaticImageData> = {
   "税金": taxImage,

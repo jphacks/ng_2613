@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import type { Catalog, CatalogTopic, TopicDetail } from "../lib/catalog/types";
+import { getPostAuthScreen } from "../lib/auth/auth-flow";
 import { screens, type Screen } from "../lib/demo-data";
 import type { FrameVoteState, VoteValue } from "../lib/votes/types";
 import type { PostStance, ThreadDetail, ThreadSummary } from "../lib/threads/types";
@@ -112,7 +113,6 @@ export function useDiscussionState() {
     complete: false,
   });
   const [authStatus, setAuthStatus] = useState<AuthStatus>("loading");
-  const [otpSent, setOtpSent] = useState(false);
   const [accountSubmitting, setAccountSubmitting] = useState(false);
   const [accountError, setAccountError] = useState("");
   const [catalog, setCatalog] = useState<Catalog | null>(null);
@@ -141,6 +141,8 @@ export function useDiscussionState() {
   useEffect(() => {
     const syncScreen = () => {
       const next = parseLocationHash();
+      const url = new URL(window.location.href);
+      const authError = url.searchParams.get("auth_error");
       setScreen(next.screen);
       setSelection(next.selection);
       setTopicDetail(null);
@@ -152,8 +154,17 @@ export function useDiscussionState() {
       setThreadDetailStatus(next.selection.threadId ? "loading" : "idle");
       setThreadDetailError("");
       setMenuOpen(false);
-      setOtpSent(false);
-      setAccountError("");
+      setAccountError(authError === "confirmation_failed"
+        ? "認証リンクが無効または期限切れです。もう一度ログインしてください。"
+        : "");
+      if (authError) {
+        url.searchParams.delete("auth_error");
+        window.history.replaceState(
+          window.history.state,
+          "",
+          `${url.pathname}${url.search}${url.hash}`,
+        );
+      }
     };
     syncScreen();
     window.addEventListener("hashchange", syncScreen);
@@ -492,38 +503,34 @@ export function useDiscussionState() {
         return;
       }
 
-      const flow = screen === "register" ? "sign-up" : "sign-in";
       const email = String(formData.get("email") ?? "");
-      if (!otpSent) {
-        const result = await requestApi<{ email: string }>("/api/auth/otp", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, flow }),
-        });
-        setProfile((current) => ({ ...current, email: result.email }));
-        setOtpSent(true);
-        setNotice("メールで認証コードを送信しました。6桁のコードを入力してください。");
+      const password = String(formData.get("password") ?? "");
+      const passwordConfirmation = String(formData.get("passwordConfirmation") ?? "");
+      if (screen === "register" && password !== passwordConfirmation) {
+        setAccountError("パスワードが一致しません。");
         return;
       }
 
       const result = await requestApi<{ authenticated: true; profile: AccountProfile }>(
-        "/api/auth/verify",
+        screen === "register" ? "/api/auth/sign-up" : "/api/auth/sign-in",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             email,
-            token: String(formData.get("token") ?? ""),
-            flow,
+            password,
+            ...(screen === "register" ? { passwordConfirmation } : {}),
           }),
         },
       );
       setProfile(result.profile);
       setAuthStatus("authenticated");
-      setHash(result.profile.complete ? "home" : "profile", {
+      setHash(getPostAuthScreen(result.profile), {
         genreId: null, middleTopicId: null, topicId: null, frameId: null, threadId: null,
       });
-      setNotice(result.profile.complete ? "ログインしました。" : "プロフィールを設定してください。");
+      setNotice(screen === "register"
+        ? "登録しました。プロフィールを設定してください。"
+        : result.profile.complete ? "ログインしました。" : "プロフィールを設定してください。");
     } catch (error) {
       setAccountError(error instanceof Error ? error.message : "処理に失敗しました。");
     } finally {
@@ -552,7 +559,7 @@ export function useDiscussionState() {
   return {
     screen, menuOpen, setMenuOpen, search, setSearch, stance, setStance, message, setMessage,
     messages, setMessages, vote, setVote, notice, setNotice, profile, navigate, submitAccount,
-    accountScreen, authStatus, otpSent, accountSubmitting, accountError, signOut, genres,
+    accountScreen, authStatus, accountSubmitting, accountError, signOut, genres,
     selectedGenre, selectedMiddleTopic, topicDetail, selectedFrame,
     catalogStatus: authStatus === "unauthenticated"
       ? "unauthenticated" as const

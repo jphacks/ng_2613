@@ -16,7 +16,7 @@
   z-index:10
 }
 
-.drawer button {
+.drawer button,.desktop-menu button {
   width:100%;
   display:block;
   border-bottom:1px solid #aaa;
@@ -25,8 +25,20 @@
   font-size:20px
 }
 
-.drawer button:disabled {
+.drawer button:disabled,.desktop-menu button:disabled {
   cursor:not-allowed;
   color:#888;
   background:#f5f5f5
+}
+
+.desktop-menu {
+  width:262px;
+  max-width:100%;
+  flex-shrink:0;
+  background:transparent
+}
+
+.desktop-menu button {
+  padding-inline:clamp(0px,calc((100vw - 420px) / 16),12px);
+  overflow-wrap:anywhere
 }
