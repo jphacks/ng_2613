@@ -3,7 +3,7 @@ begin;
 create extension if not exists pgtap with schema extensions;
 set search_path = public, extensions;
 
-select plan(32);
+select plan(36);
 
 select has_column(
   'public', 'thread_reactions', 'reactor_vote_value',
@@ -15,9 +15,9 @@ select col_type_is(
   'the reaction vote snapshot uses smallint'
 );
 
-select col_not_null(
+select col_is_null(
   'public', 'thread_reactions', 'reactor_vote_value',
-  'the reaction vote snapshot is required'
+  'the reaction vote snapshot allows unvoted NULL values'
 );
 
 insert into auth.users (
@@ -196,21 +196,37 @@ select is((select reactor_vote_value from public.thread_reactions), 2::smallint,
 reset role;
 set local role authenticated;
 select set_config('request.jwt.claims', '{"sub":"10000000-0000-0000-0000-000000000006","role":"authenticated"}', true);
-select throws_ok(
+select lives_ok(
   $$insert into public.thread_reactions (thread_id, user_id)
     values ('50000000-0000-0000-0000-000000000001', '10000000-0000-0000-0000-000000000006')$$,
-  '42501', null,
-  'a user without a vote cannot react'
+  'a user without a vote can react'
+);
+select is(
+  (select reactor_vote_value from public.thread_reactions),
+  null::smallint,
+  'an unvoted reaction stores a NULL snapshot'
+);
+
+insert into public.votes (frame_id, user_id, value)
+values ('40000000-0000-0000-0000-000000000001', '10000000-0000-0000-0000-000000000006', 4);
+select is(
+  (select reactor_vote_value from public.thread_reactions),
+  null::smallint,
+  'a later initial vote does not rewrite the NULL snapshot'
 );
 
 reset role;
 set local role authenticated;
 select set_config('request.jwt.claims', '{"sub":"10000000-0000-0000-0000-000000000004","role":"authenticated"}', true);
-select throws_ok(
+select lives_ok(
   $$insert into public.thread_reactions (thread_id, user_id)
     values ('50000000-0000-0000-0000-000000000001', '10000000-0000-0000-0000-000000000004')$$,
-  '42501', null,
-  'a vote for another frame cannot authorize a reaction'
+  'a user with only another-frame vote can still react as unvoted for this frame'
+);
+select is(
+  (select reactor_vote_value from public.thread_reactions),
+  null::smallint,
+  'another-frame vote is not used for the reaction snapshot'
 );
 
 reset role;
@@ -297,8 +313,8 @@ select is(
 select is(
   (select count(*)::bigint from public.thread_reactions where thread_id = '50000000-0000-0000-0000-000000000001')
     - (select agree_count + disagree_count from private.get_thread_reaction_counts('40000000-0000-0000-0000-000000000001') where thread_id = '50000000-0000-0000-0000-000000000001'),
-  1::bigint,
-  'neutral reactions are excluded from both bridge sides'
+  3::bigint,
+  'neutral and NULL reactions are excluded from both bridge sides'
 );
 select results_eq(
   $$select agree_count, disagree_count
@@ -308,6 +324,18 @@ select results_eq(
   'threads without reactions are returned with zero counts'
 );
 
+set local role authenticated;
+select set_config('request.jwt.claims', '{"sub":"10000000-0000-0000-0000-000000000006","role":"authenticated"}', true);
+delete from public.thread_reactions where thread_id = '50000000-0000-0000-0000-000000000001';
+insert into public.thread_reactions (thread_id, user_id)
+values ('50000000-0000-0000-0000-000000000001', '10000000-0000-0000-0000-000000000006');
+select is(
+  (select reactor_vote_value from public.thread_reactions),
+  4::smallint,
+  're-adding an formerly unvoted reaction captures the current vote value'
+);
+
+reset role;
 set local role authenticated;
 select set_config('request.jwt.claims', '{"sub":"10000000-0000-0000-0000-000000000001","role":"authenticated"}', true);
 select throws_ok(
