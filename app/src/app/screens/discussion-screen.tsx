@@ -1,3 +1,4 @@
+import { useRef, useState } from "react";
 import DataState from "../components/data-state";
 import type { DiscussionState } from "../hooks/use-discussion-state";
 import TopicSummaryCard from "../components/topic-summary-card";
@@ -5,6 +6,40 @@ import "./discussion-screen.css";
 
 type Props = Pick<DiscussionState, "navigate" | "topicStatus" | "topicError" | "retryTopic" | "selectedFrame" | "selectedFrameNumber" | "threads" | "threadsStatus" | "threadsError" | "retryThreads" | "selectThread" | "voteSubmittingFrameId" | "voteErrors" | "submitVote">;
 export default function DiscussionScreen(props: Props) {
+    const [reactionFlashes, setReactionFlashes] = useState<Record<string, number>>({});
+    const [reactionOverrides, setReactionOverrides] = useState<Record<string, boolean>>({});
+    const [reactionPending, setReactionPending] = useState<Record<string, boolean>>({});
+    const [reactionErrors, setReactionErrors] = useState<Record<string, string>>({});
+    const pendingIds = useRef(new Set<string>());
+
+    async function toggleReaction(threadId: string, reacted: boolean) {
+        if (pendingIds.current.has(threadId)) return;
+        pendingIds.current.add(threadId);
+        setReactionPending(current => ({ ...current, [threadId]: true }));
+        setReactionErrors(current => ({ ...current, [threadId]: "" }));
+        try {
+            const response = await fetch(`/api/threads/${encodeURIComponent(threadId)}/reaction`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ reacted: !reacted }),
+            });
+            const body: unknown = await response.json();
+            if (!response.ok) {
+                throw new Error(response.status === 401 ? "ログインし直してください。" : "なるほどを保存できませんでした。もう一度お試しください。");
+            }
+            if (!body || typeof body !== "object" || !("data" in body) || !body.data || typeof body.data !== "object" || !("reacted" in body.data) || typeof body.data.reacted !== "boolean") {
+                throw new Error("サーバーから正しい応答を受信できませんでした。");
+            }
+            const savedReaction = body.data.reacted;
+            setReactionOverrides(current => ({ ...current, [threadId]: savedReaction }));
+            if (savedReaction) setReactionFlashes(current => ({ ...current, [threadId]: (current[threadId] ?? 0) + 1 }));
+        } catch (error) {
+            setReactionErrors(current => ({ ...current, [threadId]: error instanceof Error ? error.message : "通信に失敗しました。" }));
+        } finally {
+            pendingIds.current.delete(threadId);
+            setReactionPending(current => ({ ...current, [threadId]: false }));
+        }
+    }
     if (props.topicStatus !== "success" || !props.selectedFrame) {
         return <DataState status={props.topicStatus === "success" ? "error" : props.topicStatus} error={props.topicStatus === "success" ? "指定された設問が見つかりません。" : props.topicError} emptyMessage="このトピックには設問がありません。" onRetry={props.retryTopic} onLogin={() => props.navigate("login")} skeleton="cards"/>;
     }
@@ -15,9 +50,26 @@ export default function DiscussionScreen(props: Props) {
         <div className="discussion-opinions" aria-labelledby="discussion-opinions-heading">
             <h2 id="discussion-opinions-heading">みんなの意見</h2>
             {props.threadsStatus === "error" && <DataState status="error" error={props.threadsError} emptyMessage="" onRetry={props.retryThreads}/>}
-            {threads.map(thread =>
-            <button key={thread.id} className={`opinion-row ${thread.stance === "agree" ? "blue" : "pink"}`} onClick={() => props.selectThread(thread.id)}><span className="opinion-text">{thread.title}</span><span>＞</span></button>
-        )}</div>
+            {threads.map(thread => {
+            const reacted = reactionOverrides[thread.id] ?? thread.reacted ?? false;
+            return <div key={thread.id}>
+            <div className={`opinion-row ${thread.stance === "agree" ? "blue" : "pink"}`}>
+                <button type="button" className={`opinion-reaction${reacted ? " is-reacted" : ""}`} aria-label={`「${thread.title}」になるほど`}
+                    aria-pressed={reacted} disabled={reactionPending[thread.id]} aria-busy={Boolean(reactionPending[thread.id])}
+                    onClick={() => void toggleReaction(thread.id, reacted)}>
+                    <svg key={`${reacted}-${reactionFlashes[thread.id] ?? 0}`} className={`reaction-bulb${reacted && reactionFlashes[thread.id] ? " is-flashing" : ""}`} width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                        <path d="M9 18h6M10 21h4M8 14a6 6 0 1 1 8 0c-1 1-1 2-1 4H9c0-2 0-3-1-4Z" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+                        <path d="M12 10v8M9.5 8.5 12 11l2.5-2.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                    <span>なるほど</span>
+                </button>
+                <button type="button" className="opinion-message" onClick={() => props.selectThread(thread.id)}>
+                    <span className="opinion-text">{thread.title}</span><span aria-hidden="true">＞</span>
+                </button>
+            </div>
+            {reactionErrors[thread.id] && <p role="alert">{reactionErrors[thread.id]}</p>}
+            </div>;
+        })}</div>
         <button type="button" className="add-opinion" aria-label="意見を追加" onClick={() => props.navigate("new-thread")}>
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">
                 <path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="1.2" />
