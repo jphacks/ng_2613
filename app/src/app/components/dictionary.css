@@ -70,8 +70,6 @@
   transition: background-color var(--duration) var(--ease-out), box-shadow var(--duration) var(--ease-out);
 }
 
-button.dictionary-term { display: inline; font: inherit; text-align: inherit; }
-
 /* 虫眼鏡が重なっている言葉 */
 .dictionary-term.is-targeted {
   background: #299ded26;
@@ -81,6 +79,8 @@ button.dictionary-term { display: inline; font: inherit; text-align: inherit; }
 .dictionary-popover {
   position: fixed;
   z-index: 6;
+  /* 表示するだけなので、ドラッグや下の操作の邪魔をしない */
+  pointer-events: none;
   padding: 14px 16px 16px;
   border: 1px solid var(--line);
   border-radius: 14px;
@@ -105,14 +105,4 @@ button.dictionary-term { display: inline; font: inherit; text-align: inherit; }
 .dictionary-popover p {
   font-size: 13px;
   line-height: 1.8;
-}
-
-.dictionary-popover-close {
-  position: absolute;
-  top: 6px;
-  right: 8px;
-  width: 28px;
-  height: 28px;
-  font-size: 18px;
-  line-height: 1;
 }

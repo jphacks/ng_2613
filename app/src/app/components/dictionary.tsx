@@ -1,12 +1,11 @@
 "use client";
 
-import { createContext, useContext, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
 import "./dictionary.css";
 
 const entries = [
   { term: "消費税", definition: "商品を買うとかかるお金です" },
 ];
-const DictionaryContext = createContext<(term: string, anchor: HTMLElement) => void>(() => {});
 
 type Popover = { term: string; definition: string; top: number; left: number; placement: "below" | "above" };
 
@@ -24,15 +23,18 @@ function lensPoint(rect: DOMRect) {
   return { x: rect.left + rect.width * (20 / 48), y: rect.top + rect.height * (20 / 48) };
 }
 
+// 言葉は押せない（クリックを下の行に通す）ため、要素の当たり判定ではなく表示位置で調べる。
+// 折り返した言葉にも対応するよう、行ごとの矩形を見る。
 function termAt(x: number, y: number) {
-  for (const element of document.elementsFromPoint(x, y)) {
-    const term = element.closest<HTMLElement>(".dictionary-term[data-term]");
-    if (term) return term;
+  for (const element of document.querySelectorAll<HTMLElement>(".dictionary-term[data-term]")) {
+    for (const rect of element.getClientRects()) {
+      if (x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom) return element;
+    }
   }
   return null;
 }
 
-// 言葉のすぐ下に出し、下に入らなければ上に出す
+// 虫眼鏡は言葉の下側にかぶさるので、解説は言葉の上に出す。上に入らなければ虫眼鏡の下に出す。
 function popoverFor(term: string, anchor: HTMLElement): Popover | null {
   const entry = entries.find((item) => item.term === term);
   if (!entry) return null;
@@ -41,25 +43,26 @@ function popoverFor(term: string, anchor: HTMLElement): Popover | null {
     Math.max(margin, rect.left + rect.width / 2 - popoverWidth / 2),
     window.innerWidth - popoverWidth - margin,
   );
-  const below = rect.bottom + 120 < window.innerHeight;
+  const above = rect.top - 110 > 0;
   return {
     ...entry,
     left,
-    top: below ? rect.bottom + 8 : rect.top - 8,
-    placement: below ? "below" : "above",
+    top: above ? rect.top - 8 : rect.bottom + lensSize + captionHeight,
+    placement: above ? "above" : "below",
   };
+}
+
+function samePopover(a: Popover | null, b: Popover | null) {
+  return a?.term === b?.term && a?.top === b?.top && a?.left === b?.left && a?.placement === b?.placement;
 }
 
 // visible が false のあいだは虫眼鏡を出さない。
 export function DictionaryProvider({ children, visible = true }: { children: ReactNode; visible?: boolean }) {
   const [popover, setPopover] = useState<Popover | null>(null);
   const lensRef = useRef<HTMLButtonElement>(null);
-  const popoverRef = useRef<HTMLDivElement>(null);
   const positionRef = useRef<{ x: number; y: number } | null>(null);
-  const restRef = useRef<{ x: number; y: number } | null>(null);
   const targetRef = useRef<HTMLElement | null>(null);
-  const draggedRef = useRef(false);
-  const dragRef = useRef<{ pointerId: number; x: number; y: number; startX: number; startY: number } | null>(null);
+  const dragRef = useRef<{ pointerId: number; x: number; y: number } | null>(null);
 
   function moveLens(x: number, y: number) {
     const lens = lensRef.current;
@@ -90,120 +93,89 @@ export function DictionaryProvider({ children, visible = true }: { children: Rea
     lens.style.bottom = "auto";
   }
 
-  // 画面遷移や画面サイズの変更のあとも、虫眼鏡が画面内に収まるようにする
-  useLayoutEffect(() => {
-    function fitLens() {
-      const rect = lensRef.current?.getBoundingClientRect();
-      if (rect) moveLens(positionRef.current?.x ?? rect.left, positionRef.current?.y ?? rect.top);
+  // レンズの下にある言葉を調べ、重なっているあいだだけ解説を出す
+  function updateTarget() {
+    const rect = lensRef.current?.getBoundingClientRect();
+    const point = rect ? lensPoint(rect) : null;
+    const next = point ? termAt(point.x, point.y) : null;
+    if (targetRef.current !== next) {
+      targetRef.current?.classList.remove("is-targeted");
+      next?.classList.add("is-targeted");
+      targetRef.current = next;
     }
-    fitLens();
-    window.addEventListener("resize", fitLens);
-    return () => window.removeEventListener("resize", fitLens);
+    const nextPopover = next?.dataset.term ? popoverFor(next.dataset.term, next) : null;
+    // 同じ内容なら state を更新しない（描画のたびに呼ぶため、無限に再描画しないように）
+    setPopover((current) => samePopover(current, nextPopover) ? current : nextPopover);
+  }
+
+  // 画面遷移や画面サイズの変更のあとも、虫眼鏡を画面内に収め、下の言葉を調べ直す
+  useLayoutEffect(() => {
+    const rect = lensRef.current?.getBoundingClientRect();
+    if (rect) moveLens(positionRef.current?.x ?? rect.left, positionRef.current?.y ?? rect.top);
+    updateTarget();
   });
 
-  // 吹き出しは Esc・外側のクリック・スクロールで閉じる
+  // 置いたままの虫眼鏡の下を画面がスクロールしたり、画面サイズが変わったりしたときも調べ直す
   useEffect(() => {
-    if (!popover) return;
-    const close = () => setPopover(null);
-    const closeOnKey = (event: KeyboardEvent) => { if (event.key === "Escape") close(); };
-    const closeOnOutside = (event: PointerEvent) => {
-      const target = event.target as Node;
-      if (!popoverRef.current?.contains(target) && !lensRef.current?.contains(target)) close();
+    let frame = 0;
+    const schedule = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => {
+        const rect = lensRef.current?.getBoundingClientRect();
+        if (rect) moveLens(positionRef.current?.x ?? rect.left, positionRef.current?.y ?? rect.top);
+        updateTarget();
+      });
     };
-    window.addEventListener("keydown", closeOnKey);
-    window.addEventListener("pointerdown", closeOnOutside);
-    window.addEventListener("scroll", close, { passive: true, capture: true });
+    window.addEventListener("scroll", schedule, { passive: true, capture: true });
+    window.addEventListener("resize", schedule);
     return () => {
-      window.removeEventListener("keydown", closeOnKey);
-      window.removeEventListener("pointerdown", closeOnOutside);
-      window.removeEventListener("scroll", close, { capture: true });
+      cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", schedule, { capture: true });
+      window.removeEventListener("resize", schedule);
     };
-  }, [popover]);
+  });
 
-  function setTarget(next: HTMLElement | null) {
-    if (targetRef.current === next) return;
-    targetRef.current?.classList.remove("is-targeted");
-    next?.classList.add("is-targeted");
-    targetRef.current = next;
-  }
-
-  function openTerm(term: string, anchor: HTMLElement) {
-    setPopover(popoverFor(term, anchor));
-  }
-
-  // 虫眼鏡を言葉に重ねて離したら解説を出し、元の位置へ戻す
-  function dropOnTerm(returnLens: boolean) {
-    const target = targetRef.current;
-    setTarget(null);
-    if (!target?.dataset.term) return false;
-    openTerm(target.dataset.term, target);
-    if (returnLens && restRef.current) moveLens(restRef.current.x, restRef.current.y);
-    return true;
-  }
-
-  function checkLensTarget() {
-    const rect = lensRef.current?.getBoundingClientRect();
-    if (!rect) return;
-    const point = lensPoint(rect);
-    setTarget(termAt(point.x, point.y));
-  }
-
-  return <DictionaryContext.Provider value={openTerm}>
+  return <>
     {children}
     {visible && <button
       ref={lensRef}
       type="button"
       className="dictionary-lens"
-      aria-label="虫眼鏡。言葉に重ねると解説を表示（ドラッグまたは矢印キーで移動、Enter で重なった言葉を調べる）"
-      onClick={(event) => {
-        // ドラッグの終わりの click は無視する。キーボードの Enter は event.detail が 0
-        if (draggedRef.current && event.detail !== 0) return;
-        checkLensTarget();
-        // クリックやキーボードでは虫眼鏡を動かしていないので、元の位置へは戻さない
-        dropOnTerm(false);
-      }}
+      aria-label="虫眼鏡。言葉に重ねているあいだ解説を表示（ドラッグまたは矢印キーで移動）"
       onPointerDown={(event) => {
         if (event.button !== 0) return;
         const rect = lensRef.current?.getBoundingClientRect();
         if (!rect) return;
-        draggedRef.current = false;
-        restRef.current = positionRef.current;
-        setPopover(null);
-        dragRef.current = { pointerId: event.pointerId, x: event.clientX - rect.left, y: event.clientY - rect.top, startX: event.clientX, startY: event.clientY };
+        dragRef.current = { pointerId: event.pointerId, x: event.clientX - rect.left, y: event.clientY - rect.top };
+        lensRef.current?.classList.add("is-dragging");
         event.currentTarget.setPointerCapture(event.pointerId);
       }}
       onPointerMove={(event) => {
         const drag = dragRef.current;
         if (drag?.pointerId !== event.pointerId) return;
-        if (Math.hypot(event.clientX - drag.startX, event.clientY - drag.startY) > 4) draggedRef.current = true;
-        if (!draggedRef.current) return;
-        lensRef.current?.classList.add("is-dragging");
         moveLens(event.clientX - drag.x, event.clientY - drag.y);
-        checkLensTarget();
+        updateTarget();
       }}
       onPointerUp={(event) => {
-        const wasDragged = draggedRef.current;
         dragRef.current = null;
         lensRef.current?.classList.remove("is-dragging");
         event.currentTarget.releasePointerCapture(event.pointerId);
-        if (wasDragged && !dropOnTerm(true)) {
-          // 言葉の外で離したら、その場所に置いたままにする
-          const position = positionRef.current;
-          if (position) moveLens(position.x, position.y);
-        }
+        // 離した場所に置いたままにする（意見追加ボタンとの重なりだけは避ける）
+        const position = positionRef.current;
+        if (position) moveLens(position.x, position.y);
+        updateTarget();
       }}
       onLostPointerCapture={() => { dragRef.current = null; lensRef.current?.classList.remove("is-dragging"); }}
-      onPointerCancel={() => { dragRef.current = null; setTarget(null); lensRef.current?.classList.remove("is-dragging"); }}
+      onPointerCancel={() => { dragRef.current = null; lensRef.current?.classList.remove("is-dragging"); }}
       onKeyDown={(event) => {
         const directions: Record<string, [number, number]> = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] };
         const direction = directions[event.key];
         const position = positionRef.current;
         if (!direction || !position) return;
         event.preventDefault();
-        draggedRef.current = false;
         const step = event.shiftKey ? 40 : 10;
         moveLens(position.x + direction[0] * step, position.y + direction[1] * step);
-        checkLensTarget();
+        updateTarget();
       }}
     >
       <svg width={lensSize} height={lensSize} viewBox="0 0 48 48" aria-hidden="true">
@@ -213,22 +185,20 @@ export function DictionaryProvider({ children, visible = true }: { children: Rea
       </svg>
       <span className="dictionary-lens-caption" aria-hidden="true">わからない言葉に<br />移動させよう</span>
     </button>}
-    {popover && <div
-      ref={popoverRef}
+    {visible && popover && <div
       className={`dictionary-popover ${popover.placement}`}
-      role="dialog"
+      role="status"
       aria-label={`${popover.term}の解説`}
       style={{ top: popover.top, left: popover.left, width: popoverWidth }}
     >
-      <button type="button" className="dictionary-popover-close" aria-label="解説を閉じる" onClick={() => setPopover(null)}>×</button>
       <h2>{popover.term}</h2>
       <p>{popover.definition}</p>
     </div>}
-  </DictionaryContext.Provider>;
+  </>;
 }
 
-export function DictionaryText({ children, interactive = true }: { children: string; interactive?: boolean }) {
-  const openTerm = useContext(DictionaryContext);
+// 辞書にある言葉に印を付ける。押せる要素にはせず、クリックは下の行などにそのまま通す。
+export function DictionaryText({ children }: { children: string }) {
   // Prefer longer terms when dictionary entries overlap.
   const terms = entries.map(entry => entry.term).sort((a, b) => b.length - a.length);
   const parts: ReactNode[] = [];
@@ -238,9 +208,7 @@ export function DictionaryText({ children, interactive = true }: { children: str
     const match = matches[0];
     if (!match) { parts.push(remaining); break; }
     parts.push(remaining.slice(0, match.index));
-    parts.push(interactive
-      ? <button type="button" className="dictionary-term" data-term={match.term} key={parts.length} aria-label={`${match.term}の意味を表示`} onClick={(event) => openTerm(match.term, event.currentTarget)}>{match.term}</button>
-      : <span className="dictionary-term" data-term={match.term} key={parts.length}>{match.term}</span>);
+    parts.push(<span className="dictionary-term" data-term={match.term} key={parts.length}>{match.term}</span>);
     remaining = remaining.slice(match.index + match.term.length);
   }
   return <>{parts}</>;

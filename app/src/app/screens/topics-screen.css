@@ -36,10 +36,6 @@
   pointer-events:none;
 }
 
-.topic-row-term .dictionary-term {
-  pointer-events:auto;
-}
-
 .topic-hero.topic-image-placeholder {
   border-radius:50%;
   background:#eef3f5
