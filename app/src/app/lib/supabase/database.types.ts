@@ -9,6 +9,12 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      thread_reactions: {
+        Row: { id: string; thread_id: string; user_id: string; created_at: string; vote_value: number | null };
+        Insert: { thread_id: string; user_id: string };
+        Update: never;
+        Relationships: [];
+      };
       genres: {
         Row: {
           id: string;
