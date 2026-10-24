@@ -3,7 +3,7 @@ import type { DiscussionState } from "../hooks/use-discussion-state";
 import TopicSummaryCard from "../components/topic-summary-card";
 import "./discussion-screen.css";
 
-type Props = Pick<DiscussionState, "navigate" | "topicStatus" | "topicError" | "retryTopic" | "selectedFrame" | "selectedFrameNumber" | "threads" | "threadsStatus" | "threadsError" | "retryThreads" | "selectThread" | "voteSubmittingFrameId" | "voteErrors" | "submitVote">;
+type Props = Pick<DiscussionState, "navigate" | "topicStatus" | "topicError" | "retryTopic" | "selectedFrame" | "selectedFrameNumber" | "threads" | "threadsStatus" | "threadsError" | "retryThreads" | "selectThread" | "voteSubmittingFrameId" | "voteErrors" | "submitVote" | "demographics" | "loadDemographics">;
 export default function DiscussionScreen(props: Props) {
     if (props.topicStatus !== "success" || !props.selectedFrame) {
         return <DataState status={props.topicStatus === "success" ? "error" : props.topicStatus} error={props.topicStatus === "success" ? "指定された設問が見つかりません。" : props.topicError} emptyMessage="このトピックには設問がありません。" onRetry={props.retryTopic} onLogin={() => props.navigate("login")} skeleton="cards"/>;
@@ -11,7 +11,7 @@ export default function DiscussionScreen(props: Props) {
     const frame = props.selectedFrame;
     const threads = props.threadsStatus === "success" ? props.threads : [];
     return <section className="discussion-list">
-        <TopicSummaryCard frame={frame} questionNumber={props.selectedFrameNumber} threads={threads} submitting={props.voteSubmittingFrameId === frame.id} error={props.voteErrors[frame.id] ?? ""} onVote={props.submitVote} onDetail={() => props.navigate("discussion")} onThread={threadId => props.selectThread(threadId)} />
+        <TopicSummaryCard frame={frame} questionNumber={props.selectedFrameNumber} threads={threads} submitting={props.voteSubmittingFrameId === frame.id} error={props.voteErrors[frame.id] ?? ""} onVote={props.submitVote} onDetail={() => props.navigate("discussion")} onThread={threadId => props.selectThread(threadId)} demographics={props.demographics[frame.id]} onLoadDemographics={props.loadDemographics} />
         <div className="discussion-opinions" aria-labelledby="discussion-opinions-heading">
             <h2 id="discussion-opinions-heading">みんなの意見</h2>
             {props.threadsStatus === "error" && <DataState status="error" error={props.threadsError} emptyMessage="" onRetry={props.retryThreads}/>}

@@ -3,7 +3,7 @@ import TopicSummaryCard from "../components/topic-summary-card";
 import type { DiscussionState } from "../hooks/use-discussion-state";
 import "./summary-screen.css";
 
-type Props = Pick<DiscussionState, "topicDetail" | "topicStatus" | "topicError" | "retryTopic" | "navigate" | "frameThreads" | "selectFrame" | "selectThread" | "voteSubmittingFrameId" | "voteErrors" | "submitVote">;
+type Props = Pick<DiscussionState, "topicDetail" | "topicStatus" | "topicError" | "retryTopic" | "navigate" | "frameThreads" | "selectFrame" | "selectThread" | "voteSubmittingFrameId" | "voteErrors" | "submitVote" | "demographics" | "loadDemographics">;
 const colors = ["cream", "white", "blue"];
 export default function SummaryScreen(props: Props) {
     if (props.topicStatus !== "success" || !props.topicDetail) {
@@ -11,6 +11,6 @@ export default function SummaryScreen(props: Props) {
     }
     const frames = props.topicDetail.periods.flatMap(period => period.frames);
     return <section className="summaries">{frames.map((frame, index) =>
-        <TopicSummaryCard key={frame.id} color={colors[index % colors.length]} questionNumber={index + 1} frame={frame} threads={props.frameThreads[frame.id] ?? []} submitting={props.voteSubmittingFrameId === frame.id} error={props.voteErrors[frame.id] ?? ""} onVote={props.submitVote} onDetail={() => props.selectFrame(frame.id)} onThread={threadId => props.selectThread(threadId, frame.id)} />
+        <TopicSummaryCard key={frame.id} color={colors[index % colors.length]} questionNumber={index + 1} frame={frame} threads={props.frameThreads[frame.id] ?? []} submitting={props.voteSubmittingFrameId === frame.id} error={props.voteErrors[frame.id] ?? ""} onVote={props.submitVote} onDetail={() => props.selectFrame(frame.id)} onThread={threadId => props.selectThread(threadId, frame.id)} demographics={props.demographics[frame.id]} onLoadDemographics={props.loadDemographics} />
     )}</section>;
 }
