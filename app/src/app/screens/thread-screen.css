@@ -62,7 +62,7 @@
   bottom:0;
   left:50%;
   transform:translateX(-50%);
-  width:min(100%,420px);
+  width:min(100%,757px);
   height:69px;
   background:var(--ink);
   display:flex;
@@ -70,6 +70,12 @@
   gap:10px;
   padding:0 16px 10px 2px;
   z-index:4
+}
+
+@media (width > 757px) {
+  .composer {
+    width:420px
+  }
 }
 
 .stance-switch {
