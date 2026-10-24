@@ -18,6 +18,7 @@ export function useDiscussionState() {
     useEffect(() => {
         const syncScreen = () => {
             const hash = window.location.hash.slice(1);
+            if (hash === "vote") setVote(null);
             setScreen(screens.includes(hash as Screen) ? hash as Screen : "home");
             setMenuOpen(false);
         };
@@ -26,6 +27,7 @@ export function useDiscussionState() {
         return () => window.removeEventListener("hashchange", syncScreen);
     }, []);
     function navigate(next: Screen) {
+        if (next === "vote") setVote(null);
         window.location.hash = next;
         setScreen(next);
         setMenuOpen(false);
