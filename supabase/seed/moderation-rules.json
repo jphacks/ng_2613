@@ -1,0 +1,613 @@
+{
+  "rules": [
+    {
+      "level": "block",
+      "category": "暴力・脅迫",
+      "match_type": "word",
+      "pattern": "死ね",
+      "suggestion": null
+    },
+    {
+      "level": "block",
+      "category": "暴力・脅迫",
+      "match_type": "word",
+      "pattern": "しね",
+      "suggestion": null
+    },
+    {
+      "level": "block",
+      "category": "暴力・脅迫",
+      "match_type": "word",
+      "pattern": "氏ね",
+      "suggestion": null
+    },
+    {
+      "level": "block",
+      "category": "暴力・脅迫",
+      "match_type": "word",
+      "pattern": "タヒね",
+      "suggestion": null
+    },
+    {
+      "level": "block",
+      "category": "暴力・脅迫",
+      "match_type": "word",
+      "pattern": "4ね",
+      "suggestion": null
+    },
+    {
+      "level": "block",
+      "category": "暴力・脅迫",
+      "match_type": "word",
+      "pattern": "殺す",
+      "suggestion": null
+    },
+    {
+      "level": "block",
+      "category": "暴力・脅迫",
+      "match_type": "word",
+      "pattern": "殺すぞ",
+      "suggestion": null
+    },
+    {
+      "level": "block",
+      "category": "暴力・脅迫",
+      "match_type": "word",
+      "pattern": "ぶっ殺す",
+      "suggestion": null
+    },
+    {
+      "level": "block",
+      "category": "暴力・脅迫",
+      "match_type": "word",
+      "pattern": "殺してやる",
+      "suggestion": null
+    },
+    {
+      "level": "block",
+      "category": "暴力・脅迫",
+      "match_type": "word",
+      "pattern": "消えろ",
+      "suggestion": null
+    },
+    {
+      "level": "block",
+      "category": "暴力・脅迫",
+      "match_type": "word",
+      "pattern": "首吊れ",
+      "suggestion": null
+    },
+    {
+      "level": "block",
+      "category": "暴力・脅迫",
+      "match_type": "word",
+      "pattern": "自殺しろ",
+      "suggestion": null
+    },
+    {
+      "level": "block",
+      "category": "暴力・脅迫",
+      "match_type": "word",
+      "pattern": "暗殺しろ",
+      "suggestion": null
+    },
+    {
+      "level": "block",
+      "category": "暴力・脅迫",
+      "match_type": "word",
+      "pattern": "爆破する",
+      "suggestion": null
+    },
+    {
+      "level": "block",
+      "category": "暴力・脅迫",
+      "match_type": "word",
+      "pattern": "燃やす",
+      "suggestion": null
+    },
+    {
+      "level": "block",
+      "category": "暴力・脅迫",
+      "match_type": "word",
+      "pattern": "刺す",
+      "suggestion": null
+    },
+    {
+      "level": "block",
+      "category": "暴力・脅迫",
+      "match_type": "word",
+      "pattern": "家を燃やす",
+      "suggestion": null
+    },
+    {
+      "level": "block",
+      "category": "暴力・脅迫",
+      "match_type": "word",
+      "pattern": "家族を狙う",
+      "suggestion": null
+    },
+    {
+      "level": "block",
+      "category": "暴力・脅迫",
+      "match_type": "word",
+      "pattern": "住所特定",
+      "suggestion": null
+    },
+    {
+      "level": "block",
+      "category": "暴力・脅迫",
+      "match_type": "word",
+      "pattern": "晒す",
+      "suggestion": null
+    },
+    {
+      "level": "block",
+      "category": "暴力・脅迫",
+      "match_type": "word",
+      "pattern": "凸する",
+      "suggestion": null
+    },
+    {
+      "level": "block",
+      "category": "侮辱・人格攻撃",
+      "match_type": "word",
+      "pattern": "バカ",
+      "suggestion": null
+    },
+    {
+      "level": "block",
+      "category": "侮辱・人格攻撃",
+      "match_type": "word",
+      "pattern": "アホ",
+      "suggestion": null
+    },
+    {
+      "level": "block",
+      "category": "侮辱・人格攻撃",
+      "match_type": "word",
+      "pattern": "クズ",
+      "suggestion": null
+    },
+    {
+      "level": "block",
+      "category": "侮辱・人格攻撃",
+      "match_type": "word",
+      "pattern": "カス",
+      "suggestion": null
+    },
+    {
+      "level": "block",
+      "category": "侮辱・人格攻撃",
+      "match_type": "word",
+      "pattern": "ゴミ",
+      "suggestion": null
+    },
+    {
+      "level": "block",
+      "category": "侮辱・人格攻撃",
+      "match_type": "word",
+      "pattern": "無能",
+      "suggestion": null
+    },
+    {
+      "level": "block",
+      "category": "侮辱・人格攻撃",
+      "match_type": "word",
+      "pattern": "低能",
+      "suggestion": null
+    },
+    {
+      "level": "block",
+      "category": "侮辱・人格攻撃",
+      "match_type": "word",
+      "pattern": "知恵遅れ",
+      "suggestion": null
+    },
+    {
+      "level": "block",
+      "category": "侮辱・人格攻撃",
+      "match_type": "word",
+      "pattern": "ジジイ",
+      "suggestion": null
+    },
+    {
+      "level": "block",
+      "category": "侮辱・人格攻撃",
+      "match_type": "word",
+      "pattern": "ババア",
+      "suggestion": null
+    },
+    {
+      "level": "block",
+      "category": "侮辱・人格攻撃",
+      "match_type": "word",
+      "pattern": "老害",
+      "suggestion": null
+    },
+    {
+      "level": "block",
+      "category": "侮辱・人格攻撃",
+      "match_type": "word",
+      "pattern": "ブス",
+      "suggestion": null
+    },
+    {
+      "level": "block",
+      "category": "侮辱・人格攻撃",
+      "match_type": "word",
+      "pattern": "デブ",
+      "suggestion": null
+    },
+    {
+      "level": "block",
+      "category": "侮辱・人格攻撃",
+      "match_type": "word",
+      "pattern": "ハゲ",
+      "suggestion": null
+    },
+    {
+      "level": "block",
+      "category": "侮辱・人格攻撃",
+      "match_type": "word",
+      "pattern": "生きる価値がない",
+      "suggestion": null
+    },
+    {
+      "level": "block",
+      "category": "侮辱・人格攻撃",
+      "match_type": "word",
+      "pattern": "人間じゃない",
+      "suggestion": null
+    },
+    {
+      "level": "block",
+      "category": "差別語",
+      "match_type": "word",
+      "pattern": "ガイジ",
+      "suggestion": null
+    },
+    {
+      "level": "block",
+      "category": "差別語",
+      "match_type": "word",
+      "pattern": "キチガイ",
+      "suggestion": null
+    },
+    {
+      "level": "block",
+      "category": "差別語",
+      "match_type": "word",
+      "pattern": "池沼",
+      "suggestion": null
+    },
+    {
+      "level": "block",
+      "category": "差別語",
+      "match_type": "word",
+      "pattern": "めくら",
+      "suggestion": null
+    },
+    {
+      "level": "block",
+      "category": "差別語",
+      "match_type": "word",
+      "pattern": "つんぼ",
+      "suggestion": null
+    },
+    {
+      "level": "block",
+      "category": "差別語",
+      "match_type": "word",
+      "pattern": "おし",
+      "suggestion": null
+    },
+    {
+      "level": "block",
+      "category": "差別語",
+      "match_type": "word",
+      "pattern": "チョン",
+      "suggestion": null
+    },
+    {
+      "level": "block",
+      "category": "差別語",
+      "match_type": "word",
+      "pattern": "シナ人",
+      "suggestion": null
+    },
+    {
+      "level": "block",
+      "category": "差別語",
+      "match_type": "word",
+      "pattern": "支那",
+      "suggestion": null
+    },
+    {
+      "level": "block",
+      "category": "差別語",
+      "match_type": "word",
+      "pattern": "土人",
+      "suggestion": null
+    },
+    {
+      "level": "block",
+      "category": "差別語",
+      "match_type": "word",
+      "pattern": "三国人",
+      "suggestion": null
+    },
+    {
+      "level": "block",
+      "category": "差別語",
+      "match_type": "word",
+      "pattern": "オカマ",
+      "suggestion": null
+    },
+    {
+      "level": "block",
+      "category": "差別語",
+      "match_type": "word",
+      "pattern": "ホモ",
+      "suggestion": null
+    },
+    {
+      "level": "warn",
+      "category": "政治的なレッテル貼り",
+      "match_type": "word",
+      "pattern": "売国奴",
+      "suggestion": "この政策は国益を損なうと思います"
+    },
+    {
+      "level": "warn",
+      "category": "政治的なレッテル貼り",
+      "match_type": "word",
+      "pattern": "国賊",
+      "suggestion": "この政策は国益を損なうと思います"
+    },
+    {
+      "level": "warn",
+      "category": "政治的なレッテル貼り",
+      "match_type": "word",
+      "pattern": "非国民",
+      "suggestion": "この政策は国益を損なうと思います"
+    },
+    {
+      "level": "warn",
+      "category": "政治的なレッテル貼り",
+      "match_type": "word",
+      "pattern": "反日",
+      "suggestion": "日本にとって不利益だと思います"
+    },
+    {
+      "level": "warn",
+      "category": "政治的なレッテル貼り",
+      "match_type": "word",
+      "pattern": "ネトウヨ",
+      "suggestion": "相手の立場ではなく、意見の中身に反論する"
+    },
+    {
+      "level": "warn",
+      "category": "政治的なレッテル貼り",
+      "match_type": "word",
+      "pattern": "パヨク",
+      "suggestion": "相手の立場ではなく、意見の中身に反論する"
+    },
+    {
+      "level": "warn",
+      "category": "政治的なレッテル貼り",
+      "match_type": "word",
+      "pattern": "ブサヨ",
+      "suggestion": "相手の立場ではなく、意見の中身に反論する"
+    },
+    {
+      "level": "warn",
+      "category": "政治的なレッテル貼り",
+      "match_type": "word",
+      "pattern": "工作員",
+      "suggestion": "根拠を示してほしいです"
+    },
+    {
+      "level": "warn",
+      "category": "政治的なレッテル貼り",
+      "match_type": "word",
+      "pattern": "〇〇の犬",
+      "suggestion": "根拠を示してほしいです"
+    },
+    {
+      "level": "warn",
+      "category": "政治的なレッテル貼り",
+      "match_type": "word",
+      "pattern": "回し者",
+      "suggestion": "根拠を示してほしいです"
+    },
+    {
+      "level": "warn",
+      "category": "政治的なレッテル貼り",
+      "match_type": "word",
+      "pattern": "信者",
+      "suggestion": "その考えには賛成できません"
+    },
+    {
+      "level": "warn",
+      "category": "政治的なレッテル貼り",
+      "match_type": "word",
+      "pattern": "〇〇脳",
+      "suggestion": "その考えには賛成できません"
+    },
+    {
+      "level": "warn",
+      "category": "政治的なレッテル貼り",
+      "match_type": "word",
+      "pattern": "情弱",
+      "suggestion": "別の情報もあります、と情報源を示す"
+    },
+    {
+      "level": "warn",
+      "category": "政治的なレッテル貼り",
+      "match_type": "word",
+      "pattern": "お花畑",
+      "suggestion": "別の情報もあります、と情報源を示す"
+    },
+    {
+      "level": "warn",
+      "category": "政治的なレッテル貼り",
+      "match_type": "word",
+      "pattern": "思考停止",
+      "suggestion": "別の情報もあります、と情報源を示す"
+    },
+    {
+      "level": "warn",
+      "category": "政治的なレッテル貼り",
+      "match_type": "word",
+      "pattern": "マスゴミ",
+      "suggestion": "その報道には偏りがあると思います"
+    },
+    {
+      "level": "warn",
+      "category": "決めつけ・威圧",
+      "match_type": "word",
+      "pattern": "頭悪い",
+      "suggestion": "私はこう考えます"
+    },
+    {
+      "level": "warn",
+      "category": "決めつけ・威圧",
+      "match_type": "word",
+      "pattern": "何も分かってない",
+      "suggestion": "私はこう考えます"
+    },
+    {
+      "level": "warn",
+      "category": "決めつけ・威圧",
+      "match_type": "word",
+      "pattern": "話にならない",
+      "suggestion": "私はこう考えます"
+    },
+    {
+      "level": "warn",
+      "category": "決めつけ・威圧",
+      "match_type": "word",
+      "pattern": "黙れ",
+      "suggestion": "意見が違います"
+    },
+    {
+      "level": "warn",
+      "category": "決めつけ・威圧",
+      "match_type": "word",
+      "pattern": "うるさい",
+      "suggestion": "意見が違います"
+    },
+    {
+      "level": "warn",
+      "category": "決めつけ・威圧",
+      "match_type": "word",
+      "pattern": "出しゃばるな",
+      "suggestion": "意見が違います"
+    },
+    {
+      "level": "warn",
+      "category": "決めつけ・威圧",
+      "match_type": "word",
+      "pattern": "ありえない",
+      "suggestion": "〜の点で反対です"
+    },
+    {
+      "level": "warn",
+      "category": "決めつけ・威圧",
+      "match_type": "word",
+      "pattern": "論外",
+      "suggestion": "〜の点で反対です"
+    },
+    {
+      "level": "block",
+      "category": "差別語",
+      "match_type": "context",
+      "pattern": "〇〇は出ていけ",
+      "suggestion": null,
+      "note": "国籍・民族を表す語との組み合わせでのみ判定"
+    },
+    {
+      "level": "block",
+      "category": "差別語",
+      "match_type": "context",
+      "pattern": "国へ帰れ",
+      "suggestion": null,
+      "note": "文脈判定が必要"
+    },
+    {
+      "level": "block",
+      "category": "差別語",
+      "match_type": "context",
+      "pattern": "日本から出ていけ",
+      "suggestion": null,
+      "note": "文脈判定が必要"
+    },
+    {
+      "level": "block",
+      "category": "個人情報",
+      "match_type": "context",
+      "pattern": "電話番号",
+      "suggestion": null,
+      "note": "電話番号の数字パターン"
+    },
+    {
+      "level": "block",
+      "category": "個人情報",
+      "match_type": "context",
+      "pattern": "メールアドレス",
+      "suggestion": null,
+      "note": "メールアドレス形式"
+    },
+    {
+      "level": "block",
+      "category": "個人情報",
+      "match_type": "context",
+      "pattern": "マイナンバー",
+      "suggestion": null,
+      "note": "12桁の数字だけでは誤検知するため追加判定が必要"
+    },
+    {
+      "level": "block",
+      "category": "個人情報",
+      "match_type": "context",
+      "pattern": "住所",
+      "suggestion": null,
+      "note": "都道府県・市区町村・丁目・番地などの組み合わせ"
+    },
+    {
+      "level": "block",
+      "category": "外部誘導",
+      "match_type": "context",
+      "pattern": "LINE交換",
+      "suggestion": null,
+      "note": "文脈判定が必要"
+    },
+    {
+      "level": "block",
+      "category": "外部誘導",
+      "match_type": "context",
+      "pattern": "DMして",
+      "suggestion": null,
+      "note": "文脈判定が必要"
+    },
+    {
+      "level": "block",
+      "category": "外部誘導",
+      "match_type": "context",
+      "pattern": "ID教えて",
+      "suggestion": null,
+      "note": "文脈判定が必要"
+    }
+  ],
+  "allowlist_examples": [
+    "ゴミ問題",
+    "死刑制度",
+    "在日米軍",
+    "部落差別"
+  ],
+  "normalization_notes": [
+    "NFKC正規化だけではひらがな・カタカナ統一はできない",
+    "文脈依存の表現は単語一致だけでブロックしない",
+    "伏せ字の変換は別途判定ロジックで扱う"
+  ]
+}
