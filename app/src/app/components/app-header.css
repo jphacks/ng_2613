@@ -3,7 +3,8 @@
   height:95px;
   padding-top:20px;
   margin:0 10px;
-  border-bottom:1px solid var(--line);
+  /* 本文との区切りは強すぎないよう、少し濃いめの薄いグレーにする */
+  border-bottom:1px solid #d0d0d6;
   position:relative;
   z-index:2
 }
