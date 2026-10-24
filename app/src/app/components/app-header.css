@@ -1,8 +1,10 @@
 .app-header {
   /* 画面の上端に詰まりすぎないよう、上に1行分ほどの余白を取る */
   height:95px;
-  padding-top:20px;
-  margin:0 10px;
+  /* 区切り線より上をグレーで塗る。画面の端まで塗るよう、左右は外側ではなく内側の余白にする */
+  --header-bg:#f3f3f5;
+  background:var(--header-bg);
+  padding:20px 10px 0;
   /* 本文との区切りは強すぎないよう、少し濃いめの薄いグレーにする */
   border-bottom:1px solid #d0d0d6;
   position:relative;
@@ -206,7 +208,8 @@
   margin-right:4px;
   border-color:var(--line);
   background:#fff;
-  box-shadow:-14px 0 0 #fff
+  /* 横スクロールしたパンくずを左端で隠す帯。ヘッダーと同じ色にする */
+  box-shadow:-14px 0 0 var(--header-bg)
 }
 @media (hover:hover) {
   .breadcrumbs .back-button:hover svg { transform:translateX(-2px) }
