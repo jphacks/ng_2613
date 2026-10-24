@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { useEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef } from "react";
 import type { DiscussionState } from "../hooks/use-discussion-state";
 import "./app-header.css";
 type Props = Pick<
@@ -45,6 +45,31 @@ export default function AppHeader({
       ?.querySelector(".active")
       ?.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "nearest" });
   }, [selectedGenre?.id]);
+
+  // 選択中のタブの下線を1本の線として描き、切り替えたときに前のタブから横にすべらせる
+  const indicatorRef = useRef<HTMLSpanElement>(null);
+  useLayoutEffect(() => {
+    const nav = categoryNavRef.current;
+    const indicator = indicatorRef.current;
+    if (!nav || !indicator) return;
+    const place = () => {
+      const active = nav.querySelector<HTMLElement>(".active");
+      indicator.style.opacity = active ? "1" : "0";
+      if (!active) return;
+      indicator.style.transform = `translateX(${active.offsetLeft}px)`;
+      indicator.style.width = `${active.offsetWidth}px`;
+    };
+    place();
+    // 最初の位置合わせではすべらせない
+    const frame = requestAnimationFrame(() => indicator.classList.add("is-ready"));
+    // フォントの読み込みや太字への切り替えでタブの幅が変わったら合わせ直す
+    const observer = new ResizeObserver(place);
+    nav.querySelectorAll("button").forEach((button) => observer.observe(button));
+    return () => {
+      cancelAnimationFrame(frame);
+      observer.disconnect();
+    };
+  }, [selectedGenre?.id, genres, screen]);
 
   // スクロールバーは隠しているので、続きがある側の端を薄くして「まだ続く」ことを見せる。
   // マウスでは横スクロールの手段がなくなるため、ホイールと、つかんで引っぱる操作でスクロールできるようにする。
@@ -156,6 +181,8 @@ export default function AppHeader({
       </div>
       {screen === "home" ? (
         <nav ref={categoryNavRef} className="category-nav" aria-label="カテゴリー">
+          {/* 末尾に置くと button:last-child の指定が外れるため先頭に置く */}
+          <span ref={indicatorRef} className="category-indicator" aria-hidden="true" />
           {/* 元のデザインと同じく、専用のデータはまだないため先頭のカテゴリーを表示する */}
           {genres[0] && <button onClick={() => selectGenre(genres[0].id)}>今日のテーマ</button>}
           {genres.map((genre) => (

@@ -225,17 +225,21 @@
 .category-nav[data-fade-right] { --fade-right:28px }
 .category-nav.is-dragging { cursor:grabbing }
 
-/* 選択中のタブは太字＋下線 */
-.category-nav button { position:relative; align-self:stretch }
+/* 選択中のタブは太字＋下線。下線は1本の線として描き、切り替えで横にすべらせる */
+.category-nav { position:relative }
+.category-nav button { align-self:stretch; transition:color 300ms var(--ease-out) }
 .category-nav .active { font-weight:700 }
-.category-nav .active::after {
-  content:"";
+.category-indicator {
   position:absolute;
   left:0;
-  right:0;
   bottom:0;
+  width:0;
   height:2px;
   border-radius:1px;
-  background:#111
+  background:#111;
+  pointer-events:none
+}
+.category-indicator.is-ready {
+  transition:transform 300ms var(--ease-out), width 300ms var(--ease-out), opacity var(--duration) var(--ease-out)
 }
 .category-nav button { flex-shrink:0 }
