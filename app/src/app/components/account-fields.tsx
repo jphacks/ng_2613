@@ -10,6 +10,30 @@ export default function AccountFields({ mode, profile }: Props) {
   const isLogin = mode === "login";
   const isProfile = mode === "profile";
 
+  if (!isLogin) {
+    return (
+      <>
+        <label className="account-field">
+          <span>ユーザー名（必須）</span>
+          <input name="username" aria-label="ユーザー名" autoComplete="nickname" defaultValue={isProfile ? profile.username : ""} required pattern=".*\S.*" />
+        </label>
+        <fieldset className="gender-field">
+          <legend>性別（任意）</legend>
+          {["男性", "女性", "その他", "回答しない"].map((label) => (
+            <label key={label}>
+              <input type="radio" name="gender" value={label === "回答しない" ? "" : label} defaultChecked={isProfile && profile.gender === (label === "回答しない" ? "" : label)} />
+              {label}
+            </label>
+          ))}
+        </fieldset>
+        <label className="account-field">
+          <span>生年月日（任意）</span>
+          <input name="birthDate" aria-label="生年月日" type="date" autoComplete="bday" defaultValue={isProfile ? profile.birthDate : ""} />
+        </label>
+      </>
+    );
+  }
+
   return (
     <>
       <label className="account-field">
@@ -19,7 +43,7 @@ export default function AccountFields({ mode, profile }: Props) {
           aria-label="電話番号"
           type="tel"
           autoComplete="tel"
-          placeholder={isLogin ? "電話番号" : ""}
+          placeholder="電話番号"
           defaultValue={isProfile ? profile.phone : ""}
           required
           pattern="[0-9０-９+\- ()]{10,15}"
@@ -31,45 +55,12 @@ export default function AccountFields({ mode, profile }: Props) {
           name="password"
           aria-label="パスワード"
           type="password"
-          autoComplete={mode === "register" ? "new-password" : "current-password"}
-          placeholder={isLogin ? "パスワード" : ""}
-          required={!isProfile}
+          autoComplete="current-password"
+          placeholder="パスワード"
+          required
           minLength={8}
         />
       </label>
-      {!isLogin && (
-        <>
-          <fieldset className="gender-field">
-            <legend>性別</legend>
-            {["男性", "女性", "その他"].map((label) => (
-              <label key={label}>
-                <input
-                  type="radio"
-                  name="gender"
-                  value={label}
-                  defaultChecked={isProfile && profile.gender === label}
-                  required
-                />
-                {label}
-              </label>
-            ))}
-          </fieldset>
-          <label className="year-field">
-            <span>生まれた年</span>
-            <select
-              aria-label="生まれた年"
-              name="year"
-              defaultValue={isProfile ? profile.year : ""}
-              required
-            >
-              <option value="" disabled />
-              {Array.from({ length: 127 }, (_, index) => 2026 - index).map((year) => (
-                <option value={year} key={year}>{year}年</option>
-              ))}
-            </select>
-          </label>
-        </>
-      )}
     </>
   );
 }

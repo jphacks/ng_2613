@@ -1,19 +1,33 @@
 import type { DiscussionState } from "../hooks/use-discussion-state";
 import "./thread-screen.css";
-type Props = Pick<DiscussionState, "messages" | "message" | "stance" | "setStance" | "setMessages" | "setMessage" | "navigate"> & { showDemoMessages?: boolean };
-export default function ThreadScreen({ messages, message, stance, setStance, setMessages, setMessage, navigate, showDemoMessages = true }: Props) {
+import { avatarColors, randomAvatarColor, usernameInitial } from "../lib/avatar";
+type Props = Pick<DiscussionState, "profile" | "messages" | "message" | "stance" | "setStance" | "setMessages" | "setMessage" | "navigate"> & { showDemoMessages?: boolean };
+export default function ThreadScreen({ profile, messages, message, stance, setStance, setMessages, setMessage, navigate, showDemoMessages = true }: Props) {
+    const username = profile.username || "ゲスト";
+    const guestColor = messages[0]?.avatarColor || avatarColors[0];
+    function renderMessage(item: DiscussionState["messages"][number], key: string | number, own = false) {
+        return <div key={key} className={`message-row${own ? " own" : ""}`}>
+            <span className="sender-avatar" style={{ backgroundColor: item.avatarColor }} role="img" aria-label={`${item.username}のアイコン`}>{usernameInitial(item.username)}</span>
+            <div className="message-content">
+                <span className="sender-name">{item.username}</span>
+                <p className={`bubble ${item.stance === "賛成" ? "agree" : "disagree"}`}>{item.text}</p>
+            </div>
+        </div>;
+    }
     return (<section className="thread">
     <h1>Q1. 増税するべきか</h1>
     <div className="message-list">
-    {showDemoMessages && <><p className="bubble agree">増税したほうがいいよ！</p>
-    <p className="bubble agree own">私もそう思います。</p>
-    <p className="bubble disagree">私は反対です。</p></>}{messages.map((item, index) => <p key={index} className={`bubble own ${item.stance === "賛成" ? "agree" : "disagree"}`}>{item.text}</p>)}</div>
+    {showDemoMessages && <>
+        {renderMessage({ text: "増税したほうがいいよ！", stance: "賛成", username: "さくら", avatarColor: avatarColors[4] }, "demo-1")}
+        {renderMessage({ text: "私もそう思います。", stance: "賛成", username, avatarColor: profile.avatarColor || guestColor }, "demo-2", true)}
+        {renderMessage({ text: "私は反対です。", stance: "反対", username: "たろう", avatarColor: avatarColors[1] }, "demo-3")}
+    </>}{messages.map((item, index) => renderMessage(item, index, true))}</div>
     <button className="definition" onClick={() => navigate("video")}>
     <span>消費税</span>
     <small>商品を買うとかかるお金です</small>
     </button>
     <form className="composer" onSubmit={event => { event.preventDefault(); if (message.trim()) {
-        setMessages([...messages, { text: message.trim(), stance }]);
+        setMessages([...messages, { text: message.trim(), stance, username, avatarColor: profile.avatarColor || messages[0]?.avatarColor || randomAvatarColor() }]);
         setMessage("");
     } }}>
     <div className="stance-switch">{["賛成", "反対"].map(label => <button type="button" key={label} className={stance === label ? `selected ${label === "賛成" ? "agree" : "disagree"}` : ""} aria-pressed={stance === label} onClick={() => setStance(label)}>{label}</button>)}</div>

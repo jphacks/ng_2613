@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState, type FormEvent } from "react";
 import { screens, topics, type Screen } from "../lib/demo-data";
+import { randomAvatarColor } from "../lib/avatar";
 export function useDiscussionState() {
     const [screen, setScreen] = useState<Screen>("home");
     const [menuOpen, setMenuOpen] = useState(false);
@@ -11,10 +12,12 @@ export function useDiscussionState() {
     const [messages, setMessages] = useState<{
         text: string;
         stance: string;
+        username: string;
+        avatarColor: string;
     }[]>([]);
     const [vote, setVote] = useState<number | null>(null);
     const [notice, setNotice] = useState("");
-    const [profile, setProfile] = useState({ phone: "", gender: "", year: "" });
+    const [profile, setProfile] = useState({ username: "", birthDate: "", avatarColor: "", phone: "", gender: "", year: "" });
     useEffect(() => {
         const syncScreen = () => {
             const hash = window.location.hash.slice(1);
@@ -34,9 +37,16 @@ export function useDiscussionState() {
     }
     function submitAccount(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
-        if (screen === "profile") {
+        if (screen === "register" || screen === "profile") {
             const data = new FormData(event.currentTarget);
-            setProfile({ phone: String(data.get("phone") ?? ""), gender: String(data.get("gender") ?? ""), year: String(data.get("year") ?? "") });
+            const username = String(data.get("username") ?? "").trim();
+            if (!username) {
+                setNotice("ユーザー名を入力してください。");
+                return;
+            }
+            setProfile({ ...profile, username, gender: String(data.get("gender") ?? ""), birthDate: String(data.get("birthDate") ?? ""), avatarColor: screen === "profile" && profile.avatarColor ? profile.avatarColor : randomAvatarColor() });
+        }
+        if (screen === "profile") {
             setNotice("会員情報を画面内で変更しました（デモ）。");
         }
         else {
