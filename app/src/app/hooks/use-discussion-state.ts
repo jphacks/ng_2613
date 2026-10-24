@@ -153,6 +153,13 @@ export function useDiscussionState() {
       setThreadDetail(null);
       setThreadDetailStatus(next.selection.threadId ? "loading" : "idle");
       setThreadDetailError("");
+      // 取得の useEffect は id が変わったときだけ走る。
+      // 同じ設問のまま画面が切り替わると id は変わらないため、
+      // 上で loading に戻しただけでは取得されず読み込み中のまま止まる。
+      // loading にするときは必ず取得も走らせる。
+      setTopicAttempt((attempt) => attempt + 1);
+      setThreadsAttempt((attempt) => attempt + 1);
+      setThreadDetailAttempt((attempt) => attempt + 1);
       setMenuOpen(false);
       setAccountError(authError === "confirmation_failed"
         ? "認証リンクが無効または期限切れです。もう一度ログインしてください。"
