@@ -94,7 +94,7 @@
   bottom: 0;
   left: 50%;
   transform: translateX(-50%);
-  width: min(100%, 420px);
+  width: min(100%, 757px);
   height: 69px;
   background: var(--ink);
   display: flex;
