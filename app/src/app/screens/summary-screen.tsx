@@ -7,7 +7,7 @@ type Props = Pick<DiscussionState, "topicDetail" | "topicStatus" | "topicError" 
 const colors = ["cream", "white", "blue"];
 export default function SummaryScreen(props: Props) {
     if (props.topicStatus !== "success" || !props.topicDetail) {
-        return <DataState status={props.topicStatus} error={props.topicError} emptyMessage="このトピックには設問がありません。" onRetry={props.retryTopic} onLogin={() => props.navigate("login")}/>;
+        return <DataState status={props.topicStatus} error={props.topicError} emptyMessage="このトピックには設問がありません。" onRetry={props.retryTopic} onLogin={() => props.navigate("login")} skeleton="cards"/>;
     }
     const frames = props.topicDetail.periods.flatMap(period => period.frames);
     return <section className="summaries">{frames.map((frame, index) =>

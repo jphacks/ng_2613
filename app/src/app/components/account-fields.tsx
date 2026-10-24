@@ -14,6 +14,30 @@ export default function AccountFields({ mode, profile }: Props) {
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [confirmationVisible, setConfirmationVisible] = useState(false);
 
+  // 会員情報変更はマージ前の UI（ユーザー名・性別・生年月日）に合わせる。
+  // 「回答しない」と未入力の生年月日は空文字で送り、バックエンドで null として保存する。
+  if (isProfile) {
+    return <>
+      <label className="account-field">
+        <span>ユーザー名（必須）</span>
+        <input name="username" aria-label="ユーザー名" autoComplete="nickname" defaultValue={profile.username} required pattern=".*\S.*" />
+      </label>
+      <fieldset className="gender-field">
+        <legend>性別（任意）</legend>
+        {["男性", "女性", "その他", "回答しない"].map((label) => (
+          <label key={label}>
+            <input type="radio" name="gender" value={label === "回答しない" ? "" : label} defaultChecked={profile.gender === (label === "回答しない" ? "" : label)} />
+            {label}
+          </label>
+        ))}
+      </fieldset>
+      <label className="account-field">
+        <span>生年月日（任意）</span>
+        <input name="birthDate" aria-label="生年月日" type="date" autoComplete="bday" defaultValue={profile.birthDate} min="1900-01-01" />
+      </label>
+    </>;
+  }
+
   return <>
     <label className="account-field">
       <span>メールアドレス</span>
@@ -25,11 +49,10 @@ export default function AccountFields({ mode, profile }: Props) {
         placeholder="name@example.com"
         defaultValue={profile.email}
         required
-        readOnly={isProfile}
         maxLength={254}
       />
     </label>
-    {!isProfile && <div className="account-field">
+    <div className="account-field">
       <label htmlFor={`${mode}-password`}>パスワード</label>
       <span className="password-input">
         <input
@@ -50,7 +73,7 @@ export default function AccountFields({ mode, profile }: Props) {
           {passwordVisible ? "隠す" : "表示"}
         </button>
       </span>
-    </div>}
+    </div>
     {mode === "register" && <div className="account-field">
       <label htmlFor="register-password-confirmation">パスワード確認</label>
       <span className="password-input">
@@ -73,41 +96,5 @@ export default function AccountFields({ mode, profile }: Props) {
         </button>
       </span>
     </div>}
-    {isProfile && <>
-      <label className="account-field">
-        <span>ユーザー名</span>
-        <input
-          name="username"
-          aria-label="ユーザー名"
-          type="text"
-          autoComplete="nickname"
-          defaultValue={profile.username}
-          required
-        />
-      </label>
-      <fieldset className="gender-field">
-        <legend>性別</legend>
-        {["男性", "女性", "その他"].map((label) => <label key={label}>
-          <input
-            type="radio"
-            name="gender"
-            value={label}
-            defaultChecked={profile.gender === label}
-            required
-          />
-          {label}
-        </label>)}
-      </fieldset>
-      <label className="year-field">
-        <span>生まれた年</span>
-        <select aria-label="生まれた年" name="year" defaultValue={profile.year} required>
-          <option value="" disabled />
-          {Array.from(
-            { length: new Date().getFullYear() - 1899 },
-            (_, index) => new Date().getFullYear() - index,
-          ).map((year) => <option value={year} key={year}>{year}年</option>)}
-        </select>
-      </label>
-    </>}
   </>;
 }

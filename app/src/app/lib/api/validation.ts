@@ -123,27 +123,36 @@ export function validateSignUpRequest(
 
 export function validateProfileUpdate(
   value: unknown,
-): ValidationResult<{ username: string; gender: Gender; year: number }> {
+): ValidationResult<{ username: string; gender: Gender | null; birthDate: string | null }> {
   if (!isRecord(value)) {
     return { ok: false, fields: { request: "リクエスト形式が正しくありません。" } };
   }
 
   const fields: Record<string, string> = {};
   const username = typeof value.username === "string" ? value.username.trim() : "";
-  const year = typeof value.year === "number" ? value.year : Number(value.year);
-  const currentYear = new Date().getFullYear();
+  // 性別と生年月日は任意。未入力（空文字・null・項目なし）は「回答しない」として null で保存する。
+  const gender = typeof value.gender === "string" && value.gender.trim() ? value.gender.trim() : null;
+  const birthDate = typeof value.birthDate === "string" && value.birthDate.trim() ? value.birthDate.trim() : null;
 
   if (!username) {
     fields.username = "ユーザー名を入力してください。";
   }
-  if (typeof value.gender !== "string" || !genders.includes(value.gender as Gender)) {
+  if (gender !== null && !genders.includes(gender as Gender)) {
     fields.gender = "性別を選択してください。";
   }
-  if (!Number.isInteger(year) || year < 1900 || year > currentYear) {
-    fields.year = "生まれた年を正しく選択してください。";
+  if (birthDate !== null && !isValidBirthDate(birthDate)) {
+    fields.birthDate = "生年月日を正しく入力してください。";
   }
 
   return Object.keys(fields).length > 0
     ? { ok: false, fields }
-    : { ok: true, value: { username, gender: value.gender as Gender, year } };
+    : { ok: true, value: { username, gender: gender as Gender | null, birthDate } };
+}
+
+// YYYY-MM-DD 形式で実在する日付か（2月30日などを弾く）、1900年以降かつ未来でないかを確かめる。
+function isValidBirthDate(value: string) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+  const date = new Date(`${value}T00:00:00Z`);
+  if (Number.isNaN(date.getTime()) || date.toISOString().slice(0, 10) !== value) return false;
+  return date.getUTCFullYear() >= 1900 && date.getTime() <= Date.now();
 }

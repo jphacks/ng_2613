@@ -6,7 +6,7 @@ import "./home-screen.css";
 type Props = Pick<DiscussionState, "selectedGenre" | "catalogStatus" | "catalogError" | "retryCatalog" | "navigate" | "selectMiddleTopic">;
 export default function HomeScreen({ selectedGenre, catalogStatus, catalogError, retryCatalog, navigate, selectMiddleTopic }: Props) {
     if (catalogStatus !== "success" || !selectedGenre) {
-        return <DataState status={catalogStatus} error={catalogError} emptyMessage="表示できる分類がありません。" onRetry={retryCatalog} onLogin={() => navigate("login")}/>;
+        return <DataState status={catalogStatus} error={catalogError} emptyMessage="表示できる分類がありません。" onRetry={retryCatalog} onLogin={() => navigate("login")} skeleton="tiles"/>;
     }
     return (<div className="topic-grid">
       {selectedGenre.middleTopics.map((middleTopic) => {

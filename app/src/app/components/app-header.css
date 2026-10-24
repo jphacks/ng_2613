@@ -59,15 +59,10 @@
   gap:16px;
   white-space:nowrap;
   overflow-x:auto;
-  scrollbar-width:none;
   font-size:15px;
   height:30px;
   align-items:center;
   color:#858585
-}
-
-.category-nav::-webkit-scrollbar {
-  display:none
 }
 
 .category-nav .active {
@@ -181,3 +176,46 @@
   padding-left:0
 }
 }
+
+/* --- 手ざわり --- */
+/* ロゴは押せるがホバーでは変化させない */
+.brand,.brand:hover:not(:disabled) { filter:none }
+.search-wrap input:focus { border-color:#299ded }
+.search-results { border-radius:12px; overflow:hidden; box-shadow:var(--shadow-lg); animation:pop-in var(--duration) var(--ease-out); transform-origin:top center }
+.search-results button { padding:10px 12px; line-height:1.4 }
+.search-results button + button { border-top:1px solid #e6e6e6 }
+@media (hover:hover) {
+  .search-results button:hover { background:#ebebeb; filter:none }
+}
+.search-results p { color:#777; text-align:center }
+.breadcrumbs button:active { transform:scale(.96) }
+
+/* 戻るボタン。パンくずが横に長くスクロールしても左端に残す */
+.breadcrumbs .back-button {
+  position:sticky;
+  left:0;
+  z-index:1;
+  display:grid;
+  place-items:center;
+  width:26px;
+  height:26px;
+  padding:0;
+  margin-right:4px;
+  border-color:var(--line);
+  background:#fff;
+  box-shadow:-14px 0 0 #fff
+}
+@media (hover:hover) {
+  .breadcrumbs .back-button:hover svg { transform:translateX(-2px) }
+}
+.breadcrumbs .back-button svg { transition:transform var(--duration) var(--ease-out) }
+
+/* 横にスクロールできることが分かるよう、細いスクロールバーを出す */
+.category-nav {
+  scroll-padding-inline:16px;
+  scrollbar-width:thin;
+  scrollbar-color:#c4c4c4 transparent
+}
+.category-nav::-webkit-scrollbar { height:4px }
+.category-nav::-webkit-scrollbar-thumb { background:#c4c4c4; border-radius:2px }
+.category-nav button { flex-shrink:0 }

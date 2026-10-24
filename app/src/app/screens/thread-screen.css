@@ -150,3 +150,13 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+/* --- 手ざわり --- */
+.thread h1 { padding-inline:16px; line-height:1.4 }
+.message-row { animation:rise-in 260ms var(--ease-out) backwards }
+.bubble { box-shadow:var(--shadow-sm); line-height:1.6; padding-inline:14px }
+.composer { box-shadow:0 -4px 16px #4645541f }
+.composer input:focus { box-shadow:0 0 0 3px #ffffff40 }
+.send:active:not(:disabled) { transform:scale(.9) }
+.send:disabled { opacity:.5 }
+.stance-switch button:active { transform:scale(.94) }

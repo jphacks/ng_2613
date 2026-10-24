@@ -50,7 +50,7 @@ export function ThreadView({ profile, selectedFrame, selectedFrameNumber, messag
 }
 export default function ThreadScreen(props: Props) {
     if (props.threadDetailStatus !== "success" || !props.threadDetail) {
-        return <DataState status={props.threadDetailStatus} error={props.threadDetailError} emptyMessage="スレッドが見つかりません。" onRetry={props.retryThreadDetail} onLogin={() => props.navigate("login")}/>;
+        return <DataState status={props.threadDetailStatus} error={props.threadDetailError} emptyMessage="スレッドが見つかりません。" onRetry={props.retryThreadDetail} onLogin={() => props.navigate("login")} skeleton="messages"/>;
     }
     const thread = props.threadDetail;
     return <ThreadView profile={props.profile} selectedFrame={props.selectedFrame} selectedFrameNumber={props.selectedFrameNumber} messages={[{ id: thread.id, body: thread.body, stance: thread.stance, author: thread.author }, ...thread.comments]} submitting={props.commentSubmitting} error={props.commentSubmitError} onSend={(body, stance) => props.submitComment({ body, stance })} />;
