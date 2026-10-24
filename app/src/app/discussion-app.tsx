@@ -21,7 +21,7 @@ export default function DiscussionApp() {
   const state = useDiscussionState();
   const { screen, accountScreen, notice, menuOpen } = state;
 
-  return <DictionaryProvider>
+  return <DictionaryProvider visible={state.authStatus === "authenticated" && !accountScreen}>
     <div className="app-layout">
     {/* 飾りのロゴ。button にするとホバー時の filter で乗算合成が切れ、白い背景が浮き出る */}
     <aside className="desktop-sidebar desktop-brand" aria-hidden="true">
