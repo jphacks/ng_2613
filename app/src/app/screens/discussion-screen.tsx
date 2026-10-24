@@ -8,7 +8,7 @@ type Props = Pick<DiscussionState, "navigate" | "topicStatus" | "topicError" | "
 export default function DiscussionScreen(props: Props) {
     const [reactionFlashes, setReactionFlashes] = useState<Record<string, number>>({});
     if (props.topicStatus !== "success" || !props.selectedFrame) {
-        return <DataState status={props.topicStatus === "success" ? "error" : props.topicStatus} error={props.topicStatus === "success" ? "指定された設問が見つかりません。" : props.topicError} emptyMessage="このトピックには設問がありません。" onRetry={props.retryTopic} onLogin={() => props.navigate("login")}/>;
+        return <DataState status={props.topicStatus === "success" ? "error" : props.topicStatus} error={props.topicStatus === "success" ? "指定された設問が見つかりません。" : props.topicError} emptyMessage="このトピックには設問がありません。" onRetry={props.retryTopic} onLogin={() => props.navigate("login")} skeleton="cards"/>;
     }
     const frame = props.selectedFrame;
     const threads = props.threadsStatus === "success" ? props.threads : [];

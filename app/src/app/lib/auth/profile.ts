@@ -7,6 +7,7 @@ export type Profile = {
   username: string;
   gender: string;
   year: string;
+  birthDate: string;
   complete: boolean;
 };
 
@@ -48,6 +49,8 @@ export async function getProfile(client: SupabaseClient<Database>): Promise<Prof
     username: data.username,
     gender: data.gender ?? "",
     year: data.birth_date?.slice(0, 4) ?? "",
-    complete: Boolean(data.username.trim() && data.gender && data.birth_date),
+    birthDate: data.birth_date ?? "",
+    // 性別と生年月日は任意なので、入力済みかどうかはユーザー名だけで判定する。
+    complete: Boolean(data.username.trim()),
   };
 }

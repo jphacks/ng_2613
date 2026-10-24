@@ -137,3 +137,17 @@
   gap:12px
 }
 }
+
+/* --- 手ざわり --- */
+.vote-screen h1 { white-space:normal; line-height:1.35; text-align:center }
+.vote-dot { transition:transform var(--duration-fast) var(--ease-out), outline-offset var(--duration) var(--ease-out) }
+@media (hover:hover) {
+  .vote-dot:hover:not(:disabled) { transform:scale(1.1) }
+}
+.vote-dot:active:not(:disabled) { transform:scale(.9) }
+.vote-dot:disabled { opacity:.5 }
+.vote-dot.chosen { animation:pop-in var(--duration) var(--ease-out) }
+.vote-status { animation:fade-in var(--duration) var(--ease-out) }
+.vote-action-tooltip { visibility:visible; opacity:0; transform:translate(-50%,4px); transition:opacity var(--duration) var(--ease-out), transform var(--duration) var(--ease-out) }
+.vote-action:hover .vote-action-tooltip { opacity:1; transform:translate(-50%,0) }
+.vote-screen h1 { font-weight:500 }

@@ -8,6 +8,14 @@
   --pale-blue: #d8e8ef;
   --pale-pink: #f6cdd6;
   --cream: #fafaf0;
+  /* 手ざわりの共通値。色は変えず、影・動き・押し込みだけをそろえる */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --duration-fast: 120ms;
+  --duration: 200ms;
+  --shadow-sm: 0 1px 2px #4645540f;
+  --shadow-md: 0 2px 4px #46455408, 0 6px 16px #4645541a;
+  --shadow-lg: 0 12px 32px #4645542e;
+  --ring: 0 0 0 3px #299ded33;
 }
 
 * {
@@ -18,8 +26,23 @@ body {
   margin: 0;
   background: #fff;
   color: #080808;
-  font-family: Arial, "Noto Sans JP", sans-serif;
+  /* 英数字は Geist、和文は Noto Sans JP（どちらも layout.tsx で読み込む） */
+  font-family: var(--font-geist-sans), var(--font-noto-sans-jp), "Hiragino Sans", "Yu Gothic UI", sans-serif;
   font-weight: 400;
+  /* 和文の字間を文字ごとの幅に詰め、全体をわずかに広げて読みやすくする */
+  font-feature-settings: "palt";
+  letter-spacing: 0.02em;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+}
+
+h1,
+h2 {
+  text-wrap: balance;
+}
+
+p {
+  text-wrap: pretty;
 }
 
 button,
@@ -31,6 +54,32 @@ select {
 button {
   cursor: pointer;
   color: inherit;
+  transition:
+    background-color var(--duration) var(--ease-out),
+    border-color var(--duration) var(--ease-out),
+    color var(--duration) var(--ease-out),
+    box-shadow var(--duration) var(--ease-out),
+    transform var(--duration-fast) var(--ease-out),
+    opacity var(--duration) var(--ease-out),
+    filter var(--duration) var(--ease-out);
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
+input,
+select,
+textarea {
+  transition:
+    border-color var(--duration) var(--ease-out),
+    box-shadow var(--duration) var(--ease-out);
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  box-shadow: var(--ring);
 }
 
 button {
@@ -58,11 +107,70 @@ p {
 
 h1 {
   font-size: 20px;
-  font-weight: 400;
+  font-weight: 600;
+  letter-spacing: 0.01em;
 }
 
-button:hover {
-  filter: brightness(0.97);
+h2 {
+  font-weight: 500;
+}
+
+/* タッチ端末でホバーが押しっぱなしに見えないよう、ホバーできる端末だけに付ける */
+@media (hover: hover) {
+  button:hover:not(:disabled) {
+    filter: brightness(0.97);
+  }
+}
+
+/* 押した瞬間にわずかに沈ませて、タップが効いたことを伝える */
+.press:active:not(:disabled),
+.primary:active:not(:disabled),
+.secondary:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+}
+
+@keyframes shimmer {
+  to {
+    background-position: -200% 0;
+  }
+}
+
+.skeleton {
+  display: block;
+  border-radius: 12px;
+  background: linear-gradient(90deg, #efefef 25%, #f7f7f7 50%, #efefef 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+  }
 }
 
 .app-layout {
@@ -134,7 +242,9 @@ button:hover {
     width: 100%;
     max-width: 100%;
     height: auto;
-    clip-path: inset(7px 3px 3px);
+    /* 画像の上端4px・左端2pxに枠線が入っている。拡大表示でにじむ分も含め、
+       表示サイズに比例する割合で切り落とす */
+    clip-path: inset(3.5% 1.5% 1.5% 2.5%);
   }
 
   .app-shell {
@@ -196,6 +306,7 @@ button:hover {
 .primary {
   background: var(--ink);
   color: #fff;
+  box-shadow: var(--shadow-sm);
 }
 
 .secondary {
@@ -204,13 +315,27 @@ button:hover {
   color: var(--ink);
 }
 
+@media (hover: hover) {
+  .primary:hover:not(:disabled),
+  .secondary:hover:not(:disabled) {
+    box-shadow: var(--shadow-md);
+  }
+}
+
+.primary:disabled,
+.secondary:disabled {
+  opacity: 0.6;
+}
+
 .notice {
   margin: 10px;
-  padding: 10px;
+  padding: 10px 12px;
   border: 1px solid #c6d9e2;
-  border-radius: 8px;
+  border-radius: 10px;
   background: #edf7fb;
   font-size: 14px;
+  line-height: 1.6;
+  animation: rise-in var(--duration) var(--ease-out);
 }
 
 @media (min-width: 600px) {

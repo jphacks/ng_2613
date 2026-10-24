@@ -38,7 +38,7 @@ export async function PATCH(request: Request) {
       .update({
         username: input.value.username,
         gender: input.value.gender,
-        birth_date: `${input.value.year}-01-01`,
+        birth_date: input.value.birthDate,
       })
       .eq("id", user.id);
 
