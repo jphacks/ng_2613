@@ -3,7 +3,7 @@ begin;
 create extension if not exists pgtap with schema extensions;
 set search_path = public, extensions;
 
-select plan(36);
+select plan(49);
 
 select is(
   (select count(*)::integer
@@ -484,6 +484,157 @@ select throws_ok(
     )$$,
   '23514', null,
   'user threads require a stance'
+);
+
+reset role;
+
+insert into public.threads (id, frame_id, type, user_id, stance, title, body)
+values
+  (
+    '00000000-0000-0000-0000-000000000503',
+    '00000000-0000-0000-0000-000000000402', 'user',
+    '00000000-0000-0000-0000-000000000101', 'agree',
+    'Locked topic thread', 'Locked topic body'
+  ),
+  (
+    '00000000-0000-0000-0000-000000000504',
+    '00000000-0000-0000-0000-000000000401', 'user',
+    '00000000-0000-0000-0000-000000000101', 'agree',
+    'Deleted thread', 'Deleted body'
+  );
+
+update public.threads
+set deleted_at = now()
+where id = '00000000-0000-0000-0000-000000000504';
+
+select has_table(
+  'public',
+  'thread_reactions',
+  'thread_reactions table exists'
+);
+
+select ok(
+  (select c.relrowsecurity
+   from pg_class as c
+   join pg_namespace as n on n.oid = c.relnamespace
+   where n.nspname = 'public'
+     and c.relname = 'thread_reactions'),
+  'RLS is enabled on thread_reactions'
+);
+
+set local role authenticated;
+select set_config(
+  'request.jwt.claims',
+  '{"sub":"00000000-0000-0000-0000-000000000101","role":"authenticated"}',
+  true
+);
+
+select lives_ok(
+  $$insert into public.thread_reactions (thread_id, user_id)
+    values (
+      (select id from public.threads where title = 'Title'),
+      '00000000-0000-0000-0000-000000000101'
+    )$$,
+  'an authenticated user can react to a visible thread'
+);
+
+select throws_ok(
+  $$insert into public.thread_reactions (thread_id, user_id)
+    values (
+      (select id from public.threads where title = 'Title'),
+      '00000000-0000-0000-0000-000000000101'
+    )$$,
+  '23505', null,
+  'duplicate reactions by the same user are rejected'
+);
+
+reset role;
+set local role authenticated;
+select set_config(
+  'request.jwt.claims',
+  '{"sub":"00000000-0000-0000-0000-000000000102","role":"authenticated"}',
+  true
+);
+
+select is(
+  (select count(*)::integer from public.thread_reactions),
+  0,
+  'a user cannot read another user reaction'
+);
+
+select is_empty(
+  $$delete from public.thread_reactions
+    where user_id = '00000000-0000-0000-0000-000000000101'
+    returning id$$,
+  'a user cannot delete another user reaction'
+);
+
+reset role;
+set local role authenticated;
+select set_config(
+  'request.jwt.claims',
+  '{"sub":"00000000-0000-0000-0000-000000000101","role":"authenticated"}',
+  true
+);
+
+select lives_ok(
+  $$delete from public.thread_reactions
+    where user_id = '00000000-0000-0000-0000-000000000101'$$,
+  'a user can remove their own reaction'
+);
+
+select lives_ok(
+  $$insert into public.thread_reactions (thread_id, user_id)
+    values (
+      (select id from public.threads where title = 'Title'),
+      '00000000-0000-0000-0000-000000000101'
+    )$$,
+  'a user can react again after removing the reaction'
+);
+
+select throws_ok(
+  $$update public.thread_reactions set created_at = now()$$,
+  '42501', null,
+  'authenticated users cannot update reactions'
+);
+
+select throws_ok(
+  $$insert into public.thread_reactions (thread_id, user_id)
+    values (
+      '00000000-0000-0000-0000-000000000504',
+      '00000000-0000-0000-0000-000000000101'
+    )$$,
+  '42501', null,
+  'reactions to logically deleted threads are rejected'
+);
+
+select throws_ok(
+  $$insert into public.thread_reactions (thread_id, user_id)
+    values (
+      '00000000-0000-0000-0000-000000000502',
+      '00000000-0000-0000-0000-000000000101'
+    )$$,
+  '42501', null,
+  'reactions to threads under hidden topics are rejected'
+);
+
+select lives_ok(
+  $$insert into public.thread_reactions (thread_id, user_id)
+    values (
+      '00000000-0000-0000-0000-000000000503',
+      '00000000-0000-0000-0000-000000000101'
+    )$$,
+  'reactions to existing threads under locked topics are allowed'
+);
+
+reset role;
+set local role anon;
+select set_config('request.jwt.claims', '{"role":"anon"}', true);
+
+select throws_ok(
+  $$select * from public.thread_reactions$$,
+  '42501', null,
+  'anon cannot access thread reactions'
 );
 
 reset role;
