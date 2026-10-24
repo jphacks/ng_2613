@@ -21,6 +21,7 @@ type Props = {
 };
 type Segment = { label: string; value: number; color: string };
 const unknownStyle = { label: "未回答", color: "#d9d9d9" };
+const hiddenStyle = { label: "少人数のため非表示", color: "#b5b5b5" };
 const ageStyles: Record<AgeBucket, { label: string; color: string }> = {
   "10s_20s": { label: "10, 20代", color: "#397fa8" },
   "30s": { label: "30代", color: "#64aaca" },
@@ -29,12 +30,14 @@ const ageStyles: Record<AgeBucket, { label: string; color: string }> = {
   "60s": { label: "60代", color: "#bba9ce" },
   "70s_plus": { label: "70代以上", color: "#d8cce4" },
   unknown: unknownStyle,
+  hidden: hiddenStyle,
 };
 const genderStyles: Record<GenderBucket, { label: string; color: string }> = {
   "男性": { label: "男性", color: "#a7daf5" },
   "女性": { label: "女性", color: "#edaab8" },
   "その他": { label: "その他", color: "#cfbded" },
   unknown: unknownStyle,
+  hidden: hiddenStyle,
 };
 // 人数を割合にする。四捨五入だけだと合計が100%にならないため、端数の大きい順に1%ずつ配る。
 function toSegments<T extends string>(
@@ -57,8 +60,9 @@ function toSegments<T extends string>(
     });
   return rows
     .map((row, index) => ({ ...styles[row.bucket], value: percents[index], bucket: row.bucket, count: row.count }))
-    // 未回答が0人なら項目ごと出さない。他の項目は0%でも元のデザインどおり並べる。
-    .filter((segment) => segment.bucket !== "unknown" || segment.count > 0)
+    // DB が返した区分だけを出す。少人数で「非表示」にまとめた区分を0%と見せると
+    // 「その区分の投票者はいない」と誤解させるため。
+    .filter((segment) => segment.count > 0)
     .map(({ label, value, color }) => ({ label, value, color }));
 }
 function DemographicChart({ title, data }: { title: string; data: Segment[] }) {

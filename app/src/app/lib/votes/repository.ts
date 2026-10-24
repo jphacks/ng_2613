@@ -109,8 +109,8 @@ export async function saveVote(
   return { ...state, votingOpen: true } satisfies FrameVoteState;
 }
 
-const ageBuckets: AgeBucket[] = ["10s_20s", "30s", "40s", "50s", "60s", "70s_plus", "unknown"];
-const genderBuckets: GenderBucket[] = ["男性", "女性", "その他", "unknown"];
+const ageBuckets: AgeBucket[] = ["10s_20s", "30s", "40s", "50s", "60s", "70s_plus", "unknown", "hidden"];
+const genderBuckets: GenderBucket[] = ["男性", "女性", "その他", "unknown", "hidden"];
 
 export class DemographicsUnavailableError extends Error {}
 
