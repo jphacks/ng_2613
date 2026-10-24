@@ -26,8 +26,12 @@ body {
   margin: 0;
   background: #fff;
   color: #080808;
-  font-family: Arial, "Noto Sans JP", sans-serif;
+  /* 英数字は Geist、和文は Noto Sans JP（どちらも layout.tsx で読み込む） */
+  font-family: var(--font-geist-sans), var(--font-noto-sans-jp), "Hiragino Sans", "Yu Gothic UI", sans-serif;
   font-weight: 400;
+  /* 和文の字間を文字ごとの幅に詰め、全体をわずかに広げて読みやすくする */
+  font-feature-settings: "palt";
+  letter-spacing: 0.02em;
   -webkit-font-smoothing: antialiased;
   -webkit-tap-highlight-color: transparent;
 }
@@ -103,7 +107,12 @@ p {
 
 h1 {
   font-size: 20px;
-  font-weight: 400;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+h2 {
+  font-weight: 500;
 }
 
 /* タッチ端末でホバーが押しっぱなしに見えないよう、ホバーできる端末だけに付ける */

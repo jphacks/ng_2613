@@ -150,3 +150,4 @@
 .vote-status { animation:fade-in var(--duration) var(--ease-out) }
 .vote-action-tooltip { visibility:visible; opacity:0; transform:translate(-50%,4px); transition:opacity var(--duration) var(--ease-out), transform var(--duration) var(--ease-out) }
 .vote-action:hover .vote-action-tooltip { opacity:1; transform:translate(-50%,0) }
+.vote-screen h1 { font-weight:500 }
