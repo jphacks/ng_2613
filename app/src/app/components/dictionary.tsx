@@ -33,15 +33,24 @@ function lensPoint(rect: DOMRect) {
   return { x: rect.left + rect.width * (20 / 48), y: rect.top + rect.height * (20 / 48) };
 }
 
+// レンズの円（SVG の半径 14 / 48）に、少しでもかかったら反応するよう外側に余裕を持たせる
+const lensReachPadding = 4;
+
 // 言葉は押せない（クリックを下の行に通す）ため、要素の当たり判定ではなく表示位置で調べる。
+// レンズの円と言葉の矩形が少しでも重なれば反応し、複数あればレンズの中心に一番近い言葉を選ぶ。
 // 折り返した言葉にも対応するよう、行ごとの矩形を見る。
-function termAt(x: number, y: number) {
+function termAt(x: number, y: number, radius: number) {
+  let nearest: { element: HTMLElement; distance: number } | null = null;
   for (const element of document.querySelectorAll<HTMLElement>(".dictionary-term[data-term]")) {
     for (const rect of element.getClientRects()) {
-      if (x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom) return element;
+      // 矩形の中でレンズの中心に一番近い点までの距離
+      const dx = x - Math.min(Math.max(x, rect.left), rect.right);
+      const dy = y - Math.min(Math.max(y, rect.top), rect.bottom);
+      const distance = Math.hypot(dx, dy);
+      if (distance <= radius && (!nearest || distance < nearest.distance)) nearest = { element, distance };
     }
   }
-  return null;
+  return nearest?.element ?? null;
 }
 
 // 虫眼鏡は言葉の下側にかぶさるので、解説は言葉の上に出す。上に入らなければ虫眼鏡の下に出す。
@@ -119,7 +128,7 @@ export function DictionaryProvider({ children, visible = true }: { children: Rea
   function updateTarget() {
     const rect = lensRef.current?.getBoundingClientRect();
     const point = rect ? lensPoint(rect) : null;
-    const next = point ? termAt(point.x, point.y) : null;
+    const next = point && rect ? termAt(point.x, point.y, rect.width * (14 / 48) + lensReachPadding) : null;
     if (targetRef.current !== next) {
       targetRef.current?.classList.remove("is-targeted");
       next?.classList.add("is-targeted");
@@ -206,7 +215,7 @@ export function DictionaryProvider({ children, visible = true }: { children: Rea
     >
       <svg width={lensSize} height={lensSize} viewBox="0 0 48 48" aria-hidden="true">
         <path d="M30 30 L42 42" stroke="var(--ink)" strokeWidth="5" strokeLinecap="round" />
-        <circle cx="20" cy="20" r="14" fill="#ffffff26" stroke="var(--ink)" strokeWidth="3.5" />
+        <circle cx="20" cy="20" r="14" fill="#bfe6ff73" stroke="var(--ink)" strokeWidth="3.5" />
         <text className="dictionary-lens-mark" x="20" y="20" textAnchor="middle" dominantBaseline="central" fontSize="17" fontWeight="700" fill="var(--ink)">?</text>
       </svg>
       <span className={`dictionary-lens-caption${captionVisible ? "" : " is-dismissed"}`} aria-hidden="true">わからない言葉に<br />移動させよう</span>
