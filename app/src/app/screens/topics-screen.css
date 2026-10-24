@@ -44,3 +44,14 @@
   border-radius:50%;
   background:#eef3f5
 }
+
+/* --- 手ざわり --- */
+.topic-row { box-shadow:var(--shadow-sm); transition:box-shadow var(--duration) var(--ease-out), transform var(--duration-fast) var(--ease-out); animation:rise-in 320ms var(--ease-out) backwards }
+@media (hover:hover) {
+  .topic-row:hover { box-shadow:var(--shadow-md); transform:translateY(-1px) }
+  .topic-row-navigation:hover { filter:none }
+}
+.topic-row:has(.topic-row-navigation:active) { transform:scale(.98); box-shadow:var(--shadow-sm) }
+.middle-topics > .topic-row:nth-of-type(2) { animation-delay:30ms }
+.middle-topics > .topic-row:nth-of-type(3) { animation-delay:60ms }
+.middle-topics > .topic-row:nth-of-type(n+4) { animation-delay:90ms }

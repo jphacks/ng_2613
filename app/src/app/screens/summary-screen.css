@@ -171,3 +171,24 @@
   .summary-card { padding-inline:10px }
   .summary-content { gap:8px }
 }
+
+/* --- 手ざわり --- */
+.summary-card { box-shadow:var(--shadow-sm); animation:rise-in 320ms var(--ease-out) backwards }
+.summary-heading h1 { line-height:1.35 }
+.summary-buttons button:active:not(:disabled) { transform:scale(.95) }
+.summary-content td button { transition:background-color var(--duration) var(--ease-out) }
+@media (hover:hover) {
+  .summary-content td button:hover { background:#49a3d314; filter:none }
+  .summary-content td:last-child button:hover { background:#ed537414 }
+  .summary-toggle:hover { text-decoration:underline; text-underline-offset:3px; filter:none }
+}
+.summary-content td button:active { background:#0000000f }
+.summary-vote-dialog[open] { animation:pop-in var(--duration) var(--ease-out) }
+.summary-vote-dialog[open]::backdrop { animation:fade-in var(--duration) var(--ease-out); backdrop-filter:blur(2px) }
+.dialog-vote-dot { transition:transform var(--duration-fast) var(--ease-out), outline-offset var(--duration) var(--ease-out) }
+@media (hover:hover) {
+  .dialog-vote-dot:hover:not(:disabled) { transform:scale(1.12) }
+}
+.dialog-vote-dot:active:not(:disabled) { transform:scale(.9) }
+.dialog-vote-dot:disabled { opacity:.5 }
+.dialog-vote-status { line-height:1.5 }

@@ -47,8 +47,13 @@ test("新規登録はパスワード確認の一致を要求する", () => {
   }).ok, false);
 });
 
-test("プロフィール更新は許可された性別と生年だけを受け付ける", () => {
-  assert.equal(validateProfileUpdate({ username: "利用者", gender: "未指定", year: 2000 }).ok, false);
-  assert.equal(validateProfileUpdate({ username: "", gender: "女性", year: 2000 }).ok, false);
-  assert.equal(validateProfileUpdate({ username: "利用者", gender: "女性", year: 2000 }).ok, true);
+test("プロフィール更新は性別と生年月日は任意で、入力するなら許可された値だけを受け付ける", () => {
+  assert.equal(validateProfileUpdate({ username: "利用者", gender: "未指定", birthDate: "2000-04-01" }).ok, false);
+  assert.equal(validateProfileUpdate({ username: "", gender: "女性", birthDate: "2000-04-01" }).ok, false);
+  assert.equal(validateProfileUpdate({ username: "利用者", gender: "女性", birthDate: "2000-04-01" }).ok, true);
+  assert.equal(validateProfileUpdate({ username: "利用者", gender: "女性", birthDate: "2001-02-29" }).ok, false);
+  assert.equal(validateProfileUpdate({ username: "利用者", gender: "女性", birthDate: "2999-01-01" }).ok, false);
+  assert.equal(validateProfileUpdate({ username: "利用者", gender: "女性", birthDate: "2000" }).ok, false);
+  assert.equal(validateProfileUpdate({ username: "利用者", gender: "", birthDate: "" }).ok, true);
+  assert.equal(validateProfileUpdate({ username: "利用者" }).ok, true);
 });

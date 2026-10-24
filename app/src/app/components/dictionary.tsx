@@ -10,7 +10,8 @@ const entries = [
 ];
 const DictionaryContext = createContext<(term: string) => void>(() => {});
 
-export function DictionaryProvider({ children }: { children: ReactNode }) {
+// visible が false のあいだは辞書パネル（開くアイコンを含む）を出さない。
+export function DictionaryProvider({ children, visible = true }: { children: ReactNode; visible?: boolean }) {
   const [minimized, setMinimized] = useState(true);
   const [selectedTerm, setSelectedTerm] = useState(entries[0].term);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -73,7 +74,7 @@ export function DictionaryProvider({ children }: { children: ReactNode }) {
   const selected = entries.find(entry => entry.term === selectedTerm) ?? entries[0];
   return <DictionaryContext.Provider value={openTerm}>
     {children}
-    <aside ref={panelRef} className={`dictionary-panel${minimized ? " minimized" : ""}`} aria-label="辞書">
+    {visible && <aside ref={panelRef} className={`dictionary-panel${minimized ? " minimized" : ""}`} aria-label="辞書">
       <div className="dictionary-header">
         <button type="button" className="dictionary-drag-handle" aria-label={minimized ? "辞書を開く（ドラッグまたは矢印キーで移動）" : "辞書を移動（ドラッグまたは矢印キー）"}
           aria-expanded={minimized ? false : undefined} aria-controls={minimized ? "dictionary-content" : undefined}
@@ -114,7 +115,7 @@ export function DictionaryProvider({ children }: { children: ReactNode }) {
         <h2>{selected.term}</h2>
         <p>{selected.definition}</p>
       </div>
-    </aside>
+    </aside>}
   </DictionaryContext.Provider>;
 }
 
