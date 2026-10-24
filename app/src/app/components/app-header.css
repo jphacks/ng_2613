@@ -1,5 +1,7 @@
 .app-header {
-  height:75px;
+  /* 画面の上端に詰まりすぎないよう、上に1行分ほどの余白を取る */
+  height:95px;
+  padding-top:20px;
   margin:0 10px;
   border-bottom:1px solid var(--line);
   position:relative;
