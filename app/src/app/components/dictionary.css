@@ -1,77 +1,121 @@
-.dictionary-panel {
-  display: flex;
-  flex-direction: column;
+/* 虫眼鏡。ドラッグして言葉に重ねると解説を出す */
+.dictionary-lens {
   position: fixed;
-  right: max(16px, calc((100vw - 420px) / 2 + 16px));
+  right: max(34px, calc((100vw - 420px) / 2 + 34px));
   bottom: calc(85px + env(safe-area-inset-bottom));
   z-index: 5;
-  width: min(132px, calc((100vw - 32px) * 0.6));
-  height: min(121.8px, calc((100dvh - 116px) * 0.6));
-  background: white;
-  border: 1px solid var(--line);
-  border-radius: 20px;
-  box-shadow: 0 4px 16px #46455414;
-  overflow: hidden;
-}
-
-.dictionary-header {
-  position: absolute;
-  top: 8px;
-  right: 4px;
-  z-index: 1;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
   padding: 0;
-  font-size: 12px;
-  color: var(--ink);
-}
-
-.dictionary-header button {
-  width: 22px;
-  height: 24px;
-  font-size: 20px;
-}
-
-.dictionary-header .dictionary-drag-handle {
-  text-align: center;
-  font-size: 12px;
+  background: none;
+  /* 枠を付けず形だけを見せる。白い背景でも見失わないよう形に沿った影だけ付ける */
+  filter: drop-shadow(0 1px 2px #46455440);
   cursor: grab;
   touch-action: none;
   user-select: none;
+  transition:
+    left 260ms var(--ease-out),
+    top 260ms var(--ease-out),
+    filter var(--duration) var(--ease-out),
+    transform var(--duration-fast) var(--ease-out);
 }
 
-.dictionary-header .dictionary-drag-handle:active { cursor: grabbing; }
-.dictionary-drag-handle span { margin: 0; }
+.dictionary-lens svg {
+  display: block;
+  pointer-events: none;
+}
 
-.dictionary-content {
-  flex: 1;
-  min-height: 0;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  padding: 12px;
+.dictionary-lens-mark {
+  transition: opacity var(--duration) var(--ease-out);
+}
+
+.dictionary-lens.is-over-term .dictionary-lens-mark {
+  opacity: 0;
+}
+
+/* ドラッグ中は指に追従させるため位置のアニメーションを切る */
+.dictionary-lens.is-dragging {
+  cursor: grabbing;
+  transition: filter var(--duration) var(--ease-out), transform var(--duration-fast) var(--ease-out);
+  transform: scale(1.12);
+  filter: drop-shadow(0 6px 10px #46455440);
+}
+
+@media (hover: hover) {
+  .dictionary-lens:hover {
+    filter: drop-shadow(0 3px 6px #46455440);
+  }
+}
+
+/* 使い方の一言。虫眼鏡のボタンの外へはみ出させて真下に置く */
+.dictionary-lens-caption {
+  position: absolute;
+  top: calc(100% + 2px);
+  left: 50%;
+  transform: translateX(-50%);
+  color: var(--ink);
+  font-size: 10px;
+  line-height: 1.35;
+  font-weight: 500;
+  text-align: center;
+  white-space: nowrap;
+  text-shadow: 0 0 3px #fff, 0 0 3px #fff;
+  transition: opacity var(--duration) var(--ease-out);
+}
+
+/* ドラッグ中は言葉が見えにくくならないよう隠す */
+.dictionary-lens.is-dragging .dictionary-lens-caption {
+  opacity: 0;
+}
+
+/* 初めて虫眼鏡に触れたら、ふわっと消して以後は出さない */
+.dictionary-lens-caption.is-dismissed {
+  opacity: 0;
+  transform: translate(-50%, -4px);
+  transition: opacity 600ms var(--ease-out), transform 600ms var(--ease-out);
+}
+
+/* 見た目は周りの文字と同じ。虫眼鏡を重ねたときだけ強調する */
+.dictionary-term {
+  border-radius: 4px;
+  transition: background-color var(--duration) var(--ease-out), box-shadow var(--duration) var(--ease-out);
+}
+
+/* 虫眼鏡が重なっている言葉 */
+.dictionary-term.is-targeted {
+  background: #299ded26;
+  box-shadow: 0 0 0 3px #299ded26;
+}
+
+.dictionary-popover {
+  position: fixed;
+  z-index: 6;
+  /* 表示するだけなので、ドラッグや下の操作の邪魔をしない */
+  pointer-events: none;
+  padding: 14px 16px 16px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: white;
+  box-shadow: var(--shadow-lg);
   overflow-wrap: anywhere;
+  animation: pop-in var(--duration) var(--ease-out);
 }
 
-.dictionary-content h2 {
-  margin: 0 0 8px;
-  padding-right: 40px;
-  font-size: 12px;
-  line-height: 1.8;
-  font-weight: 400;
+.dictionary-popover.above {
+  transform: translateY(-100%);
+  animation: none;
+}
+
+.dictionary-popover h2 {
+  margin: 0 28px 6px 0;
+  font-size: 14px;
+  line-height: 1.6;
   color: #299ded;
-  overflow-wrap: anywhere;
 }
-.dictionary-content p { font-size: 12px; line-height: 1.8; }
-.dictionary-panel.minimized { width: 48px; height: auto; border-radius: 16px; }
-.dictionary-panel.minimized .dictionary-header { position: static; padding: 0; }
-.dictionary-panel.minimized .dictionary-drag-handle {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 46px;
-  height: 48px;
+
+.dictionary-popover p {
+  font-size: 13px;
+  line-height: 1.8;
 }
-.dictionary-term { color: #299ded; text-decoration: underline; text-underline-offset: 3px; }
-button.dictionary-term { display: inline; font: inherit; text-align: inherit; }
-.dictionary-content:focus-visible { outline: 2px solid #299ded; outline-offset: -3px; }
