@@ -1,0 +1,26 @@
+.menu-scrim {
+  position:fixed;
+  inset:0;
+  background:#0002;
+  z-index:9
+}
+
+.drawer {
+  position:absolute;
+  top:0;
+  right:0;
+  bottom:0;
+  width:262px;
+  min-height:100dvh;
+  background:white;
+  z-index:10
+}
+
+.drawer button {
+  width:100%;
+  display:block;
+  border-bottom:1px solid #aaa;
+  text-align:left;
+  padding:12px;
+  font-size:20px
+}

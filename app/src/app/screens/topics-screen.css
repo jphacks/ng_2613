@@ -1,0 +1,20 @@
+.middle-topics {
+  padding:15px 10px
+}
+
+.topic-hero {
+  display:block;
+  width:150px;
+  height:150px;
+  object-fit:contain;
+  margin:0 auto 15px
+}
+
+.topic-row {
+  height:70px;
+  width:100%;
+  border:1px solid var(--line);
+  border-radius:16px;
+  margin-bottom:14px;
+  font-size:21px
+}

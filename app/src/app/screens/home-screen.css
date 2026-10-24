@@ -1,0 +1,35 @@
+.topic-grid {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  column-gap:36px;
+  row-gap:22px;
+  padding:57px 23px 30px
+}
+
+.topic-tile {
+  display:flex;
+  align-items:center;
+  flex-direction:column;
+  gap:15px;
+  font-size:15px
+}
+
+.topic-tile img {
+  width:150px;
+  height:150px;
+  max-width:100%;
+  object-fit:contain
+}
+
+@media(max-width:390px) {
+.topic-grid {
+  column-gap:25px
+}
+}
+
+@media(max-width:350px) {
+.topic-grid {
+  column-gap:22px;
+  padding-inline:18px
+}
+}
