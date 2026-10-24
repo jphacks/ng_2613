@@ -1,12 +1,15 @@
 .topic-grid {
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  column-gap:36px;
+  --topic-column-gap:36px;
+  display:flex;
+  flex-wrap:wrap;
+  column-gap:var(--topic-column-gap);
   row-gap:22px;
   padding:57px 23px 30px
 }
 
 .topic-tile {
+  flex:0 0 calc((100% - var(--topic-column-gap)) / 2);
+  min-width:0;
   display:flex;
   align-items:center;
   flex-direction:column;
@@ -23,13 +26,13 @@
 
 @media(max-width:390px) {
 .topic-grid {
-  column-gap:25px
+  --topic-column-gap:25px
 }
 }
 
 @media(max-width:350px) {
 .topic-grid {
-  column-gap:22px;
+  --topic-column-gap:22px;
   padding-inline:18px
 }
 }
