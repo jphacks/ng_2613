@@ -2,10 +2,16 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import {
   normalizePhone,
+  isUuid,
   validateOtpRequest,
   validateOtpVerification,
   validateProfileUpdate,
 } from "./validation.ts";
+
+test("UUID形式を検証する", () => {
+  assert.equal(isUuid("00000000-0000-4000-8000-000000000001"), true);
+  assert.equal(isUuid("not-a-uuid"), false);
+});
 
 test("電話番号の全角数字と区切り文字を正規化する", () => {
   assert.equal(normalizePhone("+８１ (90) 1234-5678"), "+819012345678");

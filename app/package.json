@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "node --test src/app/lib/api/validation.test.ts"
+    "test": "node --test src/app/lib/api/validation.test.ts src/app/lib/catalog/repository.test.ts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",

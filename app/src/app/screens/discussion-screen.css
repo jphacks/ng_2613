@@ -36,3 +36,29 @@
 
 .discussion-list .summary-heading h1 { margin-bottom:0 }
 .discussion-opinions { margin-top:24px }
+
+.question-detail {
+  padding:28px 20px;
+  border:1px solid var(--line);
+  border-radius:12px;
+  background:var(--cream)
+}
+
+.question-topic {
+  color:#666;
+  font-size:13px;
+  margin-bottom:14px
+}
+
+.question-detail h1 {
+  line-height:1.6
+}
+
+.feature-pending {
+  margin-top:28px;
+  padding-top:18px;
+  border-top:1px solid #ddd;
+  color:#666;
+  font-size:13px;
+  line-height:1.6
+}

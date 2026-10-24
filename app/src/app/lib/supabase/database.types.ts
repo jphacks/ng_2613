@@ -9,6 +9,72 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      genres: {
+        Row: {
+          id: string;
+          name: string;
+          description: string | null;
+          sort_order: number | null;
+          created_at: string;
+        };
+        Insert: never;
+        Update: never;
+        Relationships: [];
+      };
+      middle_topics: {
+        Row: {
+          id: string;
+          genre_id: string;
+          name: string;
+          description: string | null;
+          sort_order: number | null;
+          created_at: string;
+        };
+        Insert: never;
+        Update: never;
+        Relationships: [];
+      };
+      topics: {
+        Row: {
+          id: string;
+          middle_topic_id: string;
+          name: string;
+          description: string | null;
+          sort_order: number | null;
+          status: "open" | "locked" | "hidden";
+          created_at: string;
+        };
+        Insert: never;
+        Update: never;
+        Relationships: [];
+      };
+      periods: {
+        Row: {
+          id: string;
+          code: string;
+          start_date: string;
+          end_date: string;
+          status: "active" | "closed";
+          created_at: string;
+        };
+        Insert: never;
+        Update: never;
+        Relationships: [];
+      };
+      frames: {
+        Row: {
+          id: string;
+          topic_id: string;
+          period_id: string;
+          type: "question" | "pp" | "other";
+          question: string | null;
+          sort_order: number | null;
+          created_at: string;
+        };
+        Insert: never;
+        Update: never;
+        Relationships: [];
+      };
       users: {
         Row: {
           id: string;

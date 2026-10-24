@@ -7,6 +7,7 @@ type ValidationResult<T> =
 
 const phonePattern = /^\+[1-9]\d{7,14}$/;
 const otpPattern = /^\d{6}$/;
+const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const genders: Gender[] = ["男性", "女性", "その他"];
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -17,6 +18,10 @@ export function normalizePhone(value: string) {
   return value
     .replace(/[０-９]/g, (character) => String(character.charCodeAt(0) - 0xff10))
     .replace(/[\s\-()]/g, "");
+}
+
+export function isUuid(value: string) {
+  return uuidPattern.test(value);
 }
 
 export function validateOtpRequest(

@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "アプリ名 | 政治について話そう",
+  title: "Rights | 政治について話そう",
   description: "トピックを選んで、さまざまな意見を知り、議論に参加しましょう。",
 };
 

@@ -24,3 +24,9 @@
   padding:12px;
   font-size:20px
 }
+
+.drawer button:disabled {
+  cursor:not-allowed;
+  color:#888;
+  background:#f5f5f5
+}

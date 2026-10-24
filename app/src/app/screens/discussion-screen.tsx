@@ -1,13 +1,41 @@
+import DataState from "../components/data-state";
 import type { DiscussionState } from "../hooks/use-discussion-state";
-import TopicSummaryCard from "../components/topic-summary-card";
 import "./discussion-screen.css";
 
-type Props = Pick<DiscussionState, "navigate" | "vote" | "setVote">;
-export default function DiscussionScreen(props: Props) {
-    return <section className="discussion-list">
-        <TopicSummaryCard {...props} />
-        <div className="discussion-opinions" aria-label="議論の一覧">{["生活苦しいから増税しないで", "お金余ってるから増税して", "生活苦しいから増税しないで"].map((text, index) =>
-            <button key={index} className={`opinion-row ${index === 1 ? "blue" : "pink"}`} onClick={() => props.navigate("thread")}>{text}<span>＞</span></button>
-        )}</div>
-    </section>;
+type Props = Pick<
+  DiscussionState,
+  "selectedFrame" | "topicDetail" | "topicStatus" | "topicError" | "retryTopic" | "navigate"
+>;
+
+export default function DiscussionScreen({
+  selectedFrame,
+  topicDetail,
+  topicStatus,
+  topicError,
+  retryTopic,
+  navigate,
+}: Props) {
+  if (topicStatus !== "success") {
+    return <DataState
+      status={topicStatus}
+      error={topicError}
+      emptyMessage="このトピックには設問がありません。"
+      onRetry={retryTopic}
+      onLogin={() => navigate("login")}
+    />;
+  }
+  if (!selectedFrame || !topicDetail) {
+    return <div className="data-state" role="alert">
+      <p>指定された設問が見つかりません。</p>
+      <button className="secondary" onClick={() => navigate("summary")}>設問一覧へ</button>
+    </div>;
+  }
+
+  return <section className="discussion-list">
+    <article className="question-detail">
+      <p className="question-topic">{topicDetail.name}</p>
+      <h1>{selectedFrame.question}</h1>
+      <p className="feature-pending">投票機能はPhase 3、スレッド機能はPhase 4で利用可能になります。</p>
+    </article>
+  </section>;
 }
