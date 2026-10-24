@@ -113,7 +113,8 @@
   padding-left:14px;
   font-size:15px;
   white-space:nowrap;
-  height:30px
+  height:30px;
+  overflow-x:auto
 }
 
 .pills {
@@ -147,7 +148,8 @@
 
 .pills .current {
   border-radius:18px;
-  padding:2px 4px
+  padding:2px 4px;
+  flex-shrink:0
 }
 
 @media(max-width:390px) {
