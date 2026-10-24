@@ -47,7 +47,7 @@ export default function AppHeader({
   }, [selectedGenre?.id]);
 
   // スクロールバーは隠しているので、続きがある側の端を薄くして「まだ続く」ことを見せる。
-  // マウスでは横スクロールの手段がなくなるため、つかんで引っぱるとスクロールできるようにする。
+  // マウスでは横スクロールの手段がなくなるため、ホイールと、つかんで引っぱる操作でスクロールできるようにする。
   useEffect(() => {
     const nav = categoryNavRef.current;
     if (!nav) return;
@@ -75,6 +75,15 @@ export default function AppHeader({
       if (drag?.moved) nav.addEventListener("click", cancelClick, { capture: true, once: true });
       drag = null;
     };
+    // 縦ホイールを横スクロールに変える。端まで来たらページの縦スクロールに任せる
+    const onWheel = (event: WheelEvent) => {
+      if (Math.abs(event.deltaY) <= Math.abs(event.deltaX)) return;
+      const atStart = nav.scrollLeft <= 0 && event.deltaY < 0;
+      const atEnd = nav.scrollLeft + nav.clientWidth >= nav.scrollWidth - 1 && event.deltaY > 0;
+      if (atStart || atEnd) return;
+      event.preventDefault();
+      nav.scrollLeft += event.deltaY;
+    };
     const cancelClick = (event: MouseEvent) => {
       event.preventDefault();
       event.stopPropagation();
@@ -84,12 +93,14 @@ export default function AppHeader({
     observer.observe(nav);
     nav.addEventListener("scroll", updateFade, { passive: true });
     nav.addEventListener("pointerdown", onPointerDown);
+    nav.addEventListener("wheel", onWheel, { passive: false });
     window.addEventListener("pointermove", onPointerMove);
     window.addEventListener("pointerup", onPointerUp);
     return () => {
       observer.disconnect();
       nav.removeEventListener("scroll", updateFade);
       nav.removeEventListener("pointerdown", onPointerDown);
+      nav.removeEventListener("wheel", onWheel);
       nav.removeEventListener("click", cancelClick, { capture: true });
       window.removeEventListener("pointermove", onPointerMove);
       window.removeEventListener("pointerup", onPointerUp);
