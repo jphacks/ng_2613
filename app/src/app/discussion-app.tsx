@@ -23,10 +23,11 @@ export default function DiscussionApp() {
 
   return <DictionaryProvider>
     <div className="app-layout">
-    <aside className="desktop-sidebar desktop-brand" aria-label="ロゴ">
-      <button className="desktop-logo-button" aria-label="Rights ホームへ" onClick={() => state.navigate("home")}>
-        <Image src="/rights-logo.png" alt="Rights" width={186} height={190} className="desktop-logo" />
-      </button>
+    {/* 飾りのロゴ。button にするとホバー時の filter で乗算合成が切れ、白い背景が浮き出る */}
+    <aside className="desktop-sidebar desktop-brand" aria-hidden="true">
+      <div className="desktop-logo-button">
+        <Image src="/rights-logo.png" alt="" width={186} height={190} className="desktop-logo" />
+      </div>
     </aside>
     <main className={`app-shell screen-${screen}`}>
       {!accountScreen && screen !== "video" && screen !== "vote" && <AppHeader {...state} />}

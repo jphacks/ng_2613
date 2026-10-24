@@ -183,6 +183,8 @@
 }
 
 /* --- 手ざわり --- */
+/* ロゴは押せるがホバーでは変化させない */
+.brand,.brand:hover:not(:disabled) { filter:none }
 .search-wrap input:focus { border-color:#299ded }
 .search-results { border-radius:12px; overflow:hidden; box-shadow:var(--shadow-lg); animation:pop-in var(--duration) var(--ease-out); transform-origin:top center }
 .search-results button { padding:10px 12px; line-height:1.4 }
