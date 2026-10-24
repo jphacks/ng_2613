@@ -210,12 +210,32 @@
 }
 .breadcrumbs .back-button svg { transition:transform var(--duration) var(--ease-out) }
 
-/* 横にスクロールできることが分かるよう、細いスクロールバーを出す */
+/* スクロールバーは隠し、続きがある側の端を薄くして「まだ続く」ことを見せる */
 .category-nav {
-  scroll-padding-inline:16px;
-  scrollbar-width:thin;
-  scrollbar-color:#c4c4c4 transparent
+  --fade-left:0px;
+  --fade-right:0px;
+  scroll-padding-inline:24px;
+  scrollbar-width:none;
+  mask-image:linear-gradient(to right, transparent, #000 var(--fade-left), #000 calc(100% - var(--fade-right)), transparent);
+  cursor:grab;
+  user-select:none
 }
-.category-nav::-webkit-scrollbar { height:4px }
-.category-nav::-webkit-scrollbar-thumb { background:#c4c4c4; border-radius:2px }
+.category-nav::-webkit-scrollbar { display:none }
+.category-nav[data-fade-left] { --fade-left:28px }
+.category-nav[data-fade-right] { --fade-right:28px }
+.category-nav.is-dragging { cursor:grabbing }
+
+/* 選択中のタブは太字＋下線 */
+.category-nav button { position:relative; align-self:stretch }
+.category-nav .active { font-weight:700 }
+.category-nav .active::after {
+  content:"";
+  position:absolute;
+  left:0;
+  right:0;
+  bottom:0;
+  height:2px;
+  border-radius:1px;
+  background:#111
+}
 .category-nav button { flex-shrink:0 }

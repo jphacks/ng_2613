@@ -46,6 +46,56 @@ export default function AppHeader({
       ?.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "nearest" });
   }, [selectedGenre?.id]);
 
+  // スクロールバーは隠しているので、続きがある側の端を薄くして「まだ続く」ことを見せる。
+  // マウスでは横スクロールの手段がなくなるため、つかんで引っぱるとスクロールできるようにする。
+  useEffect(() => {
+    const nav = categoryNavRef.current;
+    if (!nav) return;
+    const updateFade = () => {
+      nav.toggleAttribute("data-fade-left", nav.scrollLeft > 1);
+      nav.toggleAttribute("data-fade-right", nav.scrollLeft + nav.clientWidth < nav.scrollWidth - 1);
+    };
+    let drag: { startX: number; startScroll: number; moved: boolean } | null = null;
+    const onPointerDown = (event: PointerEvent) => {
+      if (event.pointerType !== "mouse" || event.button !== 0) return;
+      drag = { startX: event.clientX, startScroll: nav.scrollLeft, moved: false };
+    };
+    const onPointerMove = (event: PointerEvent) => {
+      if (!drag) return;
+      const distance = event.clientX - drag.startX;
+      if (Math.abs(distance) > 4) {
+        drag.moved = true;
+        nav.classList.add("is-dragging");
+      }
+      if (drag.moved) nav.scrollLeft = drag.startScroll - distance;
+    };
+    const onPointerUp = () => {
+      nav.classList.remove("is-dragging");
+      // 引っぱったあとに指を離したときは、タブを押した扱いにしない
+      if (drag?.moved) nav.addEventListener("click", cancelClick, { capture: true, once: true });
+      drag = null;
+    };
+    const cancelClick = (event: MouseEvent) => {
+      event.preventDefault();
+      event.stopPropagation();
+    };
+    updateFade();
+    const observer = new ResizeObserver(updateFade);
+    observer.observe(nav);
+    nav.addEventListener("scroll", updateFade, { passive: true });
+    nav.addEventListener("pointerdown", onPointerDown);
+    window.addEventListener("pointermove", onPointerMove);
+    window.addEventListener("pointerup", onPointerUp);
+    return () => {
+      observer.disconnect();
+      nav.removeEventListener("scroll", updateFade);
+      nav.removeEventListener("pointerdown", onPointerDown);
+      nav.removeEventListener("click", cancelClick, { capture: true });
+      window.removeEventListener("pointermove", onPointerMove);
+      window.removeEventListener("pointerup", onPointerUp);
+    };
+  }, [screen, genres]);
+
   // 履歴ではなく階層で1つ上へ戻す。外から直接開いたときにアプリの外へ出ないようにするため。
   function goBack() {
     if (screen === "thread" || screen === "new-thread") navigate("discussion");
