@@ -1,8 +1,6 @@
 "use client";
 
 import { createContext, useContext, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
-import Image from "next/image";
-import bookSearchIcon from "../images/book-search.svg";
 import "./dictionary.css";
 
 const entries = [
@@ -17,9 +15,9 @@ const margin = 8;
 // 解説の吹き出しの幅。画面の端からはみ出さないよう位置の計算にも使う
 const popoverWidth = 220;
 
-// 虫眼鏡のレンズ（アイコンの左上寄りの円）の中心。ここが重なった言葉を調べる
+// 虫眼鏡のレンズの中心（下の SVG の円の中心 20,20 / 48）。ここが重なった言葉を調べる
 function lensPoint(rect: DOMRect) {
-  return { x: rect.left + rect.width * 0.42, y: rect.top + rect.height * 0.42 };
+  return { x: rect.left + rect.width * (20 / 48), y: rect.top + rect.height * (20 / 48) };
 }
 
 function termAt(x: number, y: number) {
@@ -212,7 +210,11 @@ export function DictionaryProvider({ children, visible = true }: { children: Rea
         checkLensTarget();
       }}
     >
-      <Image src={bookSearchIcon} width={28} height={28} alt="" draggable={false} />
+      <svg width={lensSize} height={lensSize} viewBox="0 0 48 48" aria-hidden="true">
+        <path d="M30 30 L42 42" stroke="var(--ink)" strokeWidth="5" strokeLinecap="round" />
+        <circle cx="20" cy="20" r="14" fill="#fff" stroke="var(--ink)" strokeWidth="3.5" />
+        <text x="20" y="20" textAnchor="middle" dominantBaseline="central" fontSize="17" fontWeight="700" fill="var(--ink)">?</text>
+      </svg>
     </button>}
     {visible && hint && <p className="dictionary-hint" role="status">青い言葉に重ねると解説が出ます</p>}
     {popover && <div

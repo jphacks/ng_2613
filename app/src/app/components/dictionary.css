@@ -8,36 +8,36 @@
   place-items: center;
   width: 48px;
   height: 48px;
-  border: 1px solid var(--line);
-  border-radius: 50%;
-  background: white;
-  box-shadow: var(--shadow-md);
+  padding: 0;
+  background: none;
+  /* 枠を付けず形だけを見せる。白い背景でも見失わないよう形に沿った影だけ付ける */
+  filter: drop-shadow(0 1px 2px #46455440);
   cursor: grab;
   touch-action: none;
   user-select: none;
   transition:
     left 260ms var(--ease-out),
     top 260ms var(--ease-out),
-    box-shadow var(--duration) var(--ease-out),
+    filter var(--duration) var(--ease-out),
     transform var(--duration-fast) var(--ease-out);
 }
 
-.dictionary-lens img {
+.dictionary-lens svg {
+  display: block;
   pointer-events: none;
 }
 
 /* ドラッグ中は指に追従させるため位置のアニメーションを切る */
 .dictionary-lens.is-dragging {
   cursor: grabbing;
-  transition: box-shadow var(--duration) var(--ease-out), transform var(--duration-fast) var(--ease-out);
-  transform: scale(1.08);
-  box-shadow: var(--shadow-lg);
+  transition: filter var(--duration) var(--ease-out), transform var(--duration-fast) var(--ease-out);
+  transform: scale(1.12);
+  filter: drop-shadow(0 6px 10px #46455440);
 }
 
 @media (hover: hover) {
   .dictionary-lens:hover {
-    filter: none;
-    box-shadow: var(--shadow-lg);
+    filter: drop-shadow(0 3px 6px #46455440);
   }
 }
 
