@@ -1,4 +1,5 @@
 import type { VoteValue } from "../votes/types";
+import type { PostStance } from "../threads/types";
 
 export type AuthFlow = "sign-in" | "sign-up";
 export type Gender = "男性" | "女性" | "その他";
@@ -7,19 +8,13 @@ type ValidationResult<T> =
   | { ok: true; value: T }
   | { ok: false; fields: Record<string, string> };
 
-const phonePattern = /^\+[1-9]\d{7,14}$/;
+const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const otpPattern = /^\d{6}$/;
 const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const genders: Gender[] = ["男性", "女性", "その他"];
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
-}
-
-export function normalizePhone(value: string) {
-  return value
-    .replace(/[０-９]/g, (character) => String(character.charCodeAt(0) - 0xff10))
-    .replace(/[\s\-()]/g, "");
 }
 
 export function isUuid(value: string) {
@@ -39,19 +34,57 @@ export function validateVoteRequest(value: unknown): ValidationResult<{ value: V
   return { ok: true, value: { value: value.value as VoteValue } };
 }
 
+function validatePostStance(value: unknown): value is PostStance {
+  return value === "agree" || value === "disagree";
+}
+
+export function validateThreadRequest(
+  value: unknown,
+): ValidationResult<{ title: string; body: string; stance: PostStance }> {
+  if (!isRecord(value)) {
+    return { ok: false, fields: { request: "リクエスト形式が正しくありません。" } };
+  }
+  const title = typeof value.title === "string" ? value.title.trim() : "";
+  const body = typeof value.body === "string" ? value.body.trim() : "";
+  const fields: Record<string, string> = {};
+  if (!title || title.length > 120) fields.title = "タイトルは1文字以上120文字以内で入力してください。";
+  if (!body || body.length > 5000) fields.body = "本文は1文字以上5000文字以内で入力してください。";
+  if (!validatePostStance(value.stance)) fields.stance = "立場を選択してください。";
+  return Object.keys(fields).length > 0
+    ? { ok: false, fields }
+    : { ok: true, value: { title, body, stance: value.stance as PostStance } };
+}
+
+export function validateCommentRequest(
+  value: unknown,
+): ValidationResult<{ body: string; stance: PostStance | null }> {
+  if (!isRecord(value)) {
+    return { ok: false, fields: { request: "リクエスト形式が正しくありません。" } };
+  }
+  const body = typeof value.body === "string" ? value.body.trim() : "";
+  const fields: Record<string, string> = {};
+  if (!body || body.length > 2000) fields.body = "コメントは1文字以上2000文字以内で入力してください。";
+  if (value.stance !== null && value.stance !== undefined && !validatePostStance(value.stance)) {
+    fields.stance = "立場の指定が正しくありません。";
+  }
+  return Object.keys(fields).length > 0
+    ? { ok: false, fields }
+    : { ok: true, value: { body, stance: validatePostStance(value.stance) ? value.stance : null } };
+}
+
 export function validateOtpRequest(
   value: unknown,
-): ValidationResult<{ phone: string; flow: AuthFlow }> {
+): ValidationResult<{ email: string; flow: AuthFlow }> {
   if (!isRecord(value)) {
     return { ok: false, fields: { request: "リクエスト形式が正しくありません。" } };
   }
 
-  const phone = typeof value.phone === "string" ? normalizePhone(value.phone) : "";
+  const email = typeof value.email === "string" ? value.email.trim().toLowerCase() : "";
   const flow = value.flow;
   const fields: Record<string, string> = {};
 
-  if (!phonePattern.test(phone)) {
-    fields.phone = "電話番号は+81から始まる国際形式で入力してください。";
+  if (!email || email.length > 254 || !emailPattern.test(email)) {
+    fields.email = "メールアドレスを正しく入力してください。";
   }
   if (flow !== "sign-in" && flow !== "sign-up") {
     fields.flow = "認証処理の種類が正しくありません。";
@@ -59,17 +92,15 @@ export function validateOtpRequest(
 
   return Object.keys(fields).length > 0
     ? { ok: false, fields }
-    : { ok: true, value: { phone, flow: flow as AuthFlow } };
+    : { ok: true, value: { email, flow: flow as AuthFlow } };
 }
 
 export function validateOtpVerification(
   value: unknown,
 ): ValidationResult<{
-  phone: string;
+  email: string;
   token: string;
   flow: AuthFlow;
-  gender?: Gender;
-  year?: number;
 }> {
   const base = validateOtpRequest(value);
   if (!base.ok) {
@@ -79,36 +110,13 @@ export function validateOtpVerification(
     return { ok: false, fields: { request: "リクエスト形式が正しくありません。" } };
   }
 
-  const token = typeof value.token === "string" ? value.token.trim() : "";
+  const token = typeof value.token === "string"
+    ? value.token.trim().replace(/[０-９]/g, (character) => String(character.charCodeAt(0) - 0xff10))
+    : "";
   const fields: Record<string, string> = {};
 
   if (!otpPattern.test(token)) {
-    fields.token = "SMSに記載された6桁の認証コードを入力してください。";
-  }
-
-  if (base.value.flow === "sign-up") {
-    if (typeof value.gender !== "string" || !genders.includes(value.gender as Gender)) {
-      fields.gender = "性別を選択してください。";
-    }
-    const year = typeof value.year === "number" ? value.year : Number(value.year);
-    const currentYear = new Date().getFullYear();
-    if (!Number.isInteger(year) || year < 1900 || year > currentYear) {
-      fields.year = "生まれた年を正しく選択してください。";
-    }
-
-    if (Object.keys(fields).length > 0) {
-      return { ok: false, fields };
-    }
-
-    return {
-      ok: true,
-      value: {
-        ...base.value,
-        token,
-        gender: value.gender as Gender,
-        year,
-      },
-    };
+    fields.token = "メールに記載された6桁の認証コードを入力してください。";
   }
 
   return Object.keys(fields).length > 0
@@ -118,15 +126,19 @@ export function validateOtpVerification(
 
 export function validateProfileUpdate(
   value: unknown,
-): ValidationResult<{ gender: Gender; year: number }> {
+): ValidationResult<{ username: string; gender: Gender; year: number }> {
   if (!isRecord(value)) {
     return { ok: false, fields: { request: "リクエスト形式が正しくありません。" } };
   }
 
   const fields: Record<string, string> = {};
+  const username = typeof value.username === "string" ? value.username.trim() : "";
   const year = typeof value.year === "number" ? value.year : Number(value.year);
   const currentYear = new Date().getFullYear();
 
+  if (!username) {
+    fields.username = "ユーザー名を入力してください。";
+  }
   if (typeof value.gender !== "string" || !genders.includes(value.gender as Gender)) {
     fields.gender = "性別を選択してください。";
   }
@@ -136,5 +148,5 @@ export function validateProfileUpdate(
 
   return Object.keys(fields).length > 0
     ? { ok: false, fields }
-    : { ok: true, value: { gender: value.gender as Gender, year } };
+    : { ok: true, value: { username, gender: value.gender as Gender, year } };
 }

@@ -36,6 +36,7 @@ export async function PATCH(request: Request) {
     const { error } = await supabase
       .from("users")
       .update({
+        username: input.value.username,
         gender: input.value.gender,
         birth_date: `${input.value.year}-01-01`,
       })

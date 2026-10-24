@@ -4,16 +4,24 @@ import { useEffect, useMemo, useState, type FormEvent } from "react";
 import type { Catalog, CatalogTopic, TopicDetail } from "../lib/catalog/types";
 import { screens, type Screen } from "../lib/demo-data";
 import type { FrameVoteState, VoteValue } from "../lib/votes/types";
+import type { PostStance, ThreadDetail, ThreadSummary } from "../lib/threads/types";
 
 type AuthStatus = "loading" | "authenticated" | "unauthenticated";
 export type DataStatus = "idle" | "loading" | "success" | "empty" | "unauthenticated" | "error";
-type AccountProfile = { phone: string; gender: string; year: string };
-type ApiErrorBody = { error?: { code?: string; message?: string } };
+type AccountProfile = {
+  email: string;
+  username: string;
+  gender: string;
+  year: string;
+  complete: boolean;
+};
+type ApiErrorBody = { error?: { code?: string; message?: string; fields?: Record<string, string> } };
 type Selection = {
   genreId: string | null;
   middleTopicId: string | null;
   topicId: string | null;
   frameId: string | null;
+  threadId: string | null;
 };
 export type SearchResult = CatalogTopic & {
   genreId: string;
@@ -38,8 +46,11 @@ async function requestApi<T>(url: string, init?: RequestInit): Promise<T> {
 
   if (!response.ok) {
     const errorBody = body as ApiErrorBody | null;
+    const fieldMessage = errorBody?.error?.fields
+      ? Object.values(errorBody.error.fields)[0]
+      : undefined;
     throw new ApiRequestError(
-      errorBody?.error?.message ?? "通信に失敗しました。",
+      fieldMessage ?? errorBody?.error?.message ?? "通信に失敗しました。",
       response.status,
       errorBody?.error?.code,
     );
@@ -61,6 +72,7 @@ function parseLocationHash(): { screen: Screen; selection: Selection } {
       middleTopicId: params.get("middleTopicId"),
       topicId: params.get("topicId"),
       frameId: params.get("frameId"),
+      threadId: params.get("threadId"),
     },
   };
 }
@@ -71,6 +83,7 @@ function createHash(screen: Screen, selection: Selection) {
   if (selection.middleTopicId) params.set("middleTopicId", selection.middleTopicId);
   if (selection.topicId) params.set("topicId", selection.topicId);
   if (selection.frameId) params.set("frameId", selection.frameId);
+  if (selection.threadId) params.set("threadId", selection.threadId);
   const query = params.toString();
   return `${screen}${query ? `?${query}` : ""}`;
 }
@@ -82,6 +95,7 @@ export function useDiscussionState() {
     middleTopicId: null,
     topicId: null,
     frameId: null,
+    threadId: null,
   });
   const [menuOpen, setMenuOpen] = useState(false);
   const [search, setSearch] = useState("");
@@ -90,7 +104,13 @@ export function useDiscussionState() {
   const [messages, setMessages] = useState<{ text: string; stance: string }[]>([]);
   const [vote, setVote] = useState<number | null>(null);
   const [notice, setNotice] = useState("");
-  const [profile, setProfile] = useState<AccountProfile>({ phone: "", gender: "", year: "" });
+  const [profile, setProfile] = useState<AccountProfile>({
+    email: "",
+    username: "",
+    gender: "",
+    year: "",
+    complete: false,
+  });
   const [authStatus, setAuthStatus] = useState<AuthStatus>("loading");
   const [otpSent, setOtpSent] = useState(false);
   const [accountSubmitting, setAccountSubmitting] = useState(false);
@@ -105,6 +125,18 @@ export function useDiscussionState() {
   const [topicAttempt, setTopicAttempt] = useState(0);
   const [voteSubmittingFrameId, setVoteSubmittingFrameId] = useState<string | null>(null);
   const [voteErrors, setVoteErrors] = useState<Record<string, string>>({});
+  const [threads, setThreads] = useState<ThreadSummary[]>([]);
+  const [threadsStatus, setThreadsStatus] = useState<DataStatus>("idle");
+  const [threadsError, setThreadsError] = useState("");
+  const [threadsAttempt, setThreadsAttempt] = useState(0);
+  const [threadDetail, setThreadDetail] = useState<ThreadDetail | null>(null);
+  const [threadDetailStatus, setThreadDetailStatus] = useState<DataStatus>("idle");
+  const [threadDetailError, setThreadDetailError] = useState("");
+  const [threadDetailAttempt, setThreadDetailAttempt] = useState(0);
+  const [threadSubmitting, setThreadSubmitting] = useState(false);
+  const [threadSubmitError, setThreadSubmitError] = useState("");
+  const [commentSubmitting, setCommentSubmitting] = useState(false);
+  const [commentSubmitError, setCommentSubmitError] = useState("");
 
   useEffect(() => {
     const syncScreen = () => {
@@ -114,6 +146,11 @@ export function useDiscussionState() {
       setTopicDetail(null);
       setTopicStatus(next.selection.topicId ? "loading" : "idle");
       setTopicError("");
+      setThreadsStatus(next.selection.frameId ? "loading" : "idle");
+      setThreadsError("");
+      setThreadDetail(null);
+      setThreadDetailStatus(next.selection.threadId ? "loading" : "idle");
+      setThreadDetailError("");
       setMenuOpen(false);
       setOtpSent(false);
       setAccountError("");
@@ -141,7 +178,10 @@ export function useDiscussionState() {
 
         setAuthStatus("authenticated");
         const loadedProfile = await requestApi<AccountProfile>("/api/profile");
-        if (active) setProfile(loadedProfile);
+        if (active) {
+          setProfile(loadedProfile);
+          if (!loadedProfile.complete) window.location.hash = "profile";
+        }
       } catch (error) {
         if (!active) return;
         setAuthStatus("unauthenticated");
@@ -215,6 +255,38 @@ export function useDiscussionState() {
     return () => controller.abort();
   }, [authStatus, selection.topicId, topicAttempt]);
 
+  useEffect(() => {
+    if (!selection.frameId || authStatus !== "authenticated") return;
+    const controller = new AbortController();
+    requestApi<ThreadSummary[]>(`/api/frames/${encodeURIComponent(selection.frameId)}/threads`, {
+      signal: controller.signal,
+    }).then((result) => {
+      setThreads(result);
+      setThreadsStatus(result.length > 0 ? "success" : "empty");
+    }).catch((error: unknown) => {
+      if (controller.signal.aborted) return;
+      setThreadsStatus(error instanceof ApiRequestError && error.status === 401 ? "unauthenticated" : "error");
+      setThreadsError(error instanceof Error ? error.message : "スレッドを取得できませんでした。");
+    });
+    return () => controller.abort();
+  }, [authStatus, selection.frameId, threadsAttempt]);
+
+  useEffect(() => {
+    if (!selection.threadId || authStatus !== "authenticated") return;
+    const controller = new AbortController();
+    requestApi<ThreadDetail>(`/api/threads/${encodeURIComponent(selection.threadId)}`, {
+      signal: controller.signal,
+    }).then((result) => {
+      setThreadDetail(result);
+      setThreadDetailStatus("success");
+    }).catch((error: unknown) => {
+      if (controller.signal.aborted) return;
+      setThreadDetailStatus(error instanceof ApiRequestError && error.status === 401 ? "unauthenticated" : "error");
+      setThreadDetailError(error instanceof Error ? error.message : "スレッドを取得できませんでした。");
+    });
+    return () => controller.abort();
+  }, [authStatus, selection.threadId, threadDetailAttempt]);
+
   const genres = useMemo(() => catalog?.genres ?? [], [catalog]);
   const selectedGenre = genres.find((genre) => genre.id === selection.genreId) ?? genres[0] ?? null;
   const allMiddleTopics = genres.flatMap((genre) => genre.middleTopics);
@@ -269,7 +341,7 @@ export function useDiscussionState() {
 
   function selectGenre(genreId: string) {
     setSearch("");
-    setHash("home", { genreId, middleTopicId: null, topicId: null, frameId: null });
+    setHash("home", { genreId, middleTopicId: null, topicId: null, frameId: null, threadId: null });
   }
 
   function selectMiddleTopic(middleTopicId: string) {
@@ -282,6 +354,7 @@ export function useDiscussionState() {
       middleTopicId,
       topicId: null,
       frameId: null,
+      threadId: null,
     });
   }
 
@@ -302,11 +375,62 @@ export function useDiscussionState() {
     setTopicDetail(null);
     setTopicStatus("loading");
     setTopicError("");
-    setHash("summary", { genreId, middleTopicId, topicId, frameId: null });
+    setHash("summary", { genreId, middleTopicId, topicId, frameId: null, threadId: null });
   }
 
   function selectFrame(frameId: string) {
-    setHash("discussion", { ...selection, frameId });
+    setHash("discussion", { ...selection, frameId, threadId: null });
+  }
+
+  function selectThread(threadId: string) {
+    setHash("thread", { ...selection, threadId });
+  }
+
+  async function createDiscussionThread(input: { title: string; body: string; stance: PostStance }) {
+    if (!selection.frameId || threadSubmitting) return false;
+    setThreadSubmitting(true);
+    setThreadSubmitError("");
+    try {
+      const created = await requestApi<{ id: string }>(
+        `/api/frames/${encodeURIComponent(selection.frameId)}/threads`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(input),
+        },
+      );
+      setThreadsAttempt((attempt) => attempt + 1);
+      selectThread(created.id);
+      return true;
+    } catch (error) {
+      setThreadSubmitError(error instanceof Error ? error.message : "スレッドを作成できませんでした。");
+      return false;
+    } finally {
+      setThreadSubmitting(false);
+    }
+  }
+
+  async function submitComment(input: { body: string; stance: PostStance | null }) {
+    if (!selection.threadId || commentSubmitting) return false;
+    setCommentSubmitting(true);
+    setCommentSubmitError("");
+    try {
+      await requestApi<{ id: string }>(
+        `/api/threads/${encodeURIComponent(selection.threadId)}/comments`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(input),
+        },
+      );
+      setThreadDetailAttempt((attempt) => attempt + 1);
+      return true;
+    } catch (error) {
+      setCommentSubmitError(error instanceof Error ? error.message : "コメントを投稿できませんでした。");
+      return false;
+    } finally {
+      setCommentSubmitting(false);
+    }
   }
 
   async function submitVote(frameId: string, value: VoteValue) {
@@ -355,26 +479,30 @@ export function useDiscussionState() {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
+            username: String(formData.get("username") ?? ""),
             gender: String(formData.get("gender") ?? ""),
             year: String(formData.get("year") ?? ""),
           }),
         });
         setProfile(updatedProfile);
         setNotice("会員情報を更新しました。");
+        if (!profile.complete && updatedProfile.complete) {
+          setHash("home", { genreId: null, middleTopicId: null, topicId: null, frameId: null, threadId: null });
+        }
         return;
       }
 
       const flow = screen === "register" ? "sign-up" : "sign-in";
-      const phone = String(formData.get("phone") ?? "");
+      const email = String(formData.get("email") ?? "");
       if (!otpSent) {
-        const result = await requestApi<{ phone: string }>("/api/auth/otp", {
+        const result = await requestApi<{ email: string }>("/api/auth/otp", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ phone, flow }),
+          body: JSON.stringify({ email, flow }),
         });
-        setProfile((current) => ({ ...current, phone: result.phone }));
+        setProfile((current) => ({ ...current, email: result.email }));
         setOtpSent(true);
-        setNotice("SMSで認証コードを送信しました。6桁のコードを入力してください。");
+        setNotice("メールで認証コードを送信しました。6桁のコードを入力してください。");
         return;
       }
 
@@ -384,22 +512,18 @@ export function useDiscussionState() {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            phone,
+            email,
             token: String(formData.get("token") ?? ""),
             flow,
-            ...(flow === "sign-up"
-              ? {
-                  gender: String(formData.get("gender") ?? ""),
-                  year: String(formData.get("year") ?? ""),
-                }
-              : {}),
           }),
         },
       );
       setProfile(result.profile);
       setAuthStatus("authenticated");
-      setHash("home", { genreId: null, middleTopicId: null, topicId: null, frameId: null });
-      setNotice(flow === "sign-up" ? "登録とログインが完了しました。" : "ログインしました。");
+      setHash(result.profile.complete ? "home" : "profile", {
+        genreId: null, middleTopicId: null, topicId: null, frameId: null, threadId: null,
+      });
+      setNotice(result.profile.complete ? "ログインしました。" : "プロフィールを設定してください。");
     } catch (error) {
       setAccountError(error instanceof Error ? error.message : "処理に失敗しました。");
     } finally {
@@ -413,8 +537,8 @@ export function useDiscussionState() {
     try {
       await requestApi<{ authenticated: false }>("/api/auth/sign-out", { method: "POST" });
       setAuthStatus("unauthenticated");
-      setProfile({ phone: "", gender: "", year: "" });
-      setHash("home", { genreId: null, middleTopicId: null, topicId: null, frameId: null });
+      setProfile({ email: "", username: "", gender: "", year: "", complete: false });
+      setHash("home", { genreId: null, middleTopicId: null, topicId: null, frameId: null, threadId: null });
       setNotice("ログアウトしました。");
     } catch (error) {
       setAccountError(error instanceof Error ? error.message : "ログアウトに失敗しました。");
@@ -439,6 +563,14 @@ export function useDiscussionState() {
       : topicStatus,
     topicError, searchResults, selectGenre, selectMiddleTopic, selectTopic, selectFrame,
     voteSubmittingFrameId, voteErrors, submitVote,
+    threads,
+    threadsStatus: authStatus === "unauthenticated" && selection.frameId ? "unauthenticated" as const : threadsStatus,
+    threadsError, threadDetail,
+    threadDetailStatus: authStatus === "unauthenticated" && selection.threadId
+      ? "unauthenticated" as const
+      : threadDetailStatus,
+    threadDetailError, threadSubmitting, threadSubmitError, commentSubmitting, commentSubmitError,
+    selectThread, createDiscussionThread, submitComment,
     retryCatalog: () => {
       setCatalogStatus("loading");
       setCatalogError("");
@@ -448,6 +580,16 @@ export function useDiscussionState() {
       setTopicStatus("loading");
       setTopicError("");
       setTopicAttempt((attempt) => attempt + 1);
+    },
+    retryThreads: () => {
+      setThreadsStatus("loading");
+      setThreadsError("");
+      setThreadsAttempt((attempt) => attempt + 1);
+    },
+    retryThreadDetail: () => {
+      setThreadDetailStatus("loading");
+      setThreadDetailError("");
+      setThreadDetailAttempt((attempt) => attempt + 1);
     },
   };
 }

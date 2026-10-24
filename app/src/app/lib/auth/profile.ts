@@ -3,10 +3,11 @@ import type { Database } from "../supabase/database.types";
 
 export type Profile = {
   id: string;
-  phone: string;
+  email: string;
   username: string;
   gender: string;
   year: string;
+  complete: boolean;
 };
 
 export async function getAuthenticatedUser(client: SupabaseClient<Database>) {
@@ -22,7 +23,7 @@ export async function getAuthenticatedUser(client: SupabaseClient<Database>) {
     return null;
   }
 
-  return { id: userId, phone: userData.user.phone ?? "" };
+  return { id: userId, email: userData.user.email ?? "" };
 }
 
 export async function getProfile(client: SupabaseClient<Database>): Promise<Profile | null> {
@@ -43,9 +44,10 @@ export async function getProfile(client: SupabaseClient<Database>): Promise<Prof
 
   return {
     id: data.id,
-    phone: authenticatedUser.phone,
+    email: authenticatedUser.email,
     username: data.username,
     gender: data.gender ?? "",
     year: data.birth_date?.slice(0, 4) ?? "",
+    complete: Boolean(data.username.trim() && data.gender && data.birth_date),
   };
 }

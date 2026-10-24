@@ -17,9 +17,9 @@ export async function POST(request: Request) {
   try {
     const supabase = await createClient();
     const { data, error } = await supabase.auth.verifyOtp({
-      phone: input.value.phone,
+      email: input.value.email,
       token: input.value.token,
-      type: "sms",
+      type: "email",
     });
 
     if (error) {
@@ -27,26 +27,6 @@ export async function POST(request: Request) {
     }
     if (!data.user) {
       return failure("AUTH_FAILED", "認証情報を確認できませんでした。", 401);
-    }
-
-    if (input.value.flow === "sign-up") {
-      const { gender, year } = input.value;
-      if (!gender || year === undefined) {
-        return failure("VALIDATION_ERROR", "プロフィール情報を確認してください。", 422);
-      }
-
-      const { error: profileError } = await supabase
-        .from("users")
-        .update({ gender, birth_date: `${year}-01-01` })
-        .eq("id", data.user.id);
-
-      if (profileError) {
-        return failure(
-          "PROFILE_UPDATE_FAILED",
-          "認証には成功しましたが、プロフィールを保存できませんでした。",
-          500,
-        );
-      }
     }
 
     const profile = await getProfile(supabase);

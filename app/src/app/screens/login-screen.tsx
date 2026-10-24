@@ -14,7 +14,7 @@ export default function LoginScreen({ profile, navigate, submitAccount, otpSent,
         {accountError && <p className="account-error" role="alert">{accountError}</p>}
         <div className="account-actions">
           <button className="primary" type="submit" disabled={accountSubmitting}>
-            {accountSubmitting ? "処理中…" : otpSent ? "コードを確認" : "SMSを送信"}
+            {accountSubmitting ? "処理中…" : otpSent ? "コードを確認" : "認証メールを送信"}
           </button>
         </div>
       </form>

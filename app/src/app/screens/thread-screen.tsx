@@ -1,24 +1,56 @@
+"use client";
+
+import { useState, type FormEvent } from "react";
+import DataState from "../components/data-state";
 import type { DiscussionState } from "../hooks/use-discussion-state";
+import type { PostStance } from "../lib/threads/types";
 import "./thread-screen.css";
-type Props = Pick<DiscussionState, "messages" | "message" | "stance" | "setStance" | "setMessages" | "setMessage" | "navigate">;
-export default function ThreadScreen({ messages, message, stance, setStance, setMessages, setMessage, navigate }: Props) {
-    return (<section className="thread">
-    <h1>Q1. 増税するべきか</h1>
+
+type Props = Pick<DiscussionState,
+  | "threadDetail" | "threadDetailStatus" | "threadDetailError" | "retryThreadDetail"
+  | "commentSubmitting" | "commentSubmitError" | "submitComment" | "navigate"
+>;
+
+export default function ThreadScreen(props: Props) {
+  const [message, setMessage] = useState("");
+  const [stance, setStance] = useState<PostStance>("agree");
+
+  if (props.threadDetailStatus !== "success" || !props.threadDetail) {
+    return <DataState status={props.threadDetailStatus} error={props.threadDetailError}
+      emptyMessage="スレッドが見つかりません。" onRetry={props.retryThreadDetail}
+      onLogin={() => props.navigate("login")} />;
+  }
+
+  async function submit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (await props.submitComment({ body: message, stance })) setMessage("");
+  }
+
+  const thread = props.threadDetail;
+  return <section className="thread">
+    <article className={`thread-body ${thread.stance}`}>
+      <h1>{thread.title}</h1>
+      <p>{thread.body}</p>
+      <small>{thread.author.username}・{new Date(thread.createdAt).toLocaleString("ja-JP")}</small>
+    </article>
     <div className="message-list">
-    <p className="bubble agree">増税したほうがいいよ！</p>
-    <p className="bubble agree own">私もそう思います。</p>
-    <p className="bubble disagree">私は反対です。</p>{messages.map((item, index) => <p key={index} className={`bubble own ${item.stance === "賛成" ? "agree" : "disagree"}`}>{item.text}</p>)}</div>
-    <button className="definition" onClick={() => navigate("video")}>
-    <span>消費税</span>
-    <small>商品を買うとかかるお金です</small>
-    </button>
-    <form className="composer" onSubmit={event => { event.preventDefault(); if (message.trim()) {
-        setMessages([...messages, { text: message.trim(), stance }]);
-        setMessage("");
-    } }}>
-    <div className="stance-switch">{["賛成", "反対"].map(label => <button type="button" key={label} className={stance === label ? `selected ${label === "賛成" ? "agree" : "disagree"}` : ""} aria-pressed={stance === label} onClick={() => setStance(label)}>{label}</button>)}</div>
-    <input aria-label="意見を入力" value={message} onChange={event => setMessage(event.target.value)} required/>
-    <button className="send" aria-label="意見を送信" type="submit">▶</button>
+      {thread.comments.length === 0 && <p className="thread-empty">まだコメントはありません。</p>}
+      {thread.comments.map((comment) => <article key={comment.id}
+        className={`bubble ${comment.stance ?? ""}`}>
+        <p>{comment.body}</p>
+        <small>{comment.author.username}・{new Date(comment.createdAt).toLocaleString("ja-JP")}</small>
+      </article>)}
+    </div>
+    <form className="composer" onSubmit={(event) => void submit(event)}>
+      <div className="stance-switch">
+        {(["agree", "disagree"] as const).map((value) => <button type="button" key={value}
+          className={stance === value ? `selected ${value}` : ""} aria-pressed={stance === value}
+          onClick={() => setStance(value)}>{value === "agree" ? "賛成" : "反対"}</button>)}
+      </div>
+      <input aria-label="コメントを入力" maxLength={2000} value={message}
+        onChange={(event) => setMessage(event.target.value)} required />
+      <button className="send" aria-label="コメントを送信" disabled={props.commentSubmitting}>▶</button>
+      {props.commentSubmitError && <p className="composer-error" role="alert">{props.commentSubmitError}</p>}
     </form>
-    </section>);
+  </section>;
 }

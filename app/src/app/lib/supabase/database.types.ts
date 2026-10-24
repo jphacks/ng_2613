@@ -94,6 +94,50 @@ export type Database = {
         };
         Relationships: [];
       };
+      threads: {
+        Row: {
+          id: string;
+          frame_id: string;
+          type: "user" | "video";
+          user_id: string;
+          stance: "agree" | "disagree" | null;
+          title: string;
+          body: string;
+          video_id: string | null;
+          created_at: string;
+          deleted_at: string | null;
+        };
+        Insert: {
+          frame_id: string;
+          type: "user";
+          user_id: string;
+          stance: "agree" | "disagree";
+          title: string;
+          body: string;
+          video_id?: null;
+        };
+        Update: never;
+        Relationships: [];
+      };
+      comments: {
+        Row: {
+          id: string;
+          thread_id: string;
+          user_id: string;
+          stance: "agree" | "disagree" | null;
+          body: string;
+          created_at: string;
+          deleted_at: string | null;
+        };
+        Insert: {
+          thread_id: string;
+          user_id: string;
+          stance?: "agree" | "disagree" | null;
+          body: string;
+        };
+        Update: never;
+        Relationships: [];
+      };
       users: {
         Row: {
           id: string;
@@ -125,7 +169,16 @@ export type Database = {
         Relationships: [];
       };
     };
-    Views: Record<string, never>;
+    Views: {
+      public_profiles: {
+        Row: {
+          id: string;
+          username: string;
+          created_at: string;
+        };
+        Relationships: [];
+      };
+    };
     Functions: {
       get_frame_vote_counts: {
         Args: { target_frame_id: string };

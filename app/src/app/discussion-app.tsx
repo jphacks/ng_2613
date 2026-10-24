@@ -7,6 +7,7 @@ import HomeScreen from "./screens/home-screen";
 import TopicsScreen from "./screens/topics-screen";
 import SummaryScreen from "./screens/summary-screen";
 import DiscussionScreen from "./screens/discussion-screen";
+import ThreadScreen from "./screens/thread-screen";
 import LoginScreen from "./screens/login-screen";
 import RegisterScreen from "./screens/register-screen";
 import ProfileScreen from "./screens/profile-screen";
@@ -23,7 +24,8 @@ export default function DiscussionApp() {
    {screen === "topics" && <TopicsScreen {...state} />}
    {screen === "summary" && <SummaryScreen {...state} />}
    {screen === "discussion" && <DiscussionScreen {...state} />}
-   {(screen === "thread" || screen === "video" || screen === "vote") && <DataState
+   {screen === "thread" && <ThreadScreen {...state} />}
+   {(screen === "video" || screen === "vote") && <DataState
     status="empty"
     emptyMessage="この機能は現在準備中です。"
    />}

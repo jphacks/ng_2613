@@ -16,9 +16,8 @@ export async function POST(request: Request) {
   try {
     const supabase = await createClient();
     const { error } = await supabase.auth.signInWithOtp({
-      phone: input.value.phone,
+      email: input.value.email,
       options: {
-        channel: "sms",
         shouldCreateUser: input.value.flow === "sign-up",
       },
     });
@@ -27,8 +26,8 @@ export async function POST(request: Request) {
       return authFailure(error);
     }
 
-    return success({ sent: true, phone: input.value.phone });
+    return success({ sent: true, email: input.value.email });
   } catch {
-    return failure("INTERNAL_ERROR", "SMSの送信処理に失敗しました。", 500);
+    return failure("INTERNAL_ERROR", "認証メールの送信処理に失敗しました。", 500);
   }
 }
