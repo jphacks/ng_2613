@@ -27,6 +27,14 @@
   pointer-events: none;
 }
 
+.dictionary-lens-mark {
+  transition: opacity var(--duration) var(--ease-out);
+}
+
+.dictionary-lens.is-over-term .dictionary-lens-mark {
+  opacity: 0;
+}
+
 /* ドラッグ中は指に追従させるため位置のアニメーションを切る */
 .dictionary-lens.is-dragging {
   cursor: grabbing;

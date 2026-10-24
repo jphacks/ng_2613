@@ -124,6 +124,8 @@ export function DictionaryProvider({ children, visible = true }: { children: Rea
       targetRef.current?.classList.remove("is-targeted");
       next?.classList.add("is-targeted");
       targetRef.current = next;
+      // 言葉に重なっているあいだは「?」を消して、レンズ越しに言葉が見えるようにする
+      lensRef.current?.classList.toggle("is-over-term", Boolean(next));
     }
     const nextPopover = next?.dataset.term ? popoverFor(next.dataset.term, next) : null;
     // 同じ内容なら state を更新しない（描画のたびに呼ぶため、無限に再描画しないように）
@@ -204,8 +206,8 @@ export function DictionaryProvider({ children, visible = true }: { children: Rea
     >
       <svg width={lensSize} height={lensSize} viewBox="0 0 48 48" aria-hidden="true">
         <path d="M30 30 L42 42" stroke="var(--ink)" strokeWidth="5" strokeLinecap="round" />
-        <circle cx="20" cy="20" r="14" fill="#fff" stroke="var(--ink)" strokeWidth="3.5" />
-        <text x="20" y="20" textAnchor="middle" dominantBaseline="central" fontSize="17" fontWeight="700" fill="var(--ink)">?</text>
+        <circle cx="20" cy="20" r="14" fill="#ffffff26" stroke="var(--ink)" strokeWidth="3.5" />
+        <text className="dictionary-lens-mark" x="20" y="20" textAnchor="middle" dominantBaseline="central" fontSize="17" fontWeight="700" fill="var(--ink)">?</text>
       </svg>
       <span className={`dictionary-lens-caption${captionVisible ? "" : " is-dismissed"}`} aria-hidden="true">わからない言葉に<br />移動させよう</span>
     </button>}
