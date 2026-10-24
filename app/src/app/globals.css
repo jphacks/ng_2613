@@ -79,23 +79,25 @@ button:hover {
   display: flex;
   flex-direction: column;
   width: 100%;
-  max-width: 420px;
+  max-width: 757px;
   min-height: 100dvh;
   margin: 0 auto;
   position: relative;
   background: white;
 }
 
-@media (width > 420px) {
+@media (width > 757px) {
   .app-layout {
     background-color: #fff;
-    background-image:
-      linear-gradient(135deg, #D3E8DD, #87C5EB),
-      linear-gradient(135deg, #D3E8DD, #87C5EB);
-    background-position:
-      left top,
-      right top;
-    background-size: calc((100% - 420px) / 2) 100%;
+    background-image: radial-gradient(
+      ellipse 65% 70% at center,
+      #d3e8dd 0%,
+      #d8e8f1 45%,
+      #fff 100%
+    );
+    background-position: center;
+    background-size: 100% 100%;
+    background-attachment: fixed;
     background-repeat: no-repeat;
   }
 
