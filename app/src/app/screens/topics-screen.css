@@ -10,17 +10,6 @@
   margin:0 auto 15px
 }
 
-.topic-hero.topic-image-placeholder {
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  border-radius:50%;
-  background:#f0f0f0;
-  color:#777;
-  font-size:13px;
-  text-align:center
-}
-
 .topic-row {
   position:relative;
   display:flex;
@@ -49,4 +38,9 @@
 
 .topic-row-term .dictionary-term {
   pointer-events:auto;
+}
+
+.topic-hero.topic-image-placeholder {
+  border-radius:50%;
+  background:#eef3f5
 }

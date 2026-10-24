@@ -10,6 +10,7 @@ import type { PostStance, ThreadDetail, ThreadSummary } from "../lib/threads/typ
 type AuthStatus = "loading" | "authenticated" | "unauthenticated";
 export type DataStatus = "idle" | "loading" | "success" | "empty" | "unauthenticated" | "error";
 type AccountProfile = {
+  id: string;
   email: string;
   username: string;
   gender: string;
@@ -100,12 +101,9 @@ export function useDiscussionState() {
   });
   const [menuOpen, setMenuOpen] = useState(false);
   const [search, setSearch] = useState("");
-  const [stance, setStance] = useState("賛成");
-  const [message, setMessage] = useState("");
-  const [messages, setMessages] = useState<{ text: string; stance: string }[]>([]);
-  const [vote, setVote] = useState<number | null>(null);
   const [notice, setNotice] = useState("");
   const [profile, setProfile] = useState<AccountProfile>({
+    id: "",
     email: "",
     username: "",
     gender: "",
@@ -129,6 +127,7 @@ export function useDiscussionState() {
   const [threadsStatus, setThreadsStatus] = useState<DataStatus>("idle");
   const [threadsError, setThreadsError] = useState("");
   const [threadsAttempt, setThreadsAttempt] = useState(0);
+  const [frameThreads, setFrameThreads] = useState<Record<string, ThreadSummary[]>>({});
   const [threadDetail, setThreadDetail] = useState<ThreadDetail | null>(null);
   const [threadDetailStatus, setThreadDetailStatus] = useState<DataStatus>("idle");
   const [threadDetailError, setThreadDetailError] = useState("");
@@ -289,6 +288,27 @@ export function useDiscussionState() {
     return () => controller.abort();
   }, [authStatus, selection.frameId, threadsAttempt]);
 
+  // 設問カードの賛成・反対の意見一覧に使う。カードごとに設問が違うため、
+  // トピック内の全設問ぶんのスレッドをまとめて取得する。
+  const topicFrameIds = topicDetail?.periods
+    .flatMap((period) => period.frames.map((frame) => frame.id))
+    .join(",") ?? "";
+
+  useEffect(() => {
+    if (!topicFrameIds || authStatus !== "authenticated") return;
+    const controller = new AbortController();
+    Promise.all(topicFrameIds.split(",").map((frameId) =>
+      requestApi<ThreadSummary[]>(`/api/frames/${encodeURIComponent(frameId)}/threads`, {
+        signal: controller.signal,
+      }).then((result) => [frameId, result] as const),
+    )).then((entries) => {
+      setFrameThreads(Object.fromEntries(entries));
+    }).catch(() => {
+      // カードの補助表示なので、取得できなくても画面は出す。
+    });
+    return () => controller.abort();
+  }, [authStatus, topicFrameIds, threadsAttempt]);
+
   useEffect(() => {
     if (!selection.threadId || authStatus !== "authenticated") return;
     const controller = new AbortController();
@@ -314,6 +334,9 @@ export function useDiscussionState() {
     topicDetail?.periods
       .flatMap((period) => period.frames)
       .find((frame) => frame.id === selection.frameId) ?? null;
+  const selectedFrameNumber = selectedFrame && topicDetail
+    ? topicDetail.periods.flatMap((period) => period.frames).indexOf(selectedFrame) + 1
+    : 1;
 
   const searchResults = useMemo<SearchResult[]>(() => {
     const query = search.trim().toLocaleLowerCase("ja");
@@ -400,8 +423,8 @@ export function useDiscussionState() {
     setHash("discussion", { ...selection, frameId, threadId: null });
   }
 
-  function selectThread(threadId: string) {
-    setHash("thread", { ...selection, threadId });
+  function selectThread(threadId: string, frameId = selection.frameId) {
+    setHash("thread", { ...selection, frameId, threadId });
   }
 
   async function createDiscussionThread(input: { title: string; body: string; stance: PostStance }) {
@@ -551,7 +574,7 @@ export function useDiscussionState() {
     try {
       await requestApi<{ authenticated: false }>("/api/auth/sign-out", { method: "POST" });
       setAuthStatus("unauthenticated");
-      setProfile({ email: "", username: "", gender: "", year: "", complete: false });
+      setProfile({ id: "", email: "", username: "", gender: "", year: "", complete: false });
       setHash("home", { genreId: null, middleTopicId: null, topicId: null, frameId: null, threadId: null });
       setNotice("ログアウトしました。");
     } catch (error) {
@@ -564,10 +587,9 @@ export function useDiscussionState() {
   const accountScreen = screen === "login" || screen === "register" || screen === "profile";
 
   return {
-    screen, menuOpen, setMenuOpen, search, setSearch, stance, setStance, message, setMessage,
-    messages, setMessages, vote, setVote, notice, setNotice, profile, navigate, submitAccount,
+    screen, menuOpen, setMenuOpen, search, setSearch, notice, setNotice, profile, navigate, submitAccount,
     accountScreen, authStatus, accountSubmitting, accountError, signOut, genres,
-    selectedGenre, selectedMiddleTopic, topicDetail, selectedFrame,
+    selectedGenre, selectedMiddleTopic, topicDetail, selectedFrame, selectedFrameNumber, frameThreads,
     catalogStatus: authStatus === "unauthenticated"
       ? "unauthenticated" as const
       : catalogStatus === "idle" ? "loading" as const : catalogStatus,

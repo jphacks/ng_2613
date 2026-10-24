@@ -74,6 +74,10 @@
   color:#111
 }
 
+.category-nav button:last-child {
+  margin-left:auto
+}
+
 .search-wrap {
   display:flex;
   align-items:center;
@@ -110,18 +114,9 @@
 }
 
 .search-results button {
-  display:flex;
-  flex-direction:column;
-  gap:2px;
+  display:block;
   width:100%;
-  text-align:left;
-  padding:8px 10px;
-  border-bottom:1px solid #ddd
-}
-
-.search-results small {
-  color:#666;
-  font-size:10px
+  text-align:center
 }
 
 .search-results p {
@@ -135,8 +130,8 @@
   padding-left:14px;
   font-size:15px;
   white-space:nowrap;
-  overflow-x:auto;
-  height:30px
+  height:30px;
+  overflow-x:auto
 }
 
 .pills {
