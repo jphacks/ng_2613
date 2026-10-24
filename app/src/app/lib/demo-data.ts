@@ -1,7 +1,7 @@
-import taxImage from "../images/税金.svg";
-import pricesImage from "../images/物価賃金.svg";
-import budgetImage from "../images/国の財政.svg";
-import financeImage from "../images/金融投資.svg";
+import taxImage from "../images/tax.svg";
+import pricesImage from "../images/prices-wages.svg";
+import budgetImage from "../images/national-budget.svg";
+import financeImage from "../images/finance-investment.svg";
 export type Screen = "home" | "topics" | "summary" | "discussion" | "thread" | "vote" | "video" | "login" | "register" | "profile";
 export const screens: Screen[] = ["home", "topics", "summary", "discussion", "thread", "vote", "video", "login", "register", "profile"];
 export const topics = [
