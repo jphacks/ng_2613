@@ -31,7 +31,7 @@ export default function DiscussionApp() {
    {screen === "summary" && <SummaryScreen {...state} />}
    {screen === "discussion" && <DiscussionScreen {...state} />}
    {screen === "thread" && <ThreadScreen {...state} />}
-   {screen === "new-thread" && <NewThreadScreen navigate={state.navigate} />}
+   {screen === "new-thread" && <NewThreadScreen navigate={state.navigate} profile={state.profile} />}
    {screen === "video" && <VideoScreen {...state} />}
    {screen === "vote" && <VoteScreen {...state} />}
    {screen === "login" && <LoginScreen {...state} />}
