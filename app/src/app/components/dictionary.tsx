@@ -17,6 +17,16 @@ const captionOverhang = 18;
 const margin = 8;
 // 解説の吹き出しの幅。画面の端からはみ出さないよう位置の計算にも使う
 const popoverWidth = 220;
+// 使い方の一言を見せ終えたことを覚えておくキー
+const captionSeenKey = "dictionary-lens-caption-seen";
+
+function hasSeenCaption() {
+  try {
+    return typeof window !== "undefined" && window.localStorage.getItem(captionSeenKey) === "1";
+  } catch {
+    return false;
+  }
+}
 
 // 虫眼鏡のレンズの中心（下の SVG の円の中心 20,20 / 48）。ここが重なった言葉を調べる
 function lensPoint(rect: DOMRect) {
@@ -59,6 +69,8 @@ function samePopover(a: Popover | null, b: Popover | null) {
 // visible が false のあいだは虫眼鏡を出さない。
 export function DictionaryProvider({ children, visible = true }: { children: ReactNode; visible?: boolean }) {
   const [popover, setPopover] = useState<Popover | null>(null);
+  // 使い方の一言は最初だけ出し、初めて虫眼鏡に触れたら消す。一度消したら次回以降も出さない
+  const [captionVisible, setCaptionVisible] = useState(() => !hasSeenCaption());
   const lensRef = useRef<HTMLButtonElement>(null);
   const positionRef = useRef<{ x: number; y: number } | null>(null);
   const targetRef = useRef<HTMLElement | null>(null);
@@ -91,6 +103,16 @@ export function DictionaryProvider({ children, visible = true }: { children: Rea
     lens.style.top = `${next.y}px`;
     lens.style.right = "auto";
     lens.style.bottom = "auto";
+  }
+
+  function dismissCaption() {
+    if (!captionVisible) return;
+    setCaptionVisible(false);
+    try {
+      window.localStorage.setItem(captionSeenKey, "1");
+    } catch {
+      // 保存できない環境では、ページを開くたびに最初だけ出る
+    }
   }
 
   // レンズの下にある言葉を調べ、重なっているあいだだけ解説を出す
@@ -144,6 +166,7 @@ export function DictionaryProvider({ children, visible = true }: { children: Rea
       aria-label="虫眼鏡。言葉に重ねているあいだ解説を表示（ドラッグまたは矢印キーで移動）"
       onPointerDown={(event) => {
         if (event.button !== 0) return;
+        dismissCaption();
         const rect = lensRef.current?.getBoundingClientRect();
         if (!rect) return;
         dragRef.current = { pointerId: event.pointerId, x: event.clientX - rect.left, y: event.clientY - rect.top };
@@ -173,6 +196,7 @@ export function DictionaryProvider({ children, visible = true }: { children: Rea
         const position = positionRef.current;
         if (!direction || !position) return;
         event.preventDefault();
+        dismissCaption();
         const step = event.shiftKey ? 40 : 10;
         moveLens(position.x + direction[0] * step, position.y + direction[1] * step);
         updateTarget();
@@ -183,7 +207,7 @@ export function DictionaryProvider({ children, visible = true }: { children: Rea
         <circle cx="20" cy="20" r="14" fill="#fff" stroke="var(--ink)" strokeWidth="3.5" />
         <text x="20" y="20" textAnchor="middle" dominantBaseline="central" fontSize="17" fontWeight="700" fill="var(--ink)">?</text>
       </svg>
-      <span className="dictionary-lens-caption" aria-hidden="true">わからない言葉に<br />移動させよう</span>
+      <span className={`dictionary-lens-caption${captionVisible ? "" : " is-dismissed"}`} aria-hidden="true">わからない言葉に<br />移動させよう</span>
     </button>}
     {visible && popover && <div
       className={`dictionary-popover ${popover.placement}`}
