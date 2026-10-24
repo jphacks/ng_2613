@@ -473,21 +473,6 @@ button:hover {
   height:36px;
   border-radius:15px
 }
-.dot-0 {
-  background:var(--blue)
-}
-.dot-1 {
-  background:#83c6e9
-}
-.dot-2 {
-  background:#d9d9d9
-}
-.dot-3 {
-  background:#efa1b2
-}
-.dot-4 {
-  background:var(--pink)
-}
 .vote-dot.chosen {
   outline:2px solid var(--ink);
   outline-offset:5px
