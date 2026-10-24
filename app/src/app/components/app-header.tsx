@@ -23,12 +23,12 @@ export default function AppHeader({ navigate, screen, search, setSearch, selecte
         </nav> : <nav className={`breadcrumbs ${screen === "discussion" ? "pills" : ""}`} aria-label="現在の位置">
         <button onClick={() => navigate("home")}>お金</button>
         <span>&gt;</span>
-        <button onClick={() => navigate("topics")}>{selectedTopic.label}</button>{screen !== "topics" && <>
+        <button aria-current={screen === "topics" ? "page" : undefined} onClick={() => navigate("topics")}>{selectedTopic.label}</button>{screen !== "topics" && <>
             <span>&gt;</span>
-            <button onClick={() => navigate("summary")}>消費税</button>
+            <button aria-current={screen === "summary" ? "page" : undefined} onClick={() => navigate("summary")}>消費税</button>
             </>}{screen === "discussion" && <>
             <span>&gt;</span>
-            <span className="current">増税するべきか</span>
+            <span className="current" aria-current="page">増税するべきか</span>
             </>}</nav>}
       </header>);
 }
