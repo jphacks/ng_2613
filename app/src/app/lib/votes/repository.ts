@@ -1,6 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "../supabase/database.types";
-import type { FrameVoteState, VoteValue } from "./types";
+import type { AgeBucket, FrameVoteDemographics, FrameVoteState, GenderBucket, VoteValue } from "./types";
 
 const changeIntervalMilliseconds = 7 * 24 * 60 * 60 * 1000;
 
@@ -107,4 +107,31 @@ export async function saveVote(
   const state = states.get(frameId);
   if (!state) throw new VoteRepositoryError("unknown", "投票結果を取得できませんでした。");
   return { ...state, votingOpen: true } satisfies FrameVoteState;
+}
+
+const ageBuckets: AgeBucket[] = ["10s_20s", "30s", "40s", "50s", "60s", "70s_plus", "unknown", "hidden"];
+const genderBuckets: GenderBucket[] = ["男性", "女性", "その他", "unknown", "hidden"];
+
+export class DemographicsUnavailableError extends Error {}
+
+export async function getFrameVoteDemographics(
+  client: SupabaseClient<Database>,
+  frameId: string,
+): Promise<FrameVoteDemographics> {
+  const { data, error } = await client.rpc("get_frame_vote_demographics", { target_frame_id: frameId });
+  if (error) {
+    // migration を反映する前は関数が存在しない（PostgREST の PGRST202）
+    if (error.code === "PGRST202") {
+      throw new DemographicsUnavailableError("年代・性別の集計はまだ利用できません。");
+    }
+    throw new VoteRepositoryError("unknown", "年代・性別の集計を取得できませんでした。");
+  }
+
+  const countOf = (category: string, bucket: string) =>
+    Number(data.find((row) => row.category === category && row.bucket === bucket)?.voter_count ?? 0);
+  return {
+    available: data.length > 0,
+    ages: data.length > 0 ? ageBuckets.map((bucket) => ({ bucket, count: countOf("age", bucket) })) : [],
+    genders: data.length > 0 ? genderBuckets.map((bucket) => ({ bucket, count: countOf("gender", bucket) })) : [],
+  };
 }

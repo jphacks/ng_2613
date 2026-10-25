@@ -239,6 +239,14 @@ export type Database = {
           total_count: number;
         }[];
       };
+      get_frame_vote_demographics: {
+        Args: { target_frame_id: string };
+        Returns: {
+          category: string;
+          bucket: string;
+          voter_count: number;
+        }[];
+      };
       get_thread_reaction_counts: {
         Args: { target_frame_id: string };
         Returns: {
