@@ -1,16 +1,19 @@
 import { useRef, useState } from "react";
 import DataState from "../components/data-state";
+import InlineVote from "../components/inline-vote";
 import VoteResultBar from "../components/vote-result-bar";
 import type { DiscussionState } from "../hooks/use-discussion-state";
 import "./discussion-screen.css";
 
-type Props = Pick<DiscussionState, "navigate" | "topicStatus" | "topicError" | "retryTopic" | "selectedFrame" | "selectedFrameNumber" | "threads" | "threadsStatus" | "threadsError" | "retryThreads" | "selectThread">;
+type Props = Pick<DiscussionState, "navigate" | "topicStatus" | "topicError" | "retryTopic" | "selectedFrame" | "selectedFrameNumber" | "threads" | "threadsStatus" | "threadsError" | "retryThreads" | "selectThread" | "voteSubmittingFrameId" | "voteErrors" | "submitVote">;
 export default function DiscussionScreen(props: Props) {
     const [reactionFlashes, setReactionFlashes] = useState<Record<string, number>>({});
     const [reactionOverrides, setReactionOverrides] = useState<Record<string, boolean>>({});
     const [reactionPending, setReactionPending] = useState<Record<string, boolean>>({});
     const [reactionErrors, setReactionErrors] = useState<Record<string, string>>({});
     const pendingIds = useRef(new Set<string>());
+    // 投票できたら帯グラフを描き直す
+    const [drawCount, setDrawCount] = useState(0);
 
     async function toggleReaction(threadId: string, reacted: boolean) {
         if (pendingIds.current.has(threadId)) return;
@@ -51,8 +54,10 @@ export default function DiscussionScreen(props: Props) {
             <span className="question-number">Q{props.selectedFrameNumber}.</span>
             <span>{frame.question}</span>
         </h1>
+        {/* 設問一覧のカードと同じ投票の帯。帯グラフの上に置き、ここからも投票できるようにする */}
+        <InlineVote frame={frame} questionNumber={props.selectedFrameNumber} submitting={props.voteSubmittingFrameId === frame.id} error={props.voteErrors[frame.id] ?? ""} onVote={props.submitVote} onVoted={() => setDrawCount(count => count + 1)} />
         {/* 設問一覧のカードと同じ投票結果の帯グラフ */}
-        <VoteResultBar vote={frame.vote} />
+        <VoteResultBar key={drawCount} vote={frame.vote} drawing={drawCount > 0} />
         <div className="discussion-opinions" aria-label="みんなの意見">
             {props.threadsStatus === "error" && <DataState status="error" error={props.threadsError} emptyMessage="" onRetry={props.retryThreads}/>}
             {threads.map(thread => {
