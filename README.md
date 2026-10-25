@@ -126,22 +126,22 @@ Rightsがまず取り組む問題は、「異なる立場の判断材料を探�
     
     同じ問いに対する賛否の理由と投票をまとめ、投票後に結果の比率を表示します。課題として掲げた「比較の難しさ」に直接対応する部分です。
     
-    論点まとめカード／投票結果の表示
+   [論点まとめカード](app/src/app/components/topic-summary-card.tsx)／[投票結果の表示](app/src/app/components/vote-result-bar.tsx)
     
 - **評価時点の立場を保持するリアクション基盤**
     
     リアクション時点の投票内容を保存し、賛成側・反対側それぞれからの評価を集計します。投票とリアクションが同時に更新される場合の整合性にも配慮しています。意見の自動抽出・画面への反映は今後の実装対象です。
     
-    立場の保存・集計／同時更新の制御
+    [立場の保存・集計](supabase/migrations/20261024030000_add_reaction_vote_snapshot_and_aggregation.sql)／[同時更新の制御](supabase/migrations/20261024040000_allow_unvoted_thread_reactions.sql)
     
 - **議論の文脈を保ったまま調べられる辞書レンズ**
     
     用語にレンズを重ねて解説を表示し、読む画面を離れずに理解を補えます。
     
-    辞書レンズ　app/src/app/components/dictionary.tsx
+    [辞書レンズ](app/src/app/components/dictionary.tsx)
     
 - **動画・投票・議論をつなぐ参加導線**
     
     「今日のテーマ」の動画視聴から、その問いへの投票、議論の閲覧へ進めます。
     
-    今日のテーマ画面　app/src/app/screens/daily-theme-screen.tsx
+    [今日のテーマ画面](app/src/app/screens/daily-theme-screen.tsx)
