@@ -619,10 +619,8 @@ export function useDiscussionState() {
           }),
         });
         setProfile(updatedProfile);
+        setHash("home", { genreId: null, middleTopicId: null, topicId: null, frameId: null, threadId: null });
         setNotice("会員情報を更新しました。");
-        if (!profile.complete && updatedProfile.complete) {
-          setHash("home", { genreId: null, middleTopicId: null, topicId: null, frameId: null, threadId: null });
-        }
         return;
       }
 
