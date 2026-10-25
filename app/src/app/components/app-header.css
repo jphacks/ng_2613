@@ -1,7 +1,14 @@
 .app-header {
-  height:75px;
-  margin:0 10px;
-  border-bottom:1px solid var(--line);
+  /* 画面の上端に詰まりすぎないよう、上に1行分ほどの余白を取る */
+  height:95px;
+  /* 区切り線より上を塗る。重く見えないよう、上から下へ白に近づく軽いグラデーションにする。
+     画面の端まで塗るよう、左右は外側ではなく内側の余白にする。
+     --header-bg はパンくずの段（下側）の色で、戻るボタンの左の帯に使う */
+  --header-bg:#fbfbfc;
+  background:linear-gradient(to bottom, #f5f6f8, var(--header-bg));
+  padding:20px 10px 0;
+  /* 本文との区切りは強すぎないよう、薄いグレーにする */
+  border-bottom:1px solid #dedee3;
   position:relative;
   z-index:2
 }
@@ -149,9 +156,10 @@
 
 .breadcrumbs [aria-current="page"],
 .breadcrumbs button[aria-current="page"]:hover {
-  background:#000;
+  /* 設問の見出しの文字色（globals.css の #454553）に合わせる */
+  background:#454553;
   color:#fff;
-  border-color:#000
+  border-color:#454553
 }
 
 .pills button {
@@ -203,19 +211,142 @@
   margin-right:4px;
   border-color:var(--line);
   background:#fff;
-  box-shadow:-14px 0 0 #fff
+  /* 横スクロールしたパンくずを左端で隠す帯。ヘッダーと同じ色にする */
+  box-shadow:-14px 0 0 var(--header-bg)
 }
 @media (hover:hover) {
   .breadcrumbs .back-button:hover svg { transform:translateX(-2px) }
 }
 .breadcrumbs .back-button svg { transition:transform var(--duration) var(--ease-out) }
 
-/* 横にスクロールできることが分かるよう、細いスクロールバーを出す */
+/* スクロールバーは隠し、続きがある側の端を薄くして「まだ続く」ことを見せる */
 .category-nav {
-  scroll-padding-inline:16px;
-  scrollbar-width:thin;
-  scrollbar-color:#c4c4c4 transparent
+  --fade-left:0px;
+  --fade-right:0px;
+  scroll-padding-inline:24px;
+  scrollbar-width:none;
+  mask-image:linear-gradient(to right, transparent, #000 var(--fade-left), #000 calc(100% - var(--fade-right)), transparent);
+  cursor:grab;
+  user-select:none
 }
-.category-nav::-webkit-scrollbar { height:4px }
-.category-nav::-webkit-scrollbar-thumb { background:#c4c4c4; border-radius:2px }
+.category-nav::-webkit-scrollbar { display:none }
+.category-nav[data-fade-left] { --fade-left:28px }
+.category-nav[data-fade-right] { --fade-right:28px }
+.category-nav.is-dragging { cursor:grabbing }
+
+/* 選択中のタブは太字＋下線。下線は1本の線として描き、切り替えで横にすべらせる */
+.category-nav { position:relative }
+.category-nav button { align-self:stretch; transition:color 300ms var(--ease-out) }
+.category-nav .active { font-weight:700 }
+.category-indicator {
+  position:absolute;
+  left:0;
+  bottom:0;
+  width:0;
+  height:2px;
+  border-radius:1px;
+  background:#111;
+  pointer-events:none
+}
+.category-indicator.is-ready {
+  transition:transform 300ms var(--ease-out), width 300ms var(--ease-out), opacity var(--duration) var(--ease-out)
+}
 .category-nav button { flex-shrink:0 }
+
+/* パンくずの文字は設問の見出しと同じ太さ・色にそろえる（今いる階層は白抜きのまま） */
+.breadcrumbs { color:#454553; font-weight:700 }
+
+/* 設問の画面のパンくずは横スクロールさせない。間は「…」にまとめ、
+   それでも入らない長い設問は末尾を省略する */
+.breadcrumbs.pills { overflow:hidden }
+.breadcrumbs .crumb-question {
+  flex-shrink:1;
+  min-width:0;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap
+}
+/* 間をまとめた「…」は枠を付けず文字だけにする */
+.breadcrumbs .crumb-ellipsis,
+.breadcrumbs .crumb-ellipsis:hover {
+  border-color:transparent;
+  background:transparent;
+  padding:2px
+}
+
+/* パンくずは丸い枠をやめて太字にし、今いる階層だけに下線を付ける */
+.breadcrumbs button,
+.breadcrumbs .current,
+.breadcrumbs button:hover {
+  border-color:transparent;
+  background:transparent;
+  color:#454553;
+  font-weight:700;
+  padding:2px;
+  text-decoration:none
+}
+.breadcrumbs [aria-current="page"],
+.breadcrumbs button[aria-current="page"]:hover {
+  border-color:transparent;
+  background:transparent;
+  color:#454553;
+  text-decoration:underline;
+  text-decoration-thickness:1.5px;
+  text-underline-offset:3px
+}
+/* 戻るボタンも枠なしで「‹」だけ。横スクロールで下に潜る文字を隠すため背景はヘッダーと同じ色 */
+.breadcrumbs .back-button,
+.breadcrumbs .back-button:hover {
+  border-color:transparent;
+  background:var(--header-bg);
+  text-decoration:none
+}
+
+/* トップは「今日のテーマ」と「カテゴリー」の2つに等分する。横スクロールはしない */
+.category-nav-wrap { position:relative }
+.category-nav { gap:0; overflow:visible; mask-image:none; cursor:default; user-select:auto }
+.category-nav button { flex:1 1 0; display:flex; align-items:center; justify-content:center; gap:4px }
+.category-nav button:last-child { margin-left:0 }
+.category-caret { display:inline-block; font-size:11px; transition:transform var(--duration) var(--ease-out) }
+.category-caret.is-open { transform:rotate(180deg) }
+
+/* カテゴリーを押すと下に開く一覧 */
+.category-menu {
+  position:absolute;
+  top:calc(100% + 1px);
+  right:-10px;
+  left:-10px;
+  z-index:3;
+  margin:0;
+  padding:6px 0;
+  list-style:none;
+  border-bottom:1px solid #dedee3;
+  background:#fff;
+  box-shadow:var(--shadow-lg);
+  animation:pop-in var(--duration) var(--ease-out);
+  transform-origin:top center
+}
+.category-menu button {
+  display:block;
+  width:100%;
+  padding:12px 20px;
+  color:#454553;
+  font-size:15px;
+  font-weight:500;
+  text-align:left
+}
+.category-menu button[aria-current="true"] { font-weight:700; background:var(--pale-blue) }
+@media (hover:hover) {
+  .category-menu button:hover { background:#f3f4f6; filter:none }
+}
+
+
+/* ロゴの左と検索バー・メニューの右を、画面の端から離す（パンくずやタブの段は今のまま） */
+.header-top { padding-inline:10px }
+
+/* 検索バー（虫眼鏡を含む）の幅を、下の「カテゴリー」タブ（タブの段の半分）に合わせる。
+   ロゴの段は左右に10pxずつ内側なので、その分を足す */
+.search-wrap { width:calc(50% + 10px); max-width:none }
+
+/* カテゴリー一覧の項目の間に薄いグレーの線を入れる */
+.category-menu li + li { border-top:1px solid #ececf0 }

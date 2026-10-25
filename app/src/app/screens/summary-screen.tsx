@@ -4,7 +4,8 @@ import type { DiscussionState } from "../hooks/use-discussion-state";
 import "./summary-screen.css";
 
 type Props = Pick<DiscussionState, "topicDetail" | "topicStatus" | "topicError" | "retryTopic" | "navigate" | "frameThreads" | "selectFrame" | "selectThread" | "voteSubmittingFrameId" | "voteErrors" | "submitVote">;
-const colors = ["cream", "white", "blue"];
+// カードの背景は元のクリーム色にそろえる
+const colors = ["cream"];
 export default function SummaryScreen(props: Props) {
     if (props.topicStatus !== "success" || !props.topicDetail) {
         return <DataState status={props.topicStatus} error={props.topicError} emptyMessage="このトピックには設問がありません。" onRetry={props.retryTopic} onLogin={() => props.navigate("login")} skeleton="cards"/>;

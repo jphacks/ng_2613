@@ -1,36 +1,44 @@
 .login-screen {
-  padding-top:41px
+  padding-top: 41px;
 }
 
-.avatar-placeholder {
-  width:252px;
-  height:242px;
-  border-radius:50%;
-  background:#d9d9d9;
-  margin:0 auto 46px
+.login-logo-frame {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 252px;
+  height: 252px;
+  margin: 0 auto 46px;
+}
+
+.login-logo {
+  display: block;
+  width: 200px;
+  height: 200px;
+  object-fit: contain;
+  clip-path: inset(5px 0 0 6px);
 }
 
 .login-screen h1 {
-  font-size:32px;
-  text-align:center;
-  margin-bottom:39px
+  font-size: 32px;
+  text-align: center;
+  margin-bottom: 39px;
 }
 
 .login-screen .account-field {
-  margin-bottom:31px
+  margin-bottom: 31px;
 }
 
 .login-screen .account-actions {
-  margin-top:51px
+  margin-top: 51px;
 }
 
 .login-links {
-  margin-top:100px;
-  text-align:center;
-  display:flex;
-  flex-direction:column;
-  color:#399ff1;
-  font-size:20px;
-  line-height:24px
+  margin-top: 100px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  color: #399ff1;
+  font-size: 20px;
+  line-height: 24px;
 }
-
