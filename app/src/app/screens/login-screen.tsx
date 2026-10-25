@@ -1,19 +1,49 @@
+import Image from "next/image";
 import AccountFields from "../components/account-fields";
 import type { DiscussionState } from "../hooks/use-discussion-state";
 import "./login-screen.css";
 
-type Props = Pick<DiscussionState, "profile" | "navigate" | "submitAccount" | "accountSubmitting" | "accountError">;
+type Props = Pick<
+  DiscussionState,
+  | "profile"
+  | "navigate"
+  | "submitAccount"
+  | "accountSubmitting"
+  | "accountError"
+>;
 
-export default function LoginScreen({ profile, navigate, submitAccount, accountSubmitting, accountError }: Props) {
+export default function LoginScreen({
+  profile,
+  navigate,
+  submitAccount,
+  accountSubmitting,
+  accountError,
+}: Props) {
   return (
     <section className="account-screen login-screen">
-      <div className="avatar-placeholder" />
+      <div className="login-logo-frame">
+        <Image
+          src="/rights-logo.png"
+          alt="Rights"
+          width={186}
+          height={180}
+          className="login-logo"
+        />
+      </div>
       <h1>ログイン</h1>
       <form onSubmit={submitAccount}>
         <AccountFields mode="login" profile={profile} />
-        {accountError && <p className="account-error" role="alert">{accountError}</p>}
+        {accountError && (
+          <p className="account-error" role="alert">
+            {accountError}
+          </p>
+        )}
         <div className="account-actions">
-          <button className="primary" type="submit" disabled={accountSubmitting}>
+          <button
+            className="primary"
+            type="submit"
+            disabled={accountSubmitting}
+          >
             {accountSubmitting ? "処理中…" : "ログイン"}
           </button>
         </div>
