@@ -1,7 +1,8 @@
 import { useId, useRef, useState } from "react";
+import type { DemographicsState } from "../hooks/use-discussion-state";
 import type { TopicFrame } from "../lib/catalog/types";
-import type { ThreadSummary } from "../lib/threads/types";
-import type { VoteValue } from "../lib/votes/types";
+import type { PostStance, ThreadSummary } from "../lib/threads/types";
+import type { AgeBucket, GenderBucket, VoteValue } from "../lib/votes/types";
 import InlineVote from "./inline-vote";
 import VoteResultBar from "./vote-result-bar";
 import { DictionaryText } from "./dictionary";
@@ -17,21 +18,55 @@ type Props = {
   onVote: (frameId: string, value: VoteValue) => Promise<boolean>;
   onDetail?: () => void;
   onThread: (threadId: string) => void;
+  demographics?: DemographicsState;
+  onLoadDemographics: (frameId: string) => void;
 };
 type Segment = { label: string; value: number; color: string };
-const ageGroups: Segment[] = [
-  { label: "10, 20代", value: 15, color: "#397fa8" },
-  { label: "30代", value: 25, color: "#64aaca" },
-  { label: "40代", value: 20, color: "#a8cedb" },
-  { label: "50代", value: 18, color: "#8876a5" },
-  { label: "60代", value: 12, color: "#bba9ce" },
-  { label: "70代以上", value: 10, color: "#d8cce4" },
-];
-const genders: Segment[] = [
-  { label: "男性", value: 50, color: "#a7daf5" },
-  { label: "女性", value: 40, color: "#edaab8" },
-  { label: "その他", value: 10, color: "#cfbded" },
-];
+const unknownStyle = { label: "未回答", color: "#d9d9d9" };
+const hiddenStyle = { label: "少人数のため非表示", color: "#b5b5b5" };
+const ageStyles: Record<AgeBucket, { label: string; color: string }> = {
+  "10s_20s": { label: "10, 20代", color: "#397fa8" },
+  "30s": { label: "30代", color: "#64aaca" },
+  "40s": { label: "40代", color: "#a8cedb" },
+  "50s": { label: "50代", color: "#8876a5" },
+  "60s": { label: "60代", color: "#bba9ce" },
+  "70s_plus": { label: "70代以上", color: "#d8cce4" },
+  unknown: unknownStyle,
+  hidden: hiddenStyle,
+};
+const genderStyles: Record<GenderBucket, { label: string; color: string }> = {
+  "男性": { label: "男性", color: "#a7daf5" },
+  "女性": { label: "女性", color: "#edaab8" },
+  "その他": { label: "その他", color: "#cfbded" },
+  unknown: unknownStyle,
+  hidden: hiddenStyle,
+};
+// 人数を割合にする。四捨五入だけだと合計が100%にならないため、端数の大きい順に1%ずつ配る。
+function toSegments<T extends string>(
+  rows: { bucket: T; count: number }[],
+  styles: Record<T, { label: string; color: string }>,
+): Segment[] {
+  const total = rows.reduce((sum, row) => sum + row.count, 0);
+  if (total === 0) return [];
+  const exact = rows.map((row) => (row.count / total) * 100);
+  const percents = exact.map(Math.floor);
+  let rest = 100 - percents.reduce((sum, value) => sum + value, 0);
+  exact
+    .map((value, index) => ({ index, fraction: value - Math.floor(value) }))
+    .sort((a, b) => b.fraction - a.fraction)
+    .forEach(({ index }) => {
+      if (rest > 0) {
+        percents[index] += 1;
+        rest -= 1;
+      }
+    });
+  return rows
+    .map((row, index) => ({ ...styles[row.bucket], value: percents[index], bucket: row.bucket, count: row.count }))
+    // DB が返した区分だけを出す。少人数で「非表示」にまとめた区分を0%と見せると
+    // 「その区分の投票者はいない」と誤解させるため。
+    .filter((segment) => segment.count > 0)
+    .map(({ label, value, color }) => ({ label, value, color }));
+}
 function DemographicChart({ title, data }: { title: string; data: Segment[] }) {
   const stops = data.map((item, index) => {
     const start = data
@@ -62,6 +97,14 @@ function DemographicChart({ title, data }: { title: string; data: Segment[] }) {
     </figure>
   );
 }
+// 代表に選ばれた意見を順位の順に並べる。順位がない一覧（古い応答）なら、今までどおり先頭から
+function representativesFor(threads: ThreadSummary[], stance: PostStance) {
+  const list = threads.filter((thread) => thread.stance === stance);
+  if (!list.some((thread) => thread.representativeRank != null)) return list;
+  return list
+    .filter((thread) => thread.representativeRank != null)
+    .sort((a, b) => a.representativeRank! - b.representativeRank!);
+}
 export default function TopicSummaryCard({
   color = "cream",
   questionNumber = 1,
@@ -72,6 +115,8 @@ export default function TopicSummaryCard({
   onVote,
   onDetail,
   onThread,
+  demographics,
+  onLoadDemographics,
 }: Props) {
   const statsRef = useRef<HTMLDialogElement>(null);
   const statsTitleId = useId();
@@ -79,8 +124,8 @@ export default function TopicSummaryCard({
   const [drawCount, setDrawCount] = useState(0);
   const titleId = useId();
   const { vote } = frame;
-  const agreeThreads = threads.filter((thread) => thread.stance === "agree");
-  const disagreeThreads = threads.filter((thread) => thread.stance === "disagree");
+  const agreeThreads = representativesFor(threads, "agree");
+  const disagreeThreads = representativesFor(threads, "disagree");
   return (
     <article className={`summary-card ${color}`} aria-labelledby={titleId}>
       <div className="summary-heading">
@@ -96,7 +141,11 @@ export default function TopicSummaryCard({
           aria-haspopup="dialog"
           aria-label="統計を見る"
           title="統計を見る"
-          onClick={() => statsRef.current?.showModal()}
+          onClick={() => {
+            statsRef.current?.showModal();
+            // 開いたとき、まだ読んでいないか投票で集計が破棄されていれば取り直す
+            if (!demographics) onLoadDemographics(frame.id);
+          }}
         >
           {/* 太い棒が3本並ぶ棒グラフ。中は塗らず輪郭だけ */}
           <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
@@ -150,11 +199,23 @@ export default function TopicSummaryCard({
           ×
         </button>
         <p className="stats-dialog-question">Q{questionNumber}. {frame.question}</p>
-        <h2 id={statsTitleId}>回答者の構成（デモデータ）</h2>
-        <div className="demographic-charts">
-          <DemographicChart title="回答者の年代" data={ageGroups} />
-          <DemographicChart title="回答者の性別" data={genders} />
-        </div>
+        <h2 id={statsTitleId}>回答者の構成</h2>
+        {demographics?.status === "success" && demographics.data.available ? (
+          <div className="demographic-charts">
+            <DemographicChart title="回答者の年代" data={toSegments(demographics.data.ages, ageStyles)} />
+            <DemographicChart title="回答者の性別" data={toSegments(demographics.data.genders, genderStyles)} />
+          </div>
+        ) : (
+          <p className="demographic-status" role="status">
+            {!demographics || demographics.status === "loading"
+              ? "集計中…"
+              : demographics.status === "unavailable"
+                ? "年代・性別の集計はまだ利用できません"
+                : demographics.status === "error"
+                  ? "集計を取得できませんでした"
+                  : "回答が5人以上になると表示されます"}
+          </p>
+        )}
       </dialog>
       {onDetail && (
         <button type="button" className="summary-opinions-link" onClick={onDetail}>

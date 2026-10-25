@@ -192,6 +192,7 @@
 .dialog-vote-dot:active:not(:disabled) { transform:scale(.9) }
 .dialog-vote-dot:disabled { opacity:.5 }
 .dialog-vote-status { line-height:1.5 }
+.demographic-status { padding:28px 0 12px; color:#666; font-size:12px; text-align:center }
 
 /* 見出しは省略せず、入らなければ折り返して全文を出す。統計ボタンは右上に残す */
 .summary-card { container-type:inline-size }

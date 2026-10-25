@@ -144,6 +144,12 @@ export type Database = {
         Update: never;
         Relationships: [];
       };
+      thread_embeddings: {
+        Row: { thread_id: string; model: string; embedding: number[]; created_at: string };
+        Insert: { thread_id: string; model: string; embedding: number[] };
+        Update: { model?: string; embedding?: number[] };
+        Relationships: [];
+      };
       videos: {
         Row: {
           id: string;
@@ -231,6 +237,22 @@ export type Database = {
           count_4: number;
           count_5: number;
           total_count: number;
+        }[];
+      };
+      get_frame_vote_demographics: {
+        Args: { target_frame_id: string };
+        Returns: {
+          category: string;
+          bucket: string;
+          voter_count: number;
+        }[];
+      };
+      get_thread_reaction_counts: {
+        Args: { target_frame_id: string };
+        Returns: {
+          thread_id: string;
+          agree_count: number;
+          disagree_count: number;
         }[];
       };
     };

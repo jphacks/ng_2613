@@ -5,11 +5,15 @@ import type { Catalog, CatalogTopic, TopicDetail } from "../lib/catalog/types";
 import type { DailyTheme } from "../lib/daily-theme/types";
 import { getPostAuthScreen } from "../lib/auth/auth-flow";
 import { screens, type Screen } from "../lib/demo-data";
-import type { FrameVoteState, VoteValue } from "../lib/votes/types";
+import type { FrameVoteDemographics, FrameVoteState, VoteValue } from "../lib/votes/types";
 import type { PostStance, ThreadDetail, ThreadSummary } from "../lib/threads/types";
 
 type AuthStatus = "loading" | "authenticated" | "unauthenticated";
 export type DataStatus = "idle" | "loading" | "success" | "empty" | "unauthenticated" | "error";
+// unavailable は DB に集計関数がまだ反映されていない状態
+export type DemographicsState =
+  | { status: "loading" | "unavailable" | "error" }
+  | { status: "success"; data: FrameVoteDemographics };
 type AccountProfile = {
   id: string;
   email: string;
@@ -132,6 +136,7 @@ export function useDiscussionState() {
   const [topicAttempt, setTopicAttempt] = useState(0);
   const [voteSubmittingFrameId, setVoteSubmittingFrameId] = useState<string | null>(null);
   const [voteErrors, setVoteErrors] = useState<Record<string, string>>({});
+  const [demographics, setDemographics] = useState<Record<string, DemographicsState>>({});
   const [threads, setThreads] = useState<ThreadSummary[]>([]);
   const [threadsStatus, setThreadsStatus] = useState<DataStatus>("idle");
   const [threadsError, setThreadsError] = useState("");
@@ -557,6 +562,12 @@ export function useDiscussionState() {
           ),
         })),
       } : current);
+      // 内訳が変わるので、次に開いたときに取り直す
+      setDemographics((current) => {
+        const next = { ...current };
+        delete next[frameId];
+        return next;
+      });
       setDailyTheme((current) => current && current.frame.id === frameId ? {
         ...current,
         frame: { ...current.frame, vote: voteState },
@@ -570,6 +581,23 @@ export function useDiscussionState() {
       return false;
     } finally {
       setVoteSubmittingFrameId(null);
+    }
+  }
+
+  // 「もっと見る」を開いたときだけ取りに行く。設問カードが多くても一度に取りに行かないため。
+  async function loadDemographics(frameId: string) {
+    if (demographics[frameId]) return;
+    setDemographics((current) => ({ ...current, [frameId]: { status: "loading" } }));
+    try {
+      const data = await requestApi<FrameVoteDemographics>(
+        `/api/frames/${encodeURIComponent(frameId)}/demographics`,
+      );
+      setDemographics((current) => ({ ...current, [frameId]: { status: "success", data } }));
+    } catch (error) {
+      const status = error instanceof ApiRequestError && error.code === "DEMOGRAPHICS_UNAVAILABLE"
+        ? "unavailable" as const
+        : "error" as const;
+      setDemographics((current) => ({ ...current, [frameId]: { status } }));
     }
   }
 
@@ -665,7 +693,7 @@ export function useDiscussionState() {
       ? "unauthenticated" as const
       : topicStatus,
     topicError, searchResults, selectGenre, selectMiddleTopic, selectTopic, selectFrame,
-    voteSubmittingFrameId, voteErrors, submitVote,
+    voteSubmittingFrameId, voteErrors, submitVote, demographics, loadDemographics,
     threads,
     threadsStatus: authStatus === "unauthenticated" && selection.frameId ? "unauthenticated" as const : threadsStatus,
     threadsError, threadDetail,
