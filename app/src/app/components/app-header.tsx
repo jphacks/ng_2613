@@ -93,14 +93,19 @@ export default function AppHeader({
           <span />
         </button>
       </div>
-      {screen === "home" ? (
+      {(screen === "home" || screen === "daily-theme") ? (
         <nav ref={categoryNavRef} className="category-nav" aria-label="カテゴリー">
-          {/* 元のデザインと同じく、専用のデータはまだないため先頭のカテゴリーを表示する */}
-          {genres[0] && <button onClick={() => selectGenre(genres[0].id)}>今日のテーマ</button>}
+          <button
+            className={screen === "daily-theme" ? "active" : undefined}
+            aria-current={screen === "daily-theme" ? "page" : undefined}
+            onClick={() => navigate("daily-theme")}
+          >
+            今日のテーマ
+          </button>
           {genres.map((genre) => (
             <button
               key={genre.id}
-              className={genre.id === selectedGenre?.id ? "active" : undefined}
+              className={screen === "home" && genre.id === selectedGenre?.id ? "active" : undefined}
               onClick={() => selectGenre(genre.id)}
             >
               {genre.name}

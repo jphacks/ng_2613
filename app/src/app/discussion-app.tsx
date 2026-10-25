@@ -6,6 +6,7 @@ import { DictionaryProvider } from "./components/dictionary";
 import AppMenu from "./components/app-menu";
 import { useDiscussionState } from "./hooks/use-discussion-state";
 import DiscussionScreen from "./screens/discussion-screen";
+import DailyThemeScreen from "./screens/daily-theme-screen";
 import HomeScreen from "./screens/home-screen";
 import LoginScreen from "./screens/login-screen";
 import NewThreadScreen from "./screens/new-thread-screen";
@@ -33,6 +34,7 @@ export default function DiscussionApp() {
       {!accountScreen && screen !== "video" && screen !== "vote" && <AppHeader {...state} />}
       {notice && <p className="notice" role="status">{notice}</p>}
       {screen === "home" && <HomeScreen {...state} />}
+      {screen === "daily-theme" && <DailyThemeScreen {...state} />}
       {screen === "topics" && <TopicsScreen {...state} />}
       {screen === "summary" && <SummaryScreen {...state} />}
       {screen === "discussion" && <DiscussionScreen {...state} />}
