@@ -2,6 +2,8 @@ import { failure, hasSameOrigin, readJson, success } from "@/app/lib/api/api-res
 import { isUuid, validateThreadRequest } from "@/app/lib/api/validation";
 import { getAuthenticatedUser } from "@/app/lib/auth/profile";
 import { createClient } from "@/app/lib/supabase/server";
+import { after } from "next/server";
+import { saveThreadEmbedding } from "@/app/lib/representatives/repository";
 import { createThread, getThreads, ThreadRepositoryError } from "@/app/lib/threads/repository";
 
 type ThreadsRouteContext = { params: Promise<{ frameId: string }> };
@@ -37,7 +39,10 @@ export async function POST(request: Request, context: ThreadsRouteContext) {
     const supabase = await createClient();
     const user = await getAuthenticatedUser(supabase);
     if (!user) return failure("UNAUTHENTICATED", "ログインが必要です。", 401);
-    return success(await createThread(supabase, frameId, user.id, input.value), 201);
+    const created = await createThread(supabase, frameId, user.id, input.value);
+    // 観点の判定に使うベクトルは、応答を返したあとに1回だけ作る
+    after(() => saveThreadEmbedding({ id: created.id, title: input.value.title, body: input.value.body }));
+    return success(created, 201);
   } catch (error) {
     return error instanceof ThreadRepositoryError
       ? repositoryFailure(error)
