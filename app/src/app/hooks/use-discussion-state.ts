@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import type { Catalog, CatalogTopic, TopicDetail } from "../lib/catalog/types";
+import type { DailyTheme } from "../lib/daily-theme/types";
 import { getPostAuthScreen } from "../lib/auth/auth-flow";
 import { screens, type Screen } from "../lib/demo-data";
 import type { FrameVoteDemographics, FrameVoteState, VoteValue } from "../lib/votes/types";
@@ -105,6 +106,8 @@ export function useDiscussionState() {
     threadId: null,
   });
   const [menuOpen, setMenuOpen] = useState(false);
+  // トップのタブ。「今日のテーマ」は別のコンテンツ（未実装）で、今ある分類はすべて「カテゴリー」に入る
+  const [homeTab, setHomeTab] = useState<"today" | "category">("category");
   const [search, setSearch] = useState("");
   const [notice, setNotice] = useState("");
   const [profile, setProfile] = useState<AccountProfile>({
@@ -123,6 +126,10 @@ export function useDiscussionState() {
   const [catalogStatus, setCatalogStatus] = useState<DataStatus>("idle");
   const [catalogError, setCatalogError] = useState("");
   const [catalogAttempt, setCatalogAttempt] = useState(0);
+  const [dailyTheme, setDailyTheme] = useState<DailyTheme | null>(null);
+  const [dailyThemeStatus, setDailyThemeStatus] = useState<DataStatus>("idle");
+  const [dailyThemeError, setDailyThemeError] = useState("");
+  const [dailyThemeAttempt, setDailyThemeAttempt] = useState(0);
   const [topicDetail, setTopicDetail] = useState<TopicDetail | null>(null);
   const [topicStatus, setTopicStatus] = useState<DataStatus>("idle");
   const [topicError, setTopicError] = useState("");
@@ -246,6 +253,40 @@ export function useDiscussionState() {
 
     return () => controller.abort();
   }, [authStatus, catalogAttempt]);
+
+  useEffect(() => {
+    if (screen !== "daily-theme") return;
+    if (authStatus === "loading") return;
+    if (authStatus === "unauthenticated") {
+      setDailyThemeStatus("unauthenticated");
+      return;
+    }
+
+    const controller = new AbortController();
+    setDailyThemeStatus("loading");
+    setDailyThemeError("");
+    requestApi<DailyTheme>("/api/daily-theme", { signal: controller.signal })
+      .then((result) => {
+        setDailyTheme(result);
+        setDailyThemeStatus("success");
+      })
+      .catch((error: unknown) => {
+        if (controller.signal.aborted) return;
+        setDailyTheme(null);
+        if (error instanceof ApiRequestError && error.status === 404) {
+          setDailyThemeStatus("empty");
+          return;
+        }
+        if (error instanceof ApiRequestError && error.status === 401) {
+          setDailyThemeStatus("unauthenticated");
+          return;
+        }
+        setDailyThemeStatus("error");
+        setDailyThemeError(error instanceof Error ? error.message : "今日のテーマを取得できませんでした。");
+      });
+
+    return () => controller.abort();
+  }, [authStatus, dailyThemeAttempt, screen]);
 
   useEffect(() => {
     if (!selection.topicId) return;
@@ -384,6 +425,7 @@ export function useDiscussionState() {
   }
 
   function navigate(next: Screen) {
+    if (next === "home") setHomeTab("category");
     setHash(next, selection);
   }
 
@@ -423,11 +465,28 @@ export function useDiscussionState() {
     setTopicDetail(null);
     setTopicStatus("loading");
     setTopicError("");
+    // 今いるトピックをもう一度選んだときは topicId もアドレスも変わらず、取得が走らないまま
+    // 読み込み中で止まる。loading にするときは必ず取得も走らせる。
+    setTopicAttempt((attempt) => attempt + 1);
     setHash("summary", { genreId, middleTopicId, topicId, frameId: null, threadId: null });
   }
 
   function selectFrame(frameId: string) {
     setHash("discussion", { ...selection, frameId, threadId: null });
+  }
+
+  function openDailyThemeDiscussion() {
+    if (!dailyTheme) return;
+    setTopicDetail(null);
+    setTopicStatus("loading");
+    setTopicError("");
+    setHash("discussion", {
+      genreId: dailyTheme.frame.genreId,
+      middleTopicId: dailyTheme.frame.middleTopicId,
+      topicId: dailyTheme.frame.topicId,
+      frameId: dailyTheme.frame.id,
+      threadId: null,
+    });
   }
 
   function selectThread(threadId: string, frameId = selection.frameId) {
@@ -509,6 +568,10 @@ export function useDiscussionState() {
         delete next[frameId];
         return next;
       });
+      setDailyTheme((current) => current && current.frame.id === frameId ? {
+        ...current,
+        frame: { ...current.frame, vote: voteState },
+      } : current);
       return true;
     } catch (error) {
       setVoteErrors((current) => ({
@@ -618,8 +681,9 @@ export function useDiscussionState() {
   const accountScreen = screen === "login" || screen === "register" || screen === "profile";
 
   return {
-    screen, menuOpen, setMenuOpen, search, setSearch, notice, setNotice, profile, navigate, submitAccount,
+    screen, menuOpen, setMenuOpen, homeTab, setHomeTab, search, setSearch, notice, setNotice, profile, navigate, submitAccount,
     accountScreen, authStatus, accountSubmitting, accountError, signOut, genres,
+    dailyTheme, dailyThemeStatus, dailyThemeError, openDailyThemeDiscussion,
     selectedGenre, selectedMiddleTopic, topicDetail, selectedFrame, selectedFrameNumber, frameThreads,
     catalogStatus: authStatus === "unauthenticated"
       ? "unauthenticated" as const
@@ -642,6 +706,11 @@ export function useDiscussionState() {
       setCatalogStatus("loading");
       setCatalogError("");
       setCatalogAttempt((attempt) => attempt + 1);
+    },
+    retryDailyTheme: () => {
+      setDailyThemeStatus("loading");
+      setDailyThemeError("");
+      setDailyThemeAttempt((attempt) => attempt + 1);
     },
     retryTopic: () => {
       setTopicStatus("loading");

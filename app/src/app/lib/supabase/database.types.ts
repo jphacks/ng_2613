@@ -9,6 +9,12 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      thread_reactions: {
+        Row: { id: string; thread_id: string; user_id: string; created_at: string; vote_value: number | null };
+        Insert: { thread_id: string; user_id: string };
+        Update: never;
+        Relationships: [];
+      };
       genres: {
         Row: {
           id: string;
@@ -138,6 +144,30 @@ export type Database = {
         Update: never;
         Relationships: [];
       };
+      videos: {
+        Row: {
+          id: string;
+          title: string;
+          url: string;
+          description: string | null;
+          published_at: string | null;
+          source_thread_id: string | null;
+          created_at: string;
+        };
+        Insert: never;
+        Update: never;
+        Relationships: [];
+      };
+      video_questions: {
+        Row: {
+          video_id: string;
+          frame_id: string;
+          created_at: string;
+        };
+        Insert: never;
+        Update: never;
+        Relationships: [];
+      };
       users: {
         Row: {
           id: string;
@@ -180,6 +210,17 @@ export type Database = {
       };
     };
     Functions: {
+      upsert_daily_video: {
+        Args: {
+          target_title: string;
+          target_url: string;
+          target_description: string | null;
+          target_published_at: string;
+          target_topic_id: string;
+          target_period_id: string;
+        };
+        Returns: { video_id: string; frame_id: string }[];
+      };
       get_frame_vote_counts: {
         Args: { target_frame_id: string };
         Returns: {

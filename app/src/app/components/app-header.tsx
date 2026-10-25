@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { useEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { DiscussionState } from "../hooks/use-discussion-state";
 import "./app-header.css";
 type Props = Pick<
@@ -10,6 +10,8 @@ type Props = Pick<
   | "setSearch"
   | "menuOpen"
   | "setMenuOpen"
+  | "homeTab"
+  | "setHomeTab"
   | "genres"
   | "selectedGenre"
   | "selectedMiddleTopic"
@@ -27,6 +29,8 @@ export default function AppHeader({
   setSearch,
   menuOpen,
   setMenuOpen,
+  homeTab,
+  setHomeTab,
   genres,
   selectedGenre,
   selectedMiddleTopic,
@@ -38,13 +42,56 @@ export default function AppHeader({
   selectTopic,
 }: Props) {
   const categoryNavRef = useRef<HTMLElement>(null);
+  // トップは「今日のテーマ」と「カテゴリー」の2つに分け、カテゴリーを押すと下に一覧を開く
+  const [categoryMenuOpen, setCategoryMenuOpen] = useState(false);
+  // カテゴリーの一覧を開いているあいだは、下線をカテゴリーの下に移す（選ばずに閉じたら戻る）
+  const visibleTab = screen === "daily-theme"
+    ? "today"
+    : categoryMenuOpen ? "category" : homeTab;
 
-  // カテゴリーは横に並びきらず横スクロールになるため、選んだものが端で切れていたら見える位置まで寄せる
+  // 一覧の外を押すか Esc で閉じる
   useEffect(() => {
-    categoryNavRef.current
-      ?.querySelector(".active")
-      ?.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "nearest" });
-  }, [selectedGenre?.id]);
+    if (!categoryMenuOpen) return;
+    const onPointerDown = (event: PointerEvent) => {
+      if (!categoryNavRef.current?.parentElement?.contains(event.target as Node)) setCategoryMenuOpen(false);
+    };
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setCategoryMenuOpen(false);
+    };
+    window.addEventListener("pointerdown", onPointerDown);
+    window.addEventListener("keydown", onKeyDown);
+    return () => {
+      window.removeEventListener("pointerdown", onPointerDown);
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [categoryMenuOpen]);
+
+  // 選択中のタブの下線を1本の線として描き、切り替えたときに前のタブから横にすべらせる
+  const indicatorRef = useRef<HTMLSpanElement>(null);
+  useLayoutEffect(() => {
+    const nav = categoryNavRef.current;
+    const indicator = indicatorRef.current;
+    if (!nav || !indicator) return;
+    const place = () => {
+      const active = nav.querySelector<HTMLElement>(".active");
+      indicator.style.opacity = active ? "1" : "0";
+      if (!active) return;
+      indicator.style.transform = `translateX(${active.offsetLeft}px)`;
+      indicator.style.width = `${active.offsetWidth}px`;
+    };
+    place();
+    // 最初の位置合わせではすべらせない
+    const frame = requestAnimationFrame(() => indicator.classList.add("is-ready"));
+    // フォントの読み込みや太字への切り替えでタブの幅が変わったら合わせ直す
+    const observer = new ResizeObserver(place);
+    nav.querySelectorAll("button").forEach((button) => observer.observe(button));
+    return () => {
+      cancelAnimationFrame(frame);
+      observer.disconnect();
+    };
+  }, [homeTab, categoryMenuOpen, screen]);
+
+  const collapseMiddle = (screen === "discussion" || screen === "thread") && Boolean(selectedFrame);
 
   // 履歴ではなく階層で1つ上へ戻す。外から直接開いたときにアプリの外へ出ないようにするため。
   function goBack() {
@@ -88,25 +135,57 @@ export default function AppHeader({
           aria-expanded={menuOpen}
           onClick={() => setMenuOpen(!menuOpen)}
         >
-          <span />
-          <span />
-          <span />
+          <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#454553" aria-hidden="true">
+            <path d="M120-240v-80h720v80H120Zm0-200v-80h720v80H120Zm0-200v-80h720v80H120Z" />
+          </svg>
         </button>
       </div>
-      {screen === "home" ? (
-        <nav ref={categoryNavRef} className="category-nav" aria-label="カテゴリー">
-          {/* 元のデザインと同じく、専用のデータはまだないため先頭のカテゴリーを表示する */}
-          {genres[0] && <button onClick={() => selectGenre(genres[0].id)}>今日のテーマ</button>}
-          {genres.map((genre) => (
+      {(screen === "home" || screen === "daily-theme") ? (
+        <div className="category-nav-wrap">
+          <nav ref={categoryNavRef} className="category-nav" aria-label="トップの表示切り替え">
+            {/* 末尾に置くと button:last-child の指定が外れるため先頭に置く */}
+            <span ref={indicatorRef} className="category-indicator" aria-hidden="true" />
+            {/* 今日のテーマは別のコンテンツ。今ある分類はすべてカテゴリーに入る */}
             <button
-              key={genre.id}
-              className={genre.id === selectedGenre?.id ? "active" : undefined}
-              onClick={() => selectGenre(genre.id)}
+              className={visibleTab === "today" ? "active" : undefined}
+              aria-current={screen === "daily-theme" ? "page" : undefined}
+              onClick={() => {
+                setHomeTab("today");
+                setCategoryMenuOpen(false);
+                navigate("daily-theme");
+              }}
             >
-              {genre.name}
+              今日のテーマ
             </button>
-          ))}
-        </nav>
+            <button
+              className={visibleTab === "category" ? "active" : undefined}
+              aria-expanded={categoryMenuOpen}
+              aria-controls="category-menu"
+              onClick={() => setCategoryMenuOpen((open) => !open)}
+            >
+              カテゴリー
+              <span className={`category-caret${categoryMenuOpen ? " is-open" : ""}`} aria-hidden="true">▾</span>
+            </button>
+          </nav>
+          {categoryMenuOpen && (
+            <ul id="category-menu" className="category-menu" aria-label="カテゴリー">
+              {genres.map((genre) => (
+                <li key={genre.id}>
+                  <button
+                    aria-current={homeTab === "category" && genre.id === selectedGenre?.id ? "true" : undefined}
+                    onClick={() => {
+                      setHomeTab("category");
+                      setCategoryMenuOpen(false);
+                      selectGenre(genre.id);
+                    }}
+                  >
+                    {genre.name}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
       ) : (
         <nav
           className={`breadcrumbs ${screen === "discussion" || screen === "thread" ? "pills" : ""}`}
@@ -120,7 +199,22 @@ export default function AppHeader({
           {selectedGenre && (
             <button onClick={() => selectGenre(selectedGenre.id)}>{selectedGenre.name}</button>
           )}
-          {selectedMiddleTopic && (
+          {/* 設問の画面では設問の文が長く横にはみ出すため、間の「中分類 › トピック」を「…」にまとめる。
+              「…」を押すとトピック（設問一覧）へ戻る */}
+          {collapseMiddle && topicDetail && (
+            <>
+              <span>&gt;</span>
+              <button
+                className="crumb-ellipsis"
+                aria-label={`${selectedMiddleTopic ? `${selectedMiddleTopic.name} › ` : ""}${topicDetail.name}へ戻る`}
+                title={`${selectedMiddleTopic ? `${selectedMiddleTopic.name} › ` : ""}${topicDetail.name}`}
+                onClick={() => selectTopic(topicDetail.id)}
+              >
+                …
+              </button>
+            </>
+          )}
+          {!collapseMiddle && selectedMiddleTopic && (
             <>
               <span>&gt;</span>
               <button
@@ -131,7 +225,7 @@ export default function AppHeader({
               </button>
             </>
           )}
-          {screen !== "topics" && topicDetail && (
+          {!collapseMiddle && screen !== "topics" && topicDetail && (
             <>
               <span>&gt;</span>
               <button
@@ -146,7 +240,9 @@ export default function AppHeader({
             <>
               <span>&gt;</span>
               <button
+                className="crumb-question"
                 aria-current={screen === "discussion" ? "page" : undefined}
+                title={selectedFrame.question}
                 onClick={() => navigate("discussion")}
               >
                 {selectedFrame.question}

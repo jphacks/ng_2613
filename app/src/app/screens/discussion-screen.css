@@ -10,14 +10,75 @@
   width:100%;
   border:1px solid var(--line);
   border-radius:10px;
-  height:59px;
+  min-height:59px;
   margin-bottom:15px;
   display:flex;
   align-items:center;
-  justify-content:space-between;
-  padding:0 37px 0 14px;
+  gap:8px;
+  padding:0 14px;
   font-size:21px;
-  white-space:nowrap
+  overflow-wrap:anywhere
+}
+
+.opinion-message {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  flex:1;
+  min-width:0;
+  min-height:48px;
+  text-align:left;
+  background:transparent;
+}
+
+.opinion-reaction {
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  flex-shrink:0;
+  align-items:center;
+  gap:0;
+  min-height:44px;
+  padding:3px 0;
+  border-radius:8px;
+  background:transparent;
+  color:#999;
+  font-size:8px;
+}
+
+.opinion-message:focus-visible,
+.opinion-reaction:focus-visible {
+  outline:2px solid var(--ink);
+  outline-offset:2px;
+}
+
+.opinion-reaction.is-reacted { color:#a76500 }
+.opinion-reaction.is-reacted .reaction-bulb { fill:#ffe16b }
+.opinion-reaction:disabled { cursor:wait; opacity:0.65 }
+
+.reaction-bulb { flex-shrink:0 }
+.reaction-bulb.is-flashing {
+  color:#a76500;
+  fill:#ffe16b;
+  animation:reaction-glow 850ms ease-out;
+}
+
+@keyframes reaction-glow {
+  0%, 65% {
+    color:#a76500;
+    fill:#ffe16b;
+    filter:drop-shadow(0 0 5px #ffcf33) drop-shadow(0 0 9px #fff4b1);
+  }
+  30% { transform:scale(1.2) }
+  100% { color:#a76500; fill:#ffe16b; filter:none; transform:scale(1) }
+}
+
+@media (prefers-reduced-motion:reduce) {
+  @keyframes reaction-glow {
+    0%, 80% { color:#a76500; fill:#ffe16b }
+    100% { color:#a76500; fill:#ffe16b }
+  }
 }
 
 .opinion-text {
@@ -84,3 +145,44 @@
   .add-opinion:hover { transform:scale(1.06) }
 }
 .add-opinion:active { transform:scale(.94) }
+
+/* 議論の画面の一番上の設問の文 */
+.discussion-question { margin:0 4px 4px; color:#454553; font-size:18px; font-weight:700; line-height:1.5 }
+
+/* 意見の行のふちを賛成は青、反対はピンクにする */
+.opinion-row.blue { border-color:var(--blue); background:#fff }
+.opinion-row.pink { border-color:var(--pink); background:#fff }
+
+/* 設問の文の下に、投票の帯と投票結果の帯グラフを置く */
+.discussion-list .vote-bar { width:auto; margin:0 4px }
+
+/* 左右の余白を広げる */
+.discussion-list { padding-inline:20px }
+@media(max-width:350px) { .discussion-list { padding-inline:12px } }
+
+/* 意見の文字は X（旧Twitter）の投稿本文と同じ15px。設問の文（18px）より小さい */
+.discussion-list .opinion-row { font-size:15px }
+@media(max-width:350px) { .discussion-list .opinion-row { font-size:14px } }
+
+/* なるほどは枠の外の左、枠の中は意見の文と、縦線の右に開くボタン */
+.opinion-item { display:flex; align-items:center; gap:6px; margin-bottom:15px }
+.opinion-item > .opinion-row { flex:1; min-width:0; margin-bottom:0; padding-right:0 }
+.opinion-row > .opinion-text { flex:1 }
+.opinion-open { flex-shrink:0; align-self:stretch; display:flex; align-items:center; justify-content:center; min-width:44px; padding:0 14px; border-left:1px solid #dedee3; background:transparent; color:#8a8a96 }
+.opinion-open:focus-visible { outline:2px solid var(--ink); outline-offset:-2px }
+
+/* なるほどを押したら、ボタンごとぷるっと揺れながら少し浮く */
+.opinion-reaction:has(.reaction-bulb.is-flashing) { animation:reaction-jelly 600ms var(--ease-out) }
+@keyframes reaction-jelly {
+  0% { transform:translateY(0) scale(1, 1) }
+  25% { transform:translateY(-5px) scale(.9, 1.12) }
+  45% { transform:translateY(-4px) scale(1.1, .92) }
+  65% { transform:translateY(-2px) scale(.97, 1.04) }
+  85% { transform:translateY(0) scale(1.02, .98) }
+  100% { transform:translateY(0) scale(1, 1) }
+}
+@media (prefers-reduced-motion:reduce) {
+  .opinion-reaction:has(.reaction-bulb.is-flashing) { animation:none }
+}
+/* 背景が白なので、カードの中と違って薄い枠で囲む */
+.discussion-list .summary-inline-vote { margin:12px 0; border:1px solid #e3e3e8 }

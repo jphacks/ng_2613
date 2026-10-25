@@ -35,7 +35,7 @@ function mapWriteError(error: { code?: string }) {
     : new ThreadRepositoryError("unknown", "投稿を保存できませんでした。");
 }
 
-export async function getThreads(client: SupabaseClient<Database>, frameId: string) {
+export async function getThreads(client: SupabaseClient<Database>, frameId: string, userId: string) {
   const { data: frame, error: frameError } = await client
     .from("frames")
     .select("id")
@@ -55,7 +55,15 @@ export async function getThreads(client: SupabaseClient<Database>, frameId: stri
   if (error) throw new ThreadRepositoryError("unknown", "スレッドを取得できませんでした。");
 
   const authors = await getAuthors(client, data.map((thread) => thread.user_id));
+  const reactedIds = new Set<string>();
+  if (data.length > 0) {
+    const { data: reactions, error: reactionError } = await client.from("thread_reactions")
+      .select("thread_id").eq("user_id", userId).in("thread_id", data.map(thread => thread.id));
+    if (reactionError) throw new ThreadRepositoryError("unknown", "なるほどの状態を取得できませんでした。");
+    reactions.forEach(reaction => reactedIds.add(reaction.thread_id));
+  }
   return data.map((thread): ThreadSummary => ({
+    reacted: reactedIds.has(thread.id),
     id: thread.id,
     title: thread.title,
     stance: thread.stance as PostStance,

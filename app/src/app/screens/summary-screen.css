@@ -193,3 +193,193 @@
 .dialog-vote-dot:disabled { opacity:.5 }
 .dialog-vote-status { line-height:1.5 }
 .demographic-status { padding:28px 0 12px; color:#666; font-size:12px; text-align:center }
+
+/* 見出しは省略せず、入らなければ折り返して全文を出す。統計ボタンは右上に残す */
+.summary-card { container-type:inline-size }
+.summary-heading { flex-wrap:nowrap; align-items:flex-start }
+.summary-heading h1 {
+  flex:1;
+  min-width:0;
+  font-size:min(20px, 4.6cqi);
+  white-space:normal;
+  overflow-wrap:anywhere;
+  /* globals.css の balance だと行を均等に割って早めに折り返すため、統計ボタンまで詰めてから折り返す */
+  text-wrap:wrap
+}
+
+/* 投票ダイアログの代わりに、グラフの下（年代・性別グラフの上）で直接選ぶ */
+.summary-inline-vote { margin:0 0 18px; padding:10px 14px 8px; border-radius:12px; background:#ffffffa6 }
+.summary-inline-vote .dialog-vote-status { margin-top:8px }
+.inline-vote-row { display:flex; align-items:center; gap:10px }
+.inline-vote-row .dialog-vote-options { flex:1; min-width:0 }
+.inline-vote-label { flex-shrink:0; font-size:13px }
+/* 上の円グラフ・意見の表と同じく、反対はピンク、賛成は青 */
+.inline-vote-label { font-weight:700 }
+.inline-vote-label.disagree { color:var(--pink) }
+.inline-vote-label.agree { color:var(--blue) }
+/* 押せない状態でも丸を薄くしない。円グラフや左右の文字と完全に同じ色で見せる */
+.summary-inline-vote .dialog-vote-dot:disabled { opacity:1 }
+
+/* 丸を押したときの投票の確認モーダル */
+.vote-confirm { text-align:center }
+.vote-confirm-question { font-size:12px; color:#666; line-height:1.5 }
+.vote-confirm-choice { display:flex; align-items:center; justify-content:center; gap:8px; margin:14px 0 18px; font-size:20px; font-weight:700 }
+.vote-confirm-dot { width:22px; height:22px; border-radius:50%; flex-shrink:0 }
+.vote-confirm h2 { margin:0 0 6px; font-size:16px; font-weight:500 }
+.vote-confirm-note { color:#888; font-size:11px }
+.vote-confirm-error { margin-top:10px; color:#b42318; font-size:12px; line-height:1.5 }
+.vote-confirm-actions { display:flex; gap:10px; margin-top:20px }
+.vote-confirm-actions button { flex:1; min-height:44px; font-size:15px; padding:8px 10px }
+
+/* 表は角丸で切り抜いているため、四角いマス目の枠線が下の角で途切れて見えていた。
+   一番下の行の左右の端のマス目にも同じ角丸を付けて、枠線を角に沿わせる */
+.summary-content tbody tr:last-child td:first-child { border-bottom-left-radius:11px }
+.summary-content tbody tr:last-child td:last-child { border-bottom-right-radius:11px }
+.summary-content tbody tr:last-child td button { border-radius:inherit }
+
+/* カードの一番下の、意見一覧へ進む角丸のボタン */
+.summary-opinions-link {
+  position:relative;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:100%;
+  min-height:44px;
+  margin-top:12px;
+  border:1px solid #d0d0d6;
+  border-radius:12px;
+  background:#fff;
+  color:var(--ink);
+  font-size:14px;
+  font-weight:500
+}
+.summary-opinions-link span {
+  position:absolute;
+  right:16px;
+  font-size:18px;
+  line-height:1;
+  color:#a8a8b0;
+  transition:transform var(--duration) var(--ease-out)
+}
+@media (hover:hover) {
+  .summary-opinions-link:hover { filter:none; border-color:#b8b8c0 }
+  .summary-opinions-link:hover span { transform:translateX(3px) }
+}
+.summary-opinions-link:active { transform:scale(.98) }
+
+/* カード内の文字は設問の見出しと同じ太さ・色にそろえる。
+   意味のある色（表の見出し、反対・賛成の文字、白抜きのボタン）は各ルールの色のまま */
+.summary-card { color:#454553; font-weight:700 }
+.summary-content th { font-weight:700 }
+.vote-confirm h2 { font-weight:700 }
+
+
+/* 見出しの右の「統計を見る」。回答者の構成（年代・性別）を開く */
+/* 棒グラフのマークの下に「統計」と小さく書く */
+.summary-stats-toggle {
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:1px;
+  flex-shrink:0;
+  min-width:40px;
+  padding:5px 6px 4px;
+  border:1px solid #d0d0d6;
+  border-radius:10px;
+  background:#fff;
+  color:#454553;
+  font-size:9px;
+  line-height:1.2
+}
+@media (hover:hover) {
+  .summary-stats-toggle:hover { filter:none; border-color:#b8b8c0 }
+}
+.summary-stats-toggle:active { transform:scale(.96) }
+
+/* 統計のモーダル */
+.stats-dialog { width:340px }
+.stats-dialog-question { margin:0 24px 4px 0; color:#888; font-size:11px; line-height:1.5 }
+.stats-dialog h2 { margin:0 0 18px; font-size:15px; font-weight:700 }
+.stats-dialog[open] { animation:pop-in var(--duration) var(--ease-out) }
+
+/* 意見の表を円グラフの下に置き、カードの横幅いっぱいに広げる */
+.summary-content { flex-direction:column; align-items:stretch; gap:14px }
+.summary-content table { flex:none; width:100% }
+
+/* 投票結果の帯グラフ。左から反対→賛成の5色で、各区間に割合の数字を重ねる */
+.vote-bar {
+  display:flex;
+  width:100%;
+  height:30px;
+  overflow:hidden;
+  border-radius:8px;
+  background:#d9d9d9
+}
+.vote-bar-segment {
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-width:0;
+  color:#454553;
+  font-size:10px;
+  font-weight:700
+}
+.vote-bar-empty {
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:100%;
+  font-size:12px
+}
+/* 投票したら、左から右へ伸ばす */
+@keyframes vote-bar-grow {
+  from { clip-path:inset(0 100% 0 0 round 8px) }
+  to { clip-path:inset(0 0 0 0 round 8px) }
+}
+.vote-bar.is-drawing { animation:vote-bar-grow 800ms var(--ease-out) }
+.vote-bar.is-drawing .vote-bar-segment > span { animation:fade-in 300ms var(--ease-out) 650ms backwards }
+
+/* 賛成・反対の代表意見（縦に積む）。見出しと枠は賛成が青、反対がピンク */
+.opinion-groups { display:flex; flex-direction:column; gap:10px }
+.opinion-group { --accent:var(--blue); overflow:hidden; border:1px solid var(--accent); border-radius:11px; background:#fff }
+.opinion-group.disagree { --accent:var(--pink) }
+.opinion-group h3 {
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  height:31px;
+  margin:0;
+  background:var(--accent);
+  color:#fff;
+  font-size:14px;
+  font-weight:700
+}
+.opinion-group ul { margin:0; padding:0; list-style:none }
+.opinion-group li { height:30px; border-top:1px solid var(--accent) }
+.opinion-group li:first-child { border-top:0 }
+.opinion-group li button {
+  width:100%;
+  height:100%;
+  padding:0 12px;
+  font-size:11px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  transition:background-color var(--duration) var(--ease-out)
+}
+@media (hover:hover) {
+  .opinion-group li button:hover { background:#49a3d314; filter:none }
+  .opinion-group.disagree li button:hover { background:#ed537414 }
+}
+.opinion-group li button:active { background:#0000000f }
+
+/* 「みんなの意見をもっと見る！」は白地に濃いふち（文字色と同じ）。文字も見出しと同じ色 */
+.summary-card .summary-opinions-link { border-color:#454553; background:#fff; color:#454553 }
+.summary-card .summary-opinions-link span { color:#8a8a94 }
+@media (hover:hover) {
+  .summary-card .summary-opinions-link:hover { border-color:#454553; background:#f4f4f6 }
+}
+
+/* 設問の見出し。折り返した行は「Q1.」の下ではなく文の頭にそろえる（議論の画面でも使う） */
+.question-heading { display:flex; gap:.3em }
+.question-heading .question-number { flex-shrink:0 }

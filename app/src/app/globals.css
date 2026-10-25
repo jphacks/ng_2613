@@ -26,8 +26,8 @@ body {
   margin: 0;
   background: #fff;
   color: #080808;
-  /* 英数字は Geist、和文は Noto Sans JP（どちらも layout.tsx で読み込む） */
-  font-family: var(--font-geist-sans), var(--font-noto-sans-jp), "Hiragino Sans", "Yu Gothic UI", sans-serif;
+  /* 英数字は Geist、和文は Zen Kaku Gothic New（どちらも layout.tsx で読み込む） */
+  font-family: var(--font-geist-sans), var(--font-zen-kaku-gothic-new), "Hiragino Sans", "Yu Gothic UI", sans-serif;
   font-weight: 400;
   /* 和文の字間を文字ごとの幅に詰め、全体をわずかに広げて読みやすくする */
   font-feature-settings: "palt";
@@ -113,6 +113,13 @@ h1 {
 
 h2 {
   font-weight: 500;
+}
+
+.summary-heading h1,
+.summary-vote-dialog h2,
+.vote-screen h1,
+.thread h1 {
+  color: #454553;
 }
 
 /* タッチ端末でホバーが押しっぱなしに見えないよう、ホバーできる端末だけに付ける */

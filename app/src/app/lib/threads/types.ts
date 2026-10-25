@@ -6,6 +6,7 @@ export type PostAuthor = {
 };
 
 export type ThreadSummary = {
+  reacted?: boolean;
   id: string;
   title: string;
   stance: PostStance;
