@@ -3,7 +3,7 @@
 
 <img width="466" height="466" alt="logo" src="https://github.com/user-attachments/assets/dd747544-20ec-408d-86ed-3bc90f2d43c4" />
 
-機能説明はこちら：https://www.youtube.com/watch?v=piaNsc6ilBI
+機能説明はこちら：https://youtu.be/OAwPPiOETiE
 
 開発思想はこちら：https://youtu.be/mgSQDn86y9I
 ## 製品概要
