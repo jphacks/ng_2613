@@ -2,6 +2,8 @@
 
 import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
+import { stdin, stdout } from "node:process";
+import { createInterface } from "node:readline/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -38,7 +40,11 @@ const migrationFiles = [
 function parseArguments(argumentsList) {
   const options = {
     apply: false,
+    dryRunExplicit: false,
     checkDb: false,
+    target: "local",
+    projectRef: undefined,
+    confirmProject: undefined,
     periodCode: undefined,
     help: false,
   };
@@ -56,6 +62,7 @@ function parseArguments(argumentsList) {
 
     switch (argument) {
       case "--dry-run":
+        options.dryRunExplicit = true;
         break;
       case "--check-db":
         options.checkDb = true;
@@ -63,6 +70,15 @@ function parseArguments(argumentsList) {
       case "--apply":
         options.apply = true;
         options.checkDb = true;
+        break;
+      case "--target":
+        options.target = nextValue();
+        break;
+      case "--project-ref":
+        options.projectRef = nextValue();
+        break;
+      case "--confirm-project":
+        options.confirmProject = nextValue();
         break;
       case "--period-code":
         options.periodCode = nextValue();
@@ -89,22 +105,55 @@ function printUsage() {
   # ローカルDBへの投入（Phase 3でのみ使用）
   node supabase/scripts/seed-sample-discussions.mjs --apply --period-code <code>
 
+  # リモートDBを読み取るdry-run
+  node supabase/scripts/seed-sample-discussions.mjs --target remote --dry-run --check-db --project-ref <project-ref> --period-code <code>
+
+  # リモートDBへの投入（project refの指定と対話確認が必須）
+  node supabase/scripts/seed-sample-discussions.mjs --target remote --apply --project-ref <project-ref> --confirm-project <project-ref> --period-code <code>
+
 環境変数（--check-db / --apply のみ）:
   SUPABASE_SERVICE_ROLE_KEY
   SUPABASE_LOCAL_URL（省略時 http://127.0.0.1:54321）
+  SUPABASE_URL（--target remote のみ）
 
 安全仕様:
   --apply を明示しない限り書き込みません。
-  接続先はlocalhostまたはループバックアドレスだけを許可します。
+  既定のローカルモードはlocalhostまたはループバックアドレスだけを許可します。
+  リモート書き込みはproject refの二重指定と対話確認を要求します。
 `);
 }
 
 function validateOptions(options) {
+  if (!["local", "remote"].includes(options.target)) {
+    throw new Error("--target は local または remote を指定してください。");
+  }
   if (options.checkDb && !options.periodCode) {
     throw new Error("DB確認には --period-code が必要です。");
   }
+  if (options.apply && options.dryRunExplicit) {
+    throw new Error("--dry-run と --apply は同時に指定できません。");
+  }
   if (!options.checkDb && options.periodCode) {
     throw new Error("--period-code は --check-db または --apply と一緒に指定してください。");
+  }
+  if (options.target === "remote" && !options.checkDb) {
+    throw new Error("--target remote には --check-db または --apply が必要です。");
+  }
+  if (options.target === "remote" && !options.apply && !options.dryRunExplicit) {
+    throw new Error("リモートの読み取り確認には --dry-run を明示してください。");
+  }
+  if (options.target === "remote" && !options.projectRef) {
+    throw new Error("--target remote には --project-ref が必要です。");
+  }
+  if (options.target === "local" && (options.projectRef || options.confirmProject)) {
+    throw new Error("--project-ref と --confirm-project はリモート専用です。");
+  }
+  if (!options.apply && options.confirmProject) {
+    throw new Error("--confirm-project は --apply と一緒に指定してください。");
+  }
+  if (options.target === "remote" && options.apply
+    && options.confirmProject !== options.projectRef) {
+    throw new Error("リモート投入には --confirm-project にproject refを正確に指定してください。");
   }
 }
 
@@ -127,6 +176,53 @@ function resolveLocalUrl() {
     throw new Error("SUPABASE_LOCAL_URLに認証情報・クエリ・フラグメントを含めないでください。");
   }
   return parsedUrl.toString().replace(/\/$/, "");
+}
+
+function resolveRemoteUrl(projectRef) {
+  const rawUrl = process.env.SUPABASE_URL;
+  if (!rawUrl) {
+    throw new Error("リモート確認には SUPABASE_URL が必要です。");
+  }
+  if (!/^[a-z0-9]{20}$/.test(projectRef)) {
+    throw new Error("--project-ref の形式が正しくありません。");
+  }
+
+  let parsedUrl;
+  try {
+    parsedUrl = new URL(rawUrl);
+  } catch {
+    throw new Error("SUPABASE_URL が正しいURLではありません。");
+  }
+  if (parsedUrl.protocol !== "https:") {
+    throw new Error("リモートSupabase URLはhttpsで指定してください。");
+  }
+  if (parsedUrl.hostname !== `${projectRef}.supabase.co`) {
+    throw new Error("SUPABASE_URLと--project-refが一致しません。");
+  }
+  if (parsedUrl.username || parsedUrl.password || parsedUrl.search || parsedUrl.hash
+    || !["", "/"].includes(parsedUrl.pathname)) {
+    throw new Error("SUPABASE_URLにはオリジン以外を含めないでください。");
+  }
+  return parsedUrl.origin;
+}
+
+async function confirmRemoteApply(projectRef, remoteUrl) {
+  if (!stdin.isTTY || !stdout.isTTY) {
+    throw new Error("リモート投入は対話端末から実行してください。");
+  }
+  const expected = `APPLY ${projectRef}`;
+  const prompt = createInterface({ input: stdin, output: stdout });
+  try {
+    console.log(`\n警告: リモートSupabaseへ書き込みます。`);
+    console.log(`project ref: ${projectRef}`);
+    console.log(`URL: ${remoteUrl}`);
+    const answer = await prompt.question(`続行するには「${expected}」と入力してください: `);
+    if (answer.trim() !== expected) {
+      throw new Error("確認文字列が一致しないため、リモート投入を中止しました。");
+    }
+  } finally {
+    prompt.close();
+  }
 }
 
 function assertObject(value, location) {
@@ -728,38 +824,80 @@ async function resolveFrames(client, periodCode, discussionQuestions) {
     client.select("middle_topics", "id,genre_id,name"),
     client.select("topics", "id,middle_topic_id,name"),
   ]);
+  const issues = new Map();
+  const addIssue = (key, message) => issues.set(key, message);
+  const period = periods.length === 1 ? periods[0] : null;
   if (periods.length !== 1) {
-    throw new Error(`期間 ${periodCode} は1件である必要があります（実数: ${periods.length}）。`);
+    addIssue(
+      `period:${periodCode}`,
+      `期間 ${periodCode}: ${periods.length === 0 ? "不足" : `${periods.length}件あり一意でない`}`,
+    );
   }
-  const period = periods[0];
-  const frames = await client.select(
-    "frames",
-    "id,topic_id,period_id,type,question",
-    { period_id: `eq.${period.id}`, type: "eq.question" },
-  );
+  const frames = period
+    ? await client.select(
+      "frames",
+      "id,topic_id,period_id,type,question",
+      { period_id: `eq.${period.id}`, type: "eq.question" },
+    )
+    : [];
   const frameByQuestionId = new Map();
+  let unresolvedFrameCount = 0;
 
   for (const question of discussionQuestions) {
     const genreCandidates = genres.filter((genre) => genre.name === question.genre);
     if (genreCandidates.length !== 1) {
-      throw new Error(`${question.question_id}: genre候補が${genreCandidates.length}件です。`);
+      addIssue(
+        `genre:${question.genre}`,
+        `genre「${question.genre}」: ${genreCandidates.length === 0 ? "不足" : `${genreCandidates.length}件あり一意でない`}`,
+      );
+      unresolvedFrameCount += 1;
+      continue;
     }
     const middleCandidates = middleTopics.filter((middle) =>
       middle.genre_id === genreCandidates[0].id && middle.name === question.middle_topic);
     if (middleCandidates.length !== 1) {
-      throw new Error(`${question.question_id}: middle_topic候補が${middleCandidates.length}件です。`);
+      addIssue(
+        `middle:${genreCandidates[0].id}:${question.middle_topic}`,
+        `middle_topic「${question.genre} / ${question.middle_topic}」: ${middleCandidates.length === 0 ? "不足" : `${middleCandidates.length}件あり一意でない`}`,
+      );
+      unresolvedFrameCount += 1;
+      continue;
     }
     const topicCandidates = topics.filter((topic) =>
       topic.middle_topic_id === middleCandidates[0].id && topic.name === question.topic);
     if (topicCandidates.length !== 1) {
-      throw new Error(`${question.question_id}: topic候補が${topicCandidates.length}件です。`);
+      addIssue(
+        `topic:${middleCandidates[0].id}:${question.topic}`,
+        `topic「${question.genre} / ${question.middle_topic} / ${question.topic}」: ${topicCandidates.length === 0 ? "不足" : `${topicCandidates.length}件あり一意でない`}`,
+      );
+      unresolvedFrameCount += 1;
+      continue;
+    }
+    if (!period) {
+      unresolvedFrameCount += 1;
+      continue;
     }
     const frameCandidates = frames.filter((frame) =>
       frame.topic_id === topicCandidates[0].id && frame.question === question.question);
     if (frameCandidates.length !== 1) {
-      throw new Error(`${question.question_id}: frame候補が${frameCandidates.length}件です。`);
+      addIssue(
+        `frame:${question.question_id}`,
+        `${question.question_id} のframe: ${frameCandidates.length === 0 ? "不足" : `${frameCandidates.length}件あり一意でない`}`,
+      );
+      unresolvedFrameCount += 1;
+      continue;
     }
     frameByQuestionId.set(question.question_id, frameCandidates[0].id);
+  }
+  if (issues.size > 0) {
+    const details = [...issues.values()];
+    const shown = details.slice(0, 20).map((message) => `- ${message}`);
+    if (details.length > shown.length) {
+      shown.push(`- ほか ${details.length - shown.length} 件`);
+    }
+    throw new Error(
+      `必要なカテゴリ・期間・frameを解決できません（未解決質問: ${unresolvedFrameCount}/168）。自動追加は行いません。\n${shown.join("\n")}`,
+    );
   }
   return frameByQuestionId;
 }
@@ -859,6 +997,7 @@ async function createMissingAuthUsers(client, authState) {
     if (!hasLongBan(created)) {
       throw new Error(`${sampleUserId} の長期BANを確認できません。`);
     }
+    authState.authBySampleId.set(sampleUserId, created);
     authState.userIdBySampleId.set(sampleUserId, created.id);
   }
 
@@ -868,54 +1007,102 @@ async function createMissingAuthUsers(client, authState) {
     if (!hasLongBan(updated)) {
       throw new Error(`${authUser.app_metadata.sample_user_id} の長期BAN更新を確認できません。`);
     }
+    authState.authBySampleId.set(authUser.app_metadata.sample_user_id, updated);
   }
 }
 
-async function inspectProfiles(client, sampleUsers, userIdBySampleId) {
-  const expected = sampleUsers
-    .filter((sampleUser) => userIdBySampleId.has(sampleUser.sample_user_id))
-    .map((sampleUser) => expectedProfile(sampleUser, userIdBySampleId.get(sampleUser.sample_user_id)));
+async function inspectProfiles(client, sampleUsers, authState) {
+  const bindings = sampleUsers.flatMap((sampleUser) => {
+    const sampleUserId = sampleUser.sample_user_id;
+    const authUser = authState.authBySampleId.get(sampleUserId);
+    if (!authUser) return [];
+    assertSecureSampleAuthUser(authUser, sampleUserId);
+    if (authState.userIdBySampleId.get(sampleUserId) !== authUser.id) {
+      throw new Error(`${sampleUserId} のAuth UUID対応が一致しません。`);
+    }
+    if (authUser.user_metadata?.username !== sampleUser.db_profile.username) {
+      throw new Error(`${sampleUserId} のAuth usernameメタデータが期待値と一致しません。`);
+    }
+    return [{
+      sampleUserId,
+      authUserId: authUser.id,
+      expected: expectedProfile(sampleUser, authUser.id),
+    }];
+  });
+  const expected = bindings.map((binding) => binding.expected);
   const actual = expected.length === 0
     ? []
     : await selectByIds(client, "users", "id,username,birth_date,gender,role,deleted_at", expected.map((row) => row.id));
   const actualById = new Map(actual.map((row) => [row.id, row]));
   const missing = [];
   const matching = [];
-  const update = [];
-  for (const expectedRow of expected) {
+  const completable = [];
+  const conflicts = [];
+  for (const binding of bindings) {
+    const { expected: expectedRow } = binding;
     const actualRow = actualById.get(expectedRow.id);
     if (!actualRow) {
-      missing.push(expectedRow);
+      missing.push(binding);
       continue;
     }
     if (actualRow.role !== "user" || actualRow.deleted_at !== null) {
       throw new Error(`public.users ${actualRow.id} は通常の有効sample profileではありません。`);
     }
-    const differences = rowDifferences(actualRow, expectedRow, ["username", "birth_date", "gender"]);
-    if (differences.length === 0) matching.push(expectedRow);
-    else update.push({ expected: expectedRow, differences });
+    const conflictFields = [];
+    const values = {};
+    if (actualRow.username !== expectedRow.username) {
+      conflictFields.push("username");
+    }
+    for (const field of ["birth_date", "gender"]) {
+      if (actualRow[field] === expectedRow[field]) continue;
+      if (actualRow[field] === null && expectedRow[field] !== null) {
+        values[field] = expectedRow[field];
+      } else {
+        conflictFields.push(field);
+      }
+    }
+    if (conflictFields.length > 0) {
+      conflicts.push({ ...binding, differences: conflictFields });
+    } else if (Object.keys(values).length > 0) {
+      completable.push({ ...binding, values });
+    } else {
+      matching.push(binding);
+    }
   }
-  return { expected, missing, matching, update };
+  return { expected, missing, matching, completable, conflicts };
 }
 
 async function ensureProfiles(client, profileState) {
   if (profileState.missing.length > 0) {
-    await client.insert("users", profileState.missing);
+    await client.insert("users", profileState.missing.map((item) => item.expected));
   }
-  for (const item of profileState.update) {
+  for (const item of profileState.completable) {
+    const nullFilters = Object.fromEntries(
+      Object.keys(item.values).map((field) => [field, "is.null"]),
+    );
     const updated = await client.update(
       "users",
-      { id: `eq.${item.expected.id}` },
       {
-        username: item.expected.username,
-        birth_date: item.expected.birth_date,
-        gender: item.expected.gender,
+        id: `eq.${item.authUserId}`,
+        username: `eq.${item.expected.username}`,
+        role: "eq.user",
+        deleted_at: "is.null",
+        ...nullFilters,
       },
+      item.values,
     );
     if (!Array.isArray(updated) || updated.length !== 1) {
-      throw new Error(`public.users ${item.expected.id} の更新結果を確認できません。`);
+      throw new Error(`${item.sampleUserId} のprofile補完結果を確認できません。`);
     }
   }
+}
+
+function assertNoProfileConflicts(profileState) {
+  if (profileState.conflicts.length === 0) return;
+  const first = profileState.conflicts[0];
+  throw new Error(
+    `${first.sampleUserId} の既存profileに上書きできない値があります: ${first.differences.join(", ")}`,
+  );
 }
 
 async function inspectPosts(client, validated, frameByQuestionId, userIdBySampleId) {
@@ -1002,15 +1189,16 @@ function printStaticReport(validated) {
   }
 }
 
-function printDatabaseReport(authState, profileState, postState) {
-  console.log("\nローカルDB dry-run");
+function printDatabaseReport(target, authState, profileState, postState) {
+  console.log(`\n${target === "remote" ? "リモート" : "ローカル"}DB dry-run`);
   console.table([
     { item: "Auth既存", count: authState.userIdBySampleId.size },
     { item: "Auth作成予定", count: authState.authToCreate.length },
     { item: "Auth BAN更新予定", count: authState.authToReban.length },
     { item: "profile既存一致", count: profileState.matching.length },
     { item: "profile作成予定", count: profileState.missing.length + authState.authToCreate.length },
-    { item: "profile更新予定", count: profileState.update.length },
+    { item: "profileNULL補完予定", count: profileState.completable.length },
+    { item: "profile上書き不可", count: profileState.conflicts.length },
     { item: "threads既存一致", count: postState.threadState.existing.length },
     { item: "threads登録予定", count: postState.deferred ? 504 : postState.threadState.missing.length },
     { item: "comments既存一致", count: postState.commentState.existing.length },
@@ -1039,19 +1227,34 @@ async function main() {
     throw new Error("意味上の不整合が残っているため、DBへ接続せず書き込みを中止しました。データの承認または修正が必要です。");
   }
 
-  const localUrl = resolveLocalUrl();
+  const databaseUrl = options.target === "remote"
+    ? resolveRemoteUrl(options.projectRef)
+    : resolveLocalUrl();
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!serviceRoleKey) {
     throw new Error("SUPABASE_SERVICE_ROLE_KEY が設定されていません。");
   }
-  console.log(`\n接続先（ローカル限定）: ${localUrl}`);
-  const client = new ApiClient(localUrl, serviceRoleKey);
+  if (options.target === "remote") {
+    console.log(`\n接続先: remote`);
+    console.log(`project ref: ${options.projectRef}`);
+    console.log(`URL: ${databaseUrl}`);
+    if (options.apply) {
+      await confirmRemoteApply(options.projectRef, databaseUrl);
+    }
+  } else {
+    console.log(`\n接続先（ローカル限定）: ${databaseUrl}`);
+  }
+  const client = new ApiClient(databaseUrl, serviceRoleKey);
   const frameByQuestionId = await resolveFrames(client, options.periodCode, validated.discussionQuestions);
   const authState = await inspectDatabase(client, validated);
-  const profileState = await inspectProfiles(client, validated.sampleUsers, authState.userIdBySampleId);
+  const profileState = await inspectProfiles(client, validated.sampleUsers, authState);
   const postState = await inspectPosts(client, validated, frameByQuestionId, authState.userIdBySampleId);
   assertNoPostConflicts(postState);
-  printDatabaseReport(authState, profileState, postState);
+  printDatabaseReport(options.target, authState, profileState, postState);
+  assertNoProfileConflicts(profileState);
+  if (options.target === "remote" && authState.authToReban.length > 0) {
+    throw new Error("既存のサンプルAuthユーザーのBAN設定が不足しています。リモートAuth情報を更新せず停止しました。");
+  }
 
   if (!options.apply) {
     console.log(validated.semanticBlockers.length > 0 ? "判定: BLOCKED" : "判定: DB READY");
@@ -1061,9 +1264,15 @@ async function main() {
   const completeProfileState = await inspectProfiles(
     client,
     validated.sampleUsers,
-    authState.userIdBySampleId,
+    authState,
   );
+  assertNoProfileConflicts(completeProfileState);
   await ensureProfiles(client, completeProfileState);
+  const verifiedProfileState = await inspectProfiles(client, validated.sampleUsers, authState);
+  assertNoProfileConflicts(verifiedProfileState);
+  if (verifiedProfileState.missing.length > 0 || verifiedProfileState.completable.length > 0) {
+    throw new Error("サンプルprofileの作成・NULL補完を確認できません。");
+  }
 
   const finalPostState = await inspectPosts(
     client,

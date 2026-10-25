@@ -117,3 +117,45 @@ Remove-Item Env:SUPABASE_URL
 既存の対象期間・framesを使う場合は手順3を省略し、その `periods.code` を
 `$periodCode` に設定します。本番URLや `--target remote` は使用しません。
 
+## リモート投入
+
+リモート投入はサンプル議論CLIの明示的な `--target remote` だけで行います。
+ローカルモードの接続先制限は変更されません。カテゴリ、期間、168件のframeのいずれかが
+不足または重複している場合は、自動追加せずdry-runを停止します。
+
+Auth作成トリガーが `username` だけを設定したサンプルprofileについては、Authのseed識別情報、
+予約メール、UUID、Auth側username、既存profileのusername・role・削除状態を照合したうえで、
+NULLの `birth_date` と `gender` だけを補完します。NULLではない不一致値は上書きせず停止します。
+threadsとcommentsはseedの決定的UUIDだけを照合して不足分をINSERTするため、UUIDが異なる通常投稿は
+更新・削除しません。同じUUIDで内容が異なる場合は投入を停止します。
+
+以下をリポジトリルートからPowerShellで実行します。service roleキーはプロセスの環境変数に
+だけ設定し、ファイルには保存しません。
+
+```powershell
+$projectRef = 'ueedlzvzedydbrdlmjxq'
+$periodCode = 'jphacks-2026-sample'
+$env:SUPABASE_URL = "https://$projectRef.supabase.co"
+$secureKey = Read-Host 'リモートのservice_roleキー' -AsSecureString
+$env:SUPABASE_SERVICE_ROLE_KEY = [System.Net.NetworkCredential]::new('', $secureKey).Password
+
+# 1. 読み取り専用dry-run
+node supabase/scripts/seed-sample-discussions.mjs --target remote --dry-run --check-db --project-ref $projectRef --period-code $periodCode
+
+# 2. dry-runが「DB READY」の場合だけ実投入
+# プロンプトには APPLY ueedlzvzedydbrdlmjxq と入力する
+node supabase/scripts/seed-sample-discussions.mjs --target remote --apply --project-ref $projectRef --confirm-project $projectRef --period-code $periodCode
+
+# 3. 同じdry-runで登録件数と冪等性を確認
+node supabase/scripts/seed-sample-discussions.mjs --target remote --dry-run --check-db --project-ref $projectRef --period-code $periodCode
+
+# 4. 秘密情報を破棄
+Remove-Item Env:SUPABASE_SERVICE_ROLE_KEY
+Remove-Item Env:SUPABASE_URL
+Remove-Variable secureKey
+```
+
+dry-runでカテゴリ、期間、frameの不足が報告された場合は実投入へ進まず、既存の
+`seed-database.mjs` をローカルで利用したときと同じ分類・質問データを、別途承認された
+手順で先に用意してください。このCLIはリモートの既存カテゴリやframeを変更しません。
+
