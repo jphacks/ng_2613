@@ -36,11 +36,11 @@ import workStyleImage from "../images/work-styles.svg";
 
 export type Screen =
   | "home" | "topics" | "summary" | "discussion" | "thread" | "new-thread"
-  | "vote" | "video" | "login" | "register" | "profile";
+  | "vote" | "video" | "login" | "register" | "profile" | "insights";
 
 export const screens: Screen[] = [
   "home", "topics", "summary", "discussion", "thread", "new-thread",
-  "vote", "video", "login", "register", "profile",
+  "vote", "video", "login", "register", "profile", "insights",
 ];
 
 const middleTopicImages: Record<string, StaticImageData> = {

@@ -16,6 +16,7 @@ import ThreadScreen from "./screens/thread-screen";
 import TopicsScreen from "./screens/topics-screen";
 import VideoScreen from "./screens/video-screen";
 import VoteScreen from "./screens/vote-screen";
+import InsightsScreen from "./screens/insights-screen";
 
 export default function DiscussionApp() {
   const state = useDiscussionState();
@@ -43,6 +44,7 @@ export default function DiscussionApp() {
       {screen === "login" && <LoginScreen {...state} />}
       {screen === "register" && <RegisterScreen {...state} />}
       {screen === "profile" && <ProfileScreen {...state} />}
+      {screen === "insights" && <InsightsScreen />}
       {menuOpen && <div className="mobile-menu"><AppMenu {...state} /></div>}
     </main>
     <aside className="desktop-sidebar desktop-navigation" aria-label="サイドメニュー">

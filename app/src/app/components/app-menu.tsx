@@ -12,6 +12,7 @@ export default function AppMenu({
     {!persistent && <button className="menu-scrim" aria-label="メニューを閉じる" onClick={() => setMenuOpen(false)} />}
     <nav className={persistent ? "desktop-menu" : "drawer"} aria-label="メニュー">
       {authStatus === "authenticated" ? <>
+        <button onClick={() => navigate("insights")}>あなたの傾向</button>
         <button onClick={() => navigate("profile")}>会員情報変更</button>
         <button disabled={accountSubmitting} onClick={() => void signOut()}>ログアウト</button>
       </> : <>
