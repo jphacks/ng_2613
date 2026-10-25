@@ -120,7 +120,7 @@ Rightsがまず取り組む問題は、「異なる立場の判断材料を探�
 
 ![アーキテクチャ図](./docs/architecture.svg)
 
-概要図・システム構成図・データ構造などの詳細は [docs/architecture.md](./docs/architecture.md) にまとめています。
+概要図・システム構成図・データ構造などの詳細は [docs/architecture.md](./docs/architecture.md) にまとめている。
 
 #### API・データ
 
