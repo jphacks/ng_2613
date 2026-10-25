@@ -20,7 +20,9 @@
   border:1px solid var(--line);
   border-radius:16px;
   margin-bottom:14px;
-  font-size:21px
+  font-size:21px;
+  /* 和文フォントが細めなので、選ぶ項目は本文より少し太くする */
+  font-weight:500
 }
 
 .topic-row-navigation {
@@ -34,10 +36,6 @@
 .topic-row-term {
   position:relative;
   pointer-events:none;
-}
-
-.topic-row-term .dictionary-term {
-  pointer-events:auto;
 }
 
 .topic-hero.topic-image-placeholder {

@@ -1,8 +1,9 @@
-import { useEffect, useId, useRef, useState } from "react";
+import { useId, useRef, useState } from "react";
 import { opinionColors, opinionLabels } from "../lib/demo-data";
 import type { TopicFrame } from "../lib/catalog/types";
 import type { ThreadSummary } from "../lib/threads/types";
 import type { VoteValue } from "../lib/votes/types";
+import VoteResultBar from "./vote-result-bar";
 import "../screens/summary-screen.css";
 
 type Props = {
@@ -78,29 +79,20 @@ export default function TopicSummaryCard({
   onDetail,
   onThread,
 }: Props) {
-  const [expanded, setExpanded] = useState(false);
-  const [voteCompleted, setVoteCompleted] = useState(false);
-  const detailsId = useId();
+  const statsRef = useRef<HTMLDialogElement>(null);
+  const statsTitleId = useId();
+  // 丸を押したらすぐ投票せず、確認のモーダルを出す。投票後7日間は変更できないため
+  const [pendingValue, setPendingValue] = useState<VoteValue | null>(null);
+  const confirmRef = useRef<HTMLDialogElement>(null);
+  // 投票できたら円グラフを描き直す。key を変えて作り直し、描くアニメーションを最初から流す
+  const [drawCount, setDrawCount] = useState(0);
   const titleId = useId();
-  const dialogTitleId = useId();
-  const dialogRef = useRef<HTMLDialogElement>(null);
+  const confirmTitleId = useId();
   const { vote } = frame;
-  const hasVoted = vote.myValue !== null;
-  // 5段階のうち「やや賛成」「賛成」を賛成、「反対」「やや反対」を反対として二分する。
-  const agreeCount = vote.counts[3] + vote.counts[4];
-  const disagreeCount = vote.counts[0] + vote.counts[1];
-  const stanceTotal = agreeCount + disagreeCount;
-  const agreePercent = stanceTotal ? Math.round((agreeCount / stanceTotal) * 100) : 0;
-  const disagreePercent = stanceTotal ? 100 - agreePercent : 0;
   const agreeThreads = threads.filter((thread) => thread.stance === "agree");
   const disagreeThreads = threads.filter((thread) => thread.stance === "disagree");
   const changeLocked = vote.myValue !== null && !vote.canChange;
   const voteDisabled = submitting || !vote.votingOpen || changeLocked;
-  useEffect(() => {
-    if (!voteCompleted || submitting || vote.myValue === null) return;
-    const timeoutId = window.setTimeout(() => dialogRef.current?.close(), 1000);
-    return () => window.clearTimeout(timeoutId);
-  }, [voteCompleted, submitting, vote.myValue]);
   function voteStatus() {
     if (submitting) return "送信中…";
     if (error) return error;
@@ -114,122 +106,35 @@ export default function TopicSummaryCard({
   return (
     <article className={`summary-card ${color}`} aria-labelledby={titleId}>
       <div className="summary-heading">
-        <h1 id={titleId}>Q{questionNumber}. {frame.question}</h1>
-        <div className="summary-buttons">
-          <button
-            className="summary-vote"
-            onClick={() => dialogRef.current?.showModal()}
-          >
-            投票
-          </button>
-          {onDetail && (
-            <button
-              className="summary-detail"
-              onClick={onDetail}
-            >
-              議論
-            </button>
-          )}
-        </div>
-      </div>
-      <div className="summary-content">
-        <div
-          className="pie"
-          role="img"
-          aria-label={hasVoted ? `賛成${agreePercent}%、反対${disagreePercent}%` : "投票してください"}
-          style={!hasVoted ? { background: "#d9d9d9" } : stanceTotal ? {
-            background: `linear-gradient(to right,var(--blue) ${agreePercent}%,var(--pink) ${agreePercent}%)`,
-          } : undefined}
-        >
-          {hasVoted ? (
-            <>
-              <span>
-                賛成
-                <br />
-                {agreePercent}%
-              </span>
-              <span>
-                反対
-                <br />
-                {disagreePercent}%
-              </span>
-            </>
-          ) : (
-            <span>投票してください</span>
-          )}
-        </div>
-        <table>
-          <thead>
-            <tr>
-              <th>賛成</th>
-              <th>反対</th>
-            </tr>
-          </thead>
-          <tbody>
-            {[0, 1, 2].map((row) => (
-              <tr key={row}>
-                <td>
-                  {agreeThreads[row] && (
-                    <button
-                      aria-label={`議題${questionNumber}の賛成意見${row + 1}`}
-                      onClick={() => onThread(agreeThreads[row].id)}
-                    >
-                      {agreeThreads[row].title}
-                    </button>
-                  )}
-                </td>
-                <td>
-                  {disagreeThreads[row] && (
-                    <button
-                      aria-label={`議題${questionNumber}の反対意見${row + 1}`}
-                      onClick={() => onThread(disagreeThreads[row].id)}
-                    >
-                      {disagreeThreads[row].title}
-                    </button>
-                  )}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-      <div id={detailsId} hidden={!expanded}>
-        <p className="demographic-note">回答者の構成（デモデータ）</p>
-        <div className="demographic-charts">
-          <DemographicChart title="回答者の年代" data={ageGroups} />
-          <DemographicChart title="回答者の性別" data={genders} />
-        </div>
-      </div>
-      <button
-        className="summary-toggle"
-        aria-expanded={expanded}
-        aria-controls={detailsId}
-        onClick={() => setExpanded(!expanded)}
-      >
-        {expanded ? "閉じる △" : "もっと見る ▽"}
-      </button>
-      <dialog
-        ref={dialogRef}
-        className="summary-vote-dialog"
-        aria-labelledby={dialogTitleId}
-        onClose={() => setVoteCompleted(false)}
-        onClick={(event) => {
-          if (event.target === event.currentTarget) dialogRef.current?.close();
-        }}
-      >
+        {/* 折り返した2行目以降が「Q1.」の下に入らないよう、番号と文を横に並べる */}
+        <h1 id={titleId} className="question-heading">
+          <span className="question-number">Q{questionNumber}.</span>
+          <span>{frame.question}</span>
+        </h1>
+        {/* 回答者の構成（年代・性別）をモーダルで開くボタン */}
         <button
-          className="vote-dialog-close"
-          aria-label="投票ダイアログを閉じる"
-          onClick={() => dialogRef.current?.close()}
+          type="button"
+          className="summary-stats-toggle"
+          aria-haspopup="dialog"
+          aria-label="統計を見る"
+          title="統計を見る"
+          onClick={() => statsRef.current?.showModal()}
         >
-          ×
+          {/* 太い棒が3本並ぶ棒グラフ。中は塗らず輪郭だけ */}
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+            <rect x="2.4" y="9.4" width="3.6" height="6.6" rx="1" />
+            <rect x="7.2" y="3.4" width="3.6" height="12.6" rx="1" />
+            <rect x="12" y="6.4" width="3.6" height="9.6" rx="1" />
+          </svg>
+          <span aria-hidden="true">統計</span>
         </button>
-        <h2 id={dialogTitleId}>Q{questionNumber}. {frame.question}</h2>
-        <div className="dialog-vote-labels">
-          <span>反対</span>
-          <span>賛成</span>
-        </div>
-        <div className="dialog-vote-options">
+      </div>
+      {/* 投票ボタンとダイアログをやめ、質問のすぐ下で直接選べるようにする */}
+      <div className="summary-inline-vote" role="group" aria-label={`Q${questionNumber}への投票`}>
+        {/* 反対・賛成は丸の並びの左右に置く */}
+        <div className="inline-vote-row">
+          <span className="inline-vote-label disagree" aria-hidden="true">反対</span>
+          <div className="dialog-vote-options">
           {[0, 1, 2, 3, 4].map((index) => (
             <button
               key={index}
@@ -238,17 +143,111 @@ export default function TopicSummaryCard({
               aria-pressed={vote.myValue === index + 1}
               disabled={voteDisabled}
               style={{ background: opinionColors[index] }}
-              onClick={async () => {
-                if (await onVote(frame.id, (index + 1) as VoteValue)) {
-                  setVoteCompleted(true);
-                }
+              onClick={() => {
+                setPendingValue((index + 1) as VoteValue);
+                confirmRef.current?.showModal();
               }}
             />
           ))}
+          </div>
+          <span className="inline-vote-label agree" aria-hidden="true">賛成</span>
         </div>
         <p className="dialog-vote-status" role="status">
           {voteStatus()}
         </p>
+      </div>
+      <div className="summary-content">
+        {/* 投票結果の帯グラフ。投票できたら key を変えて作り直し、左から伸びるアニメーションを流す */}
+        <VoteResultBar key={drawCount} vote={vote} drawing={drawCount > 0} />
+        {/* 賛成・反対の代表意見を縦に積む。どちらも3行分の枠を取り、意見がない行は空けておく */}
+        <div className="opinion-groups">
+          {([
+            { stance: "agree", label: "賛成", list: agreeThreads },
+            { stance: "disagree", label: "反対", list: disagreeThreads },
+          ] as const).map((group) => (
+            <section key={group.stance} className={`opinion-group ${group.stance}`}>
+              <h3>{group.label}</h3>
+              <ul>
+                {[0, 1, 2].map((row) => (
+                  <li key={row}>
+                    {group.list[row] && (
+                      <button
+                        aria-label={`議題${questionNumber}の${group.label}意見${row + 1}`}
+                        onClick={() => onThread(group.list[row].id)}
+                      >
+                        {group.list[row].title}
+                      </button>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </section>
+          ))}
+        </div>
+      </div>
+      <dialog
+        ref={statsRef}
+        className="summary-vote-dialog stats-dialog"
+        aria-labelledby={statsTitleId}
+        onClick={(event) => {
+          if (event.target === event.currentTarget) statsRef.current?.close();
+        }}
+      >
+        <button type="button" className="vote-dialog-close" aria-label="統計を閉じる" onClick={() => statsRef.current?.close()}>
+          ×
+        </button>
+        <p className="stats-dialog-question">Q{questionNumber}. {frame.question}</p>
+        <h2 id={statsTitleId}>回答者の構成（デモデータ）</h2>
+        <div className="demographic-charts">
+          <DemographicChart title="回答者の年代" data={ageGroups} />
+          <DemographicChart title="回答者の性別" data={genders} />
+        </div>
+      </dialog>
+      {onDetail && (
+        <button type="button" className="summary-opinions-link" onClick={onDetail}>
+          みんなの意見をもっと見る！
+          <span aria-hidden="true">›</span>
+        </button>
+      )}
+      <dialog
+        ref={confirmRef}
+        className="summary-vote-dialog vote-confirm"
+        aria-labelledby={confirmTitleId}
+        onClose={() => setPendingValue(null)}
+        onClick={(event) => {
+          if (event.target === event.currentTarget && !submitting) confirmRef.current?.close();
+        }}
+      >
+        {pendingValue !== null && (
+          <>
+            <p className="vote-confirm-question">Q{questionNumber}. {frame.question}</p>
+            <p className="vote-confirm-choice">
+              <span className="vote-confirm-dot" style={{ background: opinionColors[pendingValue - 1] }} aria-hidden="true" />
+              {opinionLabels[pendingValue - 1]}
+            </p>
+            <h2 id={confirmTitleId}>この内容で投票しますか？</h2>
+            <p className="vote-confirm-note">投票すると7日間は変更できません。</p>
+            {error && <p className="vote-confirm-error" role="alert">{error}</p>}
+            <div className="vote-confirm-actions">
+              <button type="button" className="secondary" disabled={submitting} onClick={() => confirmRef.current?.close()}>
+                キャンセル
+              </button>
+              <button
+                type="button"
+                className="primary"
+                disabled={submitting}
+                onClick={async () => {
+                  if (await onVote(frame.id, pendingValue)) {
+                    setDrawCount((count) => count + 1);
+                    confirmRef.current?.close();
+                  }
+                }}
+              >
+                {submitting ? "送信中…" : "投票する"}
+              </button>
+            </div>
+          </>
+        )}
       </dialog>
     </article>
   );
