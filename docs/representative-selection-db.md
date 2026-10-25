@@ -1,8 +1,8 @@
 # 代表意見の選び方：DB担当への相談
 
 設問カードに出す「代表意見（賛成・反対 各3件）」を、次の2つの軸で選ぶ仕組みを作っています。
-アプリ側の選び方（`app/src/app/lib/representatives/`）はできていて、**DBまわりの判断が必要なところで止めています**。
-以下の3点について、進め方を決めてもらえると助かります。
+アプリ側の選び方（`app/src/app/lib/representatives/`）はできていて、DBまわりの判断が必要なところで止めていました。
+以下のとおり決まり、DB への適用まで終わっています（最後の「決まったこと」を参照）。
 
 ## 選び方の概要
 
@@ -53,11 +53,16 @@
   - RLS を通らない接続なので、**このクライアントで書く処理は最小限にし、読み書きするテーブルを限定したい**。
   - Vercel など本番環境にも同じ環境変数を設定する必要がある。
 
-## 決めてほしいこと（まとめ）
+## 決まったこと（2026-10-25）
 
-- [ ] 1. `public` に、なるほどの数を数える関数を包む関数を足してよいか（実行は `service_role` だけ）
-- [ ] 2. `public.thread_embeddings` テーブルを作ってよいか（列・RLS の方針）
-- [ ] 3. `SUPABASE_SECRET_KEY` を使うサーバー専用クライアントを作ってよいか
-- [ ] マイグレーションは誰が書いて、誰が適用するか
+- [x] 1. `public.get_thread_reaction_counts` を追加（`service_role` だけが実行できる。中で `private` の関数を呼ぶだけ）
+- [x] 2. `public.thread_embeddings` を追加（列は上の表のとおり。768個の1次元配列だけ入るチェック付き。RLS 有効・ポリシーなし）
+- [x] 3. `SUPABASE_SECRET_KEY` を使うサーバー専用クライアント `app/src/app/lib/supabase/admin.ts` を追加（代表意見の選択にだけ使う）
+- [x] マイグレーション `supabase/migrations/20261025000000_add_representative_selection_support.sql` を、SQL Editor でリハーサル（取り消し前提の実行）をしてから本番に適用。`supabase_migrations.schema_migrations` にも記録済み
 
-決まれば、アプリ側のつなぎ込み（意見一覧を返すときに代表3件の順番を付ける）まで進めます。
+## アプリ側の動き
+
+- ベクトルは意見を投稿したときに、応答を返したあと（`after`）で1回だけ作って保存する。表示のときは Gemini を呼ばない
+- 意見一覧 API は今までどおり新しい順。各意見に `representativeRank`（賛成・反対それぞれ 1〜3、代表でなければ `null`）を付ける
+- なるほどの数はブラウザに返さない。キーやベクトルがないときは新しい順で選ぶ
+- 本番環境には `SUPABASE_SECRET_KEY` と `GEMINI_API_KEY` の設定が必要
