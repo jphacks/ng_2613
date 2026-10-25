@@ -4,6 +4,7 @@ import type { ThreadSummary } from "../lib/threads/types";
 import type { VoteValue } from "../lib/votes/types";
 import InlineVote from "./inline-vote";
 import VoteResultBar from "./vote-result-bar";
+import { DictionaryText } from "./dictionary";
 import "../screens/summary-screen.css";
 
 type Props = {
@@ -86,7 +87,7 @@ export default function TopicSummaryCard({
         {/* 折り返した2行目以降が「Q1.」の下に入らないよう、番号と文を横に並べる */}
         <h1 id={titleId} className="question-heading">
           <span className="question-number">Q{questionNumber}.</span>
-          <span>{frame.question}</span>
+          <span><DictionaryText>{frame.question}</DictionaryText></span>
         </h1>
         {/* 回答者の構成（年代・性別）をモーダルで開くボタン */}
         <button
@@ -127,7 +128,7 @@ export default function TopicSummaryCard({
                         aria-label={`議題${questionNumber}の${group.label}意見${row + 1}`}
                         onClick={() => onThread(group.list[row].id)}
                       >
-                        {group.list[row].title}
+                        <DictionaryText>{group.list[row].title}</DictionaryText>
                       </button>
                     )}
                   </li>

@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
 import DataState from "../components/data-state";
+import { DictionaryText } from "../components/dictionary";
 import InlineVote from "../components/inline-vote";
 import VoteResultBar from "../components/vote-result-bar";
 import type { DiscussionState } from "../hooks/use-discussion-state";
@@ -52,7 +53,7 @@ export default function DiscussionScreen(props: Props) {
         {/* 設問一覧と同じカードは繰り返さず、何の設問の意見かが分かるよう設問の文だけ出す */}
         <h1 className="discussion-question question-heading">
             <span className="question-number">Q{props.selectedFrameNumber}.</span>
-            <span>{frame.question}</span>
+            <span><DictionaryText>{frame.question}</DictionaryText></span>
         </h1>
         {/* 設問一覧のカードと同じ投票の帯。帯グラフの上に置き、ここからも投票できるようにする */}
         <InlineVote frame={frame} questionNumber={props.selectedFrameNumber} submitting={props.voteSubmittingFrameId === frame.id} error={props.voteErrors[frame.id] ?? ""} onVote={props.submitVote} onVoted={() => setDrawCount(count => count + 1)} />
@@ -75,7 +76,7 @@ export default function DiscussionScreen(props: Props) {
                     <span>なるほど</span>
                 </button>
                 <div className={`opinion-row ${thread.stance === "agree" ? "blue" : "pink"}`}>
-                    <span className="opinion-text">{thread.title}</span>
+                    <span className="opinion-text"><DictionaryText>{thread.title}</DictionaryText></span>
                     {/* 縦線の右だけが開くボタン */}
                     <button type="button" className="opinion-open" aria-label={`「${thread.title}」の意見交換を開く`} onClick={() => props.selectThread(thread.id)}>
                         <span aria-hidden="true">＞</span>

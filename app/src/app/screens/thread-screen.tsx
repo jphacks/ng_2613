@@ -38,7 +38,7 @@ export function ThreadView({ profile, selectedFrame, selectedFrameNumber, messag
     const [stance, setStance] = useState("賛成");
     const stanceLabels = allowNeutral ? ["賛成", "中立", "反対"] : ["賛成", "反対"];
     return (<section className="thread">
-    {selectedFrame && <h1>Q{selectedFrameNumber}. {selectedFrame.question}</h1>}
+    {selectedFrame && <h1>Q{selectedFrameNumber}. <DictionaryText>{selectedFrame.question}</DictionaryText></h1>}
     <div className="message-list">
     {messages.map(item => {
         const own = item.author.id === profile.id;
