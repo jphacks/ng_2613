@@ -2,6 +2,7 @@ import { useRef, useState } from "react";
 import DataState from "../components/data-state";
 import { DictionaryText } from "../components/dictionary";
 import InlineVote from "../components/inline-vote";
+import SproutChat from "../components/sprout-chat";
 import VoteResultBar from "../components/vote-result-bar";
 import type { DiscussionState } from "../hooks/use-discussion-state";
 import "./discussion-screen.css";
@@ -86,6 +87,8 @@ export default function DiscussionScreen(props: Props) {
             {reactionErrors[thread.id] && <p role="alert">{reactionErrors[thread.id]}</p>}
             </div>;
         })}</div>
+        {/* 意見が定まっていない人向けに、AI と話して考えを整理する（今はモック） */}
+        <SproutChat threads={threads} onThread={threadId => props.selectThread(threadId)} />
         <button type="button" className="add-opinion" aria-label="意見を追加" onClick={() => props.navigate("new-thread")}>
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">
                 <path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="1.2" />

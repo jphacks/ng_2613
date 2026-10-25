@@ -1,0 +1,152 @@
+/* 芽生えのマーク。意見を追加する「＋」の上に置く */
+.sprout-open {
+  position:fixed;
+  right:16px;
+  bottom:calc(84px + env(safe-area-inset-bottom, 0px));
+  z-index:4;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:48px;
+  height:48px;
+  border:1px solid #cfe5c4;
+  border-radius:50%;
+  background:#fff;
+  color:#5a9a3c;
+  box-shadow:var(--shadow-lg);
+  transition:transform var(--duration) var(--ease-out)
+}
+@media (hover:hover) {
+  .sprout-open:hover { transform:scale(1.06) }
+}
+.sprout-open:active { transform:scale(.94) }
+@media (width > 757px) {
+  .sprout-open { right:calc((100% - 420px) / 2 + 16px) }
+}
+
+.sprout-scrim {
+  position:fixed;
+  inset:0;
+  z-index:10;
+  background:#4645544d;
+  animation:fade-in var(--duration) var(--ease-out)
+}
+
+/* 下から出る対話の画面。幅はアプリの本体に合わせる */
+.sprout-chat {
+  position:fixed;
+  left:50%;
+  bottom:0;
+  z-index:11;
+  display:flex;
+  flex-direction:column;
+  width:min(100%, 420px);
+  height:min(80dvh, 640px);
+  padding-bottom:env(safe-area-inset-bottom, 0px);
+  border-radius:16px 16px 0 0;
+  background:var(--cream);
+  color:var(--ink);
+  box-shadow:var(--shadow-lg);
+  transform:translateX(-50%);
+  animation:rise-in 320ms var(--ease-out)
+}
+
+.sprout-chat-header {
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:12px 12px 12px 16px;
+  border-bottom:1px solid #e4e4e8
+}
+.sprout-chat-header h2 { flex:1; margin:0; font-size:16px; font-weight:700 }
+.sprout-chat-icon { display:flex; color:#5a9a3c }
+.sprout-close { width:36px; height:36px; font-size:26px; line-height:1 }
+
+.sprout-log {
+  flex:1;
+  overflow-y:auto;
+  padding:16px
+}
+
+.sprout-message {
+  max-width:85%;
+  margin-bottom:10px;
+  padding:10px 12px;
+  border-radius:14px;
+  font-size:15px;
+  line-height:1.6;
+  animation:rise-in 240ms var(--ease-out) backwards
+}
+.sprout-message p { margin:0; white-space:pre-line }
+.sprout-message.from-ai { margin-right:auto; border-top-left-radius:4px; background:#fff; box-shadow:var(--shadow-sm) }
+.sprout-message.from-user { margin-left:auto; border-top-right-radius:4px; background:#e3f0da }
+
+/* AI が挙げた実際の意見。賛成は青、反対はピンクの枠 */
+.sprout-post {
+  margin-top:8px;
+  padding:8px 10px;
+  border:1px solid var(--blue);
+  border-radius:8px;
+  background:#fff
+}
+.sprout-post.disagree { border-color:var(--pink) }
+.sprout-post-stance { color:var(--blue); font-size:11px; font-weight:700 }
+.sprout-post.disagree .sprout-post-stance { color:var(--pink) }
+.sprout-message .sprout-post-title { margin:2px 0 6px; font-size:14px; line-height:1.5 }
+.sprout-curious {
+  display:flex;
+  align-items:center;
+  gap:4px;
+  margin-left:auto;
+  padding:4px 10px;
+  border:1px solid #cfe5c4;
+  border-radius:999px;
+  color:#5a9a3c;
+  font-size:12px;
+  font-weight:700
+}
+@media (hover:hover) {
+  .sprout-curious:hover { background:#f1f8ec }
+}
+
+/* AI が考えているあいだの3つの点 */
+.sprout-typing { display:flex; gap:4px; width:fit-content }
+.sprout-typing span {
+  width:6px;
+  height:6px;
+  border-radius:50%;
+  background:#b8b8c0;
+  animation:sprout-blink 1s infinite
+}
+.sprout-typing span:nth-child(2) { animation-delay:.15s }
+.sprout-typing span:nth-child(3) { animation-delay:.3s }
+@keyframes sprout-blink {
+  50% { opacity:.3 }
+}
+
+.sprout-input {
+  display:flex;
+  gap:8px;
+  padding:10px 12px 4px;
+  border-top:1px solid #e4e4e8
+}
+.sprout-input input {
+  flex:1;
+  min-width:0;
+  padding:10px 14px;
+  border:1px solid #d0d0d6;
+  border-radius:999px;
+  background:#fff;
+  font-size:15px
+}
+.sprout-input button {
+  padding:0 16px;
+  border-radius:999px;
+  background:var(--ink);
+  color:#fff;
+  font-size:14px;
+  font-weight:700
+}
+.sprout-input button:disabled { opacity:.4; cursor:not-allowed }
+
+.sprout-note { margin:0; padding:4px 16px 10px; color:#8a8a96; font-size:11px }
