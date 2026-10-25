@@ -151,6 +151,13 @@ Rightsがまず取り組む問題は、「異なる立場の判断材料を探�
 
 専用機器を必要とせず、日常的に使うブラウザーからアクセスできる構成です。
 
+**動作確認済み環境**（2026年10月時点）
+
+| OS | ブラウザー |
+| --- | --- |
+| Windows 11 | Google Chrome / Microsoft Edge |
+| iOS 26 | Safari / Google Chrome / Microsoft Edge |
+
 ### 独自技術
 
 #### ハッカソンで開発した独自機能・技術
