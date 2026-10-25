@@ -1,0 +1,158 @@
+/* ホームの「探索する」。右下に置く */
+.explore-open {
+  position:fixed;
+  right:16px;
+  bottom:calc(24px + env(safe-area-inset-bottom, 0px));
+  z-index:4;
+  display:flex;
+  align-items:center;
+  gap:6px;
+  height:48px;
+  padding:0 18px 0 14px;
+  border-radius:999px;
+  background:var(--ink);
+  color:#fff;
+  font-size:15px;
+  font-weight:700;
+  box-shadow:var(--shadow-lg);
+  transition:transform var(--duration) var(--ease-out)
+}
+@media (hover:hover) {
+  .explore-open:hover { transform:scale(1.04) }
+}
+.explore-open:active { transform:scale(.96) }
+@media (width > 757px) {
+  .explore-open { right:calc((100% - 420px) / 2 + 16px) }
+}
+
+/* 探索の画面。幅はアプリの本体に合わせ、全体をおおう */
+.explore {
+  position:fixed;
+  top:0;
+  bottom:0;
+  left:50%;
+  z-index:11;
+  display:flex;
+  flex-direction:column;
+  width:min(100%, 420px);
+  background:var(--cream);
+  color:var(--ink);
+  transform:translateX(-50%);
+  overflow-y:auto;
+  animation:fade-in var(--duration) var(--ease-out)
+}
+
+.explore-header {
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:12px 12px 12px 16px;
+  border-bottom:1px solid #e4e4e8
+}
+.explore-header h2 { flex:1; margin:0; font-size:16px; font-weight:700 }
+.explore-header-icon { display:flex }
+.explore-close { width:36px; height:36px; font-size:26px; line-height:1 }
+
+/* 線と札を重ねる地図。線の座標は explore-map.tsx の linePaths と合わせる */
+.explore-map {
+  position:relative;
+  flex-shrink:0;
+  height:560px;
+  margin:8px 0
+}
+.explore-lines { position:absolute; inset:0; width:100%; height:100% }
+
+/* 線が AI チャットから順に伸びていく */
+.explore-line {
+  fill:none;
+  stroke-width:2.5;
+  stroke-linecap:round;
+  vector-effect:non-scaling-stroke;
+  stroke-dasharray:1;
+  stroke-dashoffset:1;
+  animation:explore-grow 700ms var(--ease-out) forwards
+}
+.explore-line.level-1 { animation-delay:150ms }
+.explore-line.level-2 { animation-delay:750ms }
+@keyframes explore-grow {
+  to { stroke-dashoffset:0 }
+}
+
+.explore-node {
+  position:absolute;
+  box-sizing:border-box;
+  animation:pop-in 320ms var(--ease-out) backwards
+}
+
+.explore-root {
+  top:16px;
+  left:15%;
+  width:70%;
+  height:72px;
+  padding:10px 14px;
+  border:1.5px solid #5a9a3c;
+  border-radius:14px;
+  background:#fff;
+  text-align:center;
+  box-shadow:var(--shadow-md)
+}
+.explore-root-label { color:#5a9a3c; font-size:12px; font-weight:700 }
+.explore-root p { margin:2px 0 0; font-size:14px; line-height:1.5 }
+
+.explore-branch {
+  top:160px;
+  width:40%;
+  height:40px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border:1.5px solid #49a3d3;
+  border-radius:999px;
+  background:#fff;
+  font-size:14px;
+  font-weight:700;
+  animation-delay:650ms
+}
+.explore-branch.side-0 { left:7% }
+.explore-branch.side-1 { left:53% }
+
+.explore-leaf {
+  width:40%;
+  height:110px;
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+  padding:10px 12px;
+  border:1.5px solid #9b7fd1;
+  border-radius:12px;
+  background:#fff;
+  text-align:left;
+  box-shadow:var(--shadow-sm);
+  animation-delay:1300ms;
+  transition:box-shadow var(--duration) var(--ease-out), transform var(--duration) var(--ease-out)
+}
+.explore-leaf.side-0 { left:8% }
+.explore-leaf.side-1 { left:52% }
+.explore-leaf.row-0 { top:260px }
+.explore-leaf.row-1 { top:410px; animation-delay:1450ms }
+@media (hover:hover) {
+  .explore-leaf:hover { box-shadow:var(--shadow-md); transform:translateY(-2px) }
+}
+.explore-leaf:active { transform:scale(.97) }
+.explore-leaf-label { color:#9b7fd1; font-size:11px; font-weight:700 }
+.explore-leaf-name {
+  display:-webkit-box;
+  overflow:hidden;
+  font-size:14px;
+  font-weight:700;
+  line-height:1.45;
+  -webkit-line-clamp:3;
+  -webkit-box-orient:vertical
+}
+
+.explore-note { margin:0; padding:0 16px 16px; color:#8a8a96; font-size:11px }
+
+@media (prefers-reduced-motion:reduce) {
+  .explore-line { animation:none; stroke-dashoffset:0 }
+  .explore-node { animation:none }
+}

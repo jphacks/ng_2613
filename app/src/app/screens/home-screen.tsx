@@ -1,10 +1,23 @@
+import { useState } from "react";
 import Image from "next/image";
 import DataState from "../components/data-state";
+import ExploreMap, { TelescopeIcon } from "../components/explore-map";
 import { getMiddleTopicImage } from "../lib/demo-data";
 import type { DiscussionState } from "../hooks/use-discussion-state";
 import "./home-screen.css";
-type Props = Pick<DiscussionState, "homeTab" | "selectedGenre" | "catalogStatus" | "catalogError" | "retryCatalog" | "navigate" | "selectMiddleTopic">;
-export default function HomeScreen({ homeTab, selectedGenre, catalogStatus, catalogError, retryCatalog, navigate, selectMiddleTopic }: Props) {
+type Props = Pick<DiscussionState, "homeTab" | "selectedGenre" | "catalogStatus" | "catalogError" | "retryCatalog" | "navigate" | "selectMiddleTopic" | "genres" | "selectTopic">;
+export default function HomeScreen(props: Props) {
+    const [exploring, setExploring] = useState(false);
+    return (<>
+      <HomeContent {...props}/>
+      {/* AI チャットから分かれた先のおすすめの問いを、望遠鏡で探す（今はモック） */}
+      {props.catalogStatus === "success" && <button type="button" className="explore-open" onClick={() => setExploring(true)}>
+        <TelescopeIcon />探索する
+      </button>}
+      {exploring && <ExploreMap genres={props.genres} onTopic={props.selectTopic} onClose={() => setExploring(false)}/>}
+    </>);
+}
+function HomeContent({ homeTab, selectedGenre, catalogStatus, catalogError, retryCatalog, navigate, selectMiddleTopic }: Props) {
     // 今日のテーマは別のコンテンツで、まだ中身がない
     if (homeTab === "today") {
         return <p className="home-coming-soon">今日のテーマは準備中です</p>;
