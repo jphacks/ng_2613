@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
 import DataState from "../components/data-state";
+import { DictionaryText } from "../components/dictionary";
 import VoteResultBar from "../components/vote-result-bar";
 import type { DiscussionState } from "../hooks/use-discussion-state";
 import "./discussion-screen.css";
@@ -49,7 +50,7 @@ export default function DiscussionScreen(props: Props) {
         {/* 設問一覧と同じカードは繰り返さず、何の設問の意見かが分かるよう設問の文だけ出す */}
         <h1 className="discussion-question question-heading">
             <span className="question-number">Q{props.selectedFrameNumber}.</span>
-            <span>{frame.question}</span>
+            <span><DictionaryText>{frame.question}</DictionaryText></span>
         </h1>
         {/* 設問一覧のカードと同じ投票結果の帯グラフ */}
         <VoteResultBar vote={frame.vote} />
@@ -70,7 +71,7 @@ export default function DiscussionScreen(props: Props) {
                     <span>なるほど</span>
                 </button>
                 <div className={`opinion-row ${thread.stance === "agree" ? "blue" : "pink"}`}>
-                    <span className="opinion-text">{thread.title}</span>
+                    <span className="opinion-text"><DictionaryText>{thread.title}</DictionaryText></span>
                     {/* 縦線の右だけが開くボタン */}
                     <button type="button" className="opinion-open" aria-label={`「${thread.title}」の意見交換を開く`} onClick={() => props.selectThread(thread.id)}>
                         <span aria-hidden="true">＞</span>

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import DataState from "../components/data-state";
+import { DictionaryText } from "../components/dictionary";
 import { opinionLabels, opinionColors } from "../lib/demo-data";
 import type { DiscussionState } from "../hooks/use-discussion-state";
 import type { VoteValue } from "../lib/votes/types";
@@ -27,7 +28,7 @@ function VoteForm({ frame, voteSubmittingFrameId, voteErrors, submitVote, naviga
     }
     return (<section className="vote-screen">
     <div className="video-placeholder" role="img" aria-label="動画表示エリア（動画素材未設定）"/>
-    <h1>Q. {frame.question}</h1>
+    <h1>Q. <DictionaryText>{frame.question}</DictionaryText></h1>
     <p className="vote-date">{frame.vote.votingOpen ? `${changeDate} 変更可能` : "投票受付終了"}</p>
     <div className="vote-labels">
     <span>反対</span>
