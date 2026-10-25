@@ -50,17 +50,6 @@
   flex-shrink:0
 }
 
-.menu-button span {
-  display:block;
-  height:2px;
-  width:19px;
-  background:#111
-}
-
-.menu-button span:nth-child(2) {
-  width:14px
-}
-
 .category-nav {
   display:flex;
   gap:16px;
