@@ -160,3 +160,97 @@
 .send:active:not(:disabled) { transform:scale(.9) }
 .send:disabled { opacity:.5 }
 .stance-switch button:active { transform:scale(.94) }
+
+/* 吹き出しの上下の余白を詰める */
+.bubble { min-height:0; padding-block:8px }
+
+/* 吹き出しのしっぽ。ほかの人はアイコンのある左、自分は右に出す。
+   枠の色の三角（::before）の上に白い三角（::after）を重ねて、枠線つきに見せる */
+.bubble { --bubble-line:#399ff1; position:relative }
+.bubble.disagree { --bubble-line:#ff4c73 }
+.bubble::before,
+.bubble::after {
+  content:"";
+  position:absolute;
+  top:8px;
+  width:0;
+  height:0;
+  border-style:solid
+}
+.bubble::before { left:-9px; border-width:6px 9px 6px 0; border-color:transparent var(--bubble-line) transparent transparent }
+.bubble::after { left:-7px; border-width:5px 8px 5px 0; border-color:transparent #fff transparent transparent }
+.own .bubble::before { left:auto; right:-9px; border-width:6px 0 6px 9px; border-color:transparent transparent transparent var(--bubble-line) }
+.own .bubble::after { left:auto; right:-7px; border-width:5px 0 5px 8px; border-color:transparent transparent transparent #fff }
+/* 自分の発言はアイコンがないぶん、横いっぱいまで使える */
+.own .message-content { max-width:calc(100% - 12px) }
+/* 角が大きく丸いとしっぽがカーブの途中に付いて形がくずれるため、しっぽ側の上の角だけ小さく丸める */
+.bubble { border-top-left-radius:4px }
+.own .bubble { border-top-left-radius:21px; border-top-right-radius:4px }
+
+/* 下の入力欄を2行にする。上の行で立場（賛成・中立・反対）を選び、下の行でコメントを打つ */
+.composer {
+  height:auto;
+  flex-direction:column;
+  align-items:stretch;
+  gap:8px;
+  padding:10px 16px calc(12px + env(safe-area-inset-bottom, 0px))
+}
+.composer .stance-switch { align-self:flex-start }
+.stance-switch button { font-size:12px; padding:3px 14px }
+.stance-switch .neutral { background:#8a8a96 }
+.composer-row { display:flex; align-items:center; gap:10px }
+.composer-row input { height:32px }
+/* 入力欄が高くなったぶん、最後の発言が隠れないよう下を空ける */
+.thread { padding-bottom:130px }
+/* 中立（立場なし）のコメントは灰色の吹き出しにする */
+.bubble:not(.agree):not(.disagree) { --bubble-line:#b8b8c0; border-color:#b8b8c0 }
+
+/* 立場の切り替え。選んだボタンの後ろの色の丸を1つだけ描き、横にぬるっとすべらせる */
+.stance-switch {
+  position:relative;
+  display:grid;
+  grid-template-columns:repeat(var(--stance-count), 1fr)
+}
+.stance-thumb {
+  position:absolute;
+  top:2px;
+  bottom:2px;
+  left:2px;
+  width:calc((100% - 4px) / var(--stance-count));
+  border-radius:20px;
+  background:var(--blue);
+  transform:translateX(calc(var(--stance-index) * 100%));
+  transition:transform 300ms var(--ease-out), background-color 300ms var(--ease-out)
+}
+.stance-thumb.disagree { background:var(--pink) }
+.stance-thumb.neutral { background:#8a8a96 }
+/* 色は後ろの丸で出すので、ボタン自体は塗らない */
+.stance-switch > button,
+.stance-switch > button.selected {
+  position:relative;
+  background:transparent;
+  transition:color 300ms var(--ease-out)
+}
+.stance-switch > button.selected { color:#fff }
+
+/* コメントの入力欄。端まで打つと折り返し、3行まで枠ごと伸びる */
+.composer-row { align-items:flex-end }
+.composer-row textarea {
+  flex:1;
+  width:0;
+  min-height:32px;
+  padding:6px 12px;
+  border:0;
+  border-radius:16px;
+  background:#fff;
+  font:inherit;
+  font-size:14px;
+  line-height:20px;
+  resize:none;
+  overflow-y:auto
+}
+
+/* コメントどうしの縦の間隔を少し詰める */
+.message-list { gap:12px }
+/* 吹き出しの横幅を広げる（200px → 260px）。画面がせまいときは入るぶんだけ */
+.bubble { width:260px }
