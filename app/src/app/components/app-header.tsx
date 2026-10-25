@@ -44,6 +44,8 @@ export default function AppHeader({
   const categoryNavRef = useRef<HTMLElement>(null);
   // トップは「今日のテーマ」と「カテゴリー」の2つに分け、カテゴリーを押すと下に一覧を開く
   const [categoryMenuOpen, setCategoryMenuOpen] = useState(false);
+  // カテゴリーの一覧を開いているあいだは、下線をカテゴリーの下に移す（選ばずに閉じたら戻る）
+  const visibleTab = categoryMenuOpen ? "category" : homeTab;
 
   // 一覧の外を押すか Esc で閉じる
   useEffect(() => {
@@ -85,7 +87,7 @@ export default function AppHeader({
       cancelAnimationFrame(frame);
       observer.disconnect();
     };
-  }, [homeTab, screen]);
+  }, [homeTab, categoryMenuOpen, screen]);
 
   const collapseMiddle = (screen === "discussion" || screen === "thread") && Boolean(selectedFrame);
 
@@ -143,7 +145,7 @@ export default function AppHeader({
             <span ref={indicatorRef} className="category-indicator" aria-hidden="true" />
             {/* 今日のテーマは別のコンテンツ。今ある分類はすべてカテゴリーに入る */}
             <button
-              className={homeTab === "today" ? "active" : undefined}
+              className={visibleTab === "today" ? "active" : undefined}
               onClick={() => {
                 setHomeTab("today");
                 setCategoryMenuOpen(false);
@@ -152,7 +154,7 @@ export default function AppHeader({
               今日のテーマ
             </button>
             <button
-              className={homeTab === "category" ? "active" : undefined}
+              className={visibleTab === "category" ? "active" : undefined}
               aria-expanded={categoryMenuOpen}
               aria-controls="category-menu"
               onClick={() => setCategoryMenuOpen((open) => !open)}

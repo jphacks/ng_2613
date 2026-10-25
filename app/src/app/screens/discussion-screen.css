@@ -153,8 +153,8 @@
 .opinion-row.blue { border-color:var(--blue); background:#fff }
 .opinion-row.pink { border-color:var(--pink); background:#fff }
 
-/* 設問の文の下に投票結果の帯グラフを置く */
-.discussion-question + .vote-bar { width:auto; margin:12px 4px 0 }
+/* 設問の文の下に、投票の帯と投票結果の帯グラフを置く */
+.discussion-list .vote-bar { width:auto; margin:0 4px }
 
 /* 左右の余白を広げる */
 .discussion-list { padding-inline:20px }
@@ -184,3 +184,5 @@
 @media (prefers-reduced-motion:reduce) {
   .opinion-reaction:has(.reaction-bulb.is-flashing) { animation:none }
 }
+/* 背景が白なので、カードの中と違って薄い枠で囲む */
+.discussion-list .summary-inline-vote { margin:12px 0; border:1px solid #e3e3e8 }
