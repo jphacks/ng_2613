@@ -45,7 +45,9 @@ export default function AppHeader({
   // トップは「今日のテーマ」と「カテゴリー」の2つに分け、カテゴリーを押すと下に一覧を開く
   const [categoryMenuOpen, setCategoryMenuOpen] = useState(false);
   // カテゴリーの一覧を開いているあいだは、下線をカテゴリーの下に移す（選ばずに閉じたら戻る）
-  const visibleTab = categoryMenuOpen ? "category" : homeTab;
+  const visibleTab = screen === "daily-theme"
+    ? "today"
+    : categoryMenuOpen ? "category" : homeTab;
 
   // 一覧の外を押すか Esc で閉じる
   useEffect(() => {
@@ -138,7 +140,7 @@ export default function AppHeader({
           </svg>
         </button>
       </div>
-      {screen === "home" ? (
+      {(screen === "home" || screen === "daily-theme") ? (
         <div className="category-nav-wrap">
           <nav ref={categoryNavRef} className="category-nav" aria-label="トップの表示切り替え">
             {/* 末尾に置くと button:last-child の指定が外れるため先頭に置く */}
@@ -146,9 +148,11 @@ export default function AppHeader({
             {/* 今日のテーマは別のコンテンツ。今ある分類はすべてカテゴリーに入る */}
             <button
               className={visibleTab === "today" ? "active" : undefined}
+              aria-current={screen === "daily-theme" ? "page" : undefined}
               onClick={() => {
                 setHomeTab("today");
                 setCategoryMenuOpen(false);
+                navigate("daily-theme");
               }}
             >
               今日のテーマ
