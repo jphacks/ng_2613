@@ -1,12 +1,12 @@
 # Rights
-
-
-<img width="466" height="466" alt="logo" src="https://github.com/user-attachments/assets/dd747544-20ec-408d-86ed-3bc90f2d43c4" />
-
 機能説明はこちら：https://youtu.be/OAwPPiOETiE
+
+開発思想はこちら：https://youtu.be/mgSQDn86y9I
+
 
 ## 製品概要
 SNSで政治に触れる若者に向けた、点在した意見を1か所に集め、俯瞰して考える場を提供するSNSアプリ
+
 かつ、現状のSNSの問題を根本から解決する、これからの民主主義社会で必要不可欠なSNSアプリ
 
 ### 背景
@@ -21,7 +21,7 @@ SNSはその特性上、ユーザーの好みの投稿が表示される。同�
 
 これからの民主主義には**全体を俯瞰して見ることができるSNSの仕組み**が必要不可欠である。
 
-（開発思想はこちら：https://youtu.be/mgSQDn86y9I）
+
 
 ### 製品説明（具体的な製品の説明）
 
