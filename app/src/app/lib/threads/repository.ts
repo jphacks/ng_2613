@@ -1,5 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "../supabase/database.types";
+import { rankRepresentatives } from "../representatives/repository";
 import type { PostAuthor, PostStance, ThreadDetail, ThreadSummary } from "./types";
 
 const threadLimit = 50;
@@ -62,7 +63,13 @@ export async function getThreads(client: SupabaseClient<Database>, frameId: stri
     if (reactionError) throw new ThreadRepositoryError("unknown", "なるほどの状態を取得できませんでした。");
     reactions.forEach(reaction => reactedIds.add(reaction.thread_id));
   }
+  const ranks = await rankRepresentatives(frameId, data.map((thread) => ({
+    id: thread.id,
+    stance: thread.stance as PostStance,
+    createdAt: thread.created_at,
+  })));
   return data.map((thread): ThreadSummary => ({
+    representativeRank: ranks.get(thread.id) ?? null,
     reacted: reactedIds.has(thread.id),
     id: thread.id,
     title: thread.title,

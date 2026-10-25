@@ -12,6 +12,8 @@ export type ThreadSummary = {
   stance: PostStance;
   createdAt: string;
   author: PostAuthor;
+  // 設問カードに出す代表意見の順位（賛成・反対それぞれ 1〜3）。代表でなければ null
+  representativeRank?: number | null;
 };
 
 export type ThreadComment = {
