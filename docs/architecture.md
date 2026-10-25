@@ -47,7 +47,7 @@ flowchart LR
 ```mermaid
 flowchart LR
     subgraph browser["ブラウザ"]
-        ui["画面<br/>React Client Components"]
+        ui["画面<br/>React・Tailwind CSS"]
         state["状態管理<br/>use-discussion-state"]
         glossary["用語辞書データ<br/>glossary.json を同梱"]
         ui --- state
@@ -85,7 +85,7 @@ flowchart LR
 
 | 区分 | エンドポイント | 内容 |
 | --- | --- | --- |
-| 認証 | `POST /api/auth/sign-up`<br/>`POST /api/auth/sign-in`<br/>`POST /api/auth/sign-out`<br/>`GET /api/auth/session` | 新規登録・ログイン・ログアウト・ログイン状態の確認 |
+| 認証 | `POST /api/auth/sign-up`<br/>`POST /api/auth/sign-in`<br/>`POST /api/auth/sign-out`<br/>`GET /api/auth/session`<br/>`GET /auth/confirm` | 新規登録・ログイン・ログアウト・ログイン状態の確認・確認メールのリンクからのログイン |
 | 会員情報 | `GET` / `PATCH /api/profile` | ユーザー名・性別・生年月日の取得と更新 |
 | 分類 | `GET /api/catalog` | ジャンル・中分類・トピックの一覧 |
 | トピック | `GET /api/topics/[topicId]` | トピックの設問と投票状況 |
