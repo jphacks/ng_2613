@@ -66,6 +66,11 @@
   justify-content: center;
 }
 
+/* 投票済みでも、既存の投票表示と同じ色で選択肢を表示する */
+.daily-theme-vote .vote-dot:disabled {
+  opacity: 1;
+}
+
 .daily-theme-after-vote {
   display: grid;
   justify-items: center;
