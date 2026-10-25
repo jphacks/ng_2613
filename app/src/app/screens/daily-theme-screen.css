@@ -1,0 +1,93 @@
+.daily-theme-screen {
+  padding: 24px 18px 48px;
+}
+
+.daily-theme-heading > p:first-child {
+  color: #777783;
+  font-size: 14px;
+  letter-spacing: .08em;
+}
+
+.daily-theme-heading h1 {
+  margin-top: 8px;
+  color: var(--ink);
+  font-size: 24px;
+  line-height: 1.45;
+}
+
+.daily-theme-description {
+  margin-top: 10px;
+  color: #666;
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.daily-theme-video-wrap {
+  margin: 22px -18px 0;
+  background: #111;
+}
+
+.daily-theme-video {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #111;
+}
+
+.daily-theme-skip {
+  display: grid;
+  justify-items: center;
+  gap: 16px;
+  padding: 24px 0;
+  color: #666;
+  text-align: center;
+  font-size: 14px;
+}
+
+.daily-theme-skip .secondary,
+.daily-theme-after-vote .secondary {
+  min-height: 46px;
+  font-size: 16px;
+}
+
+.daily-theme-vote {
+  scroll-margin-top: 20px;
+  margin-top: 26px;
+  padding: 28px 0 4px;
+  border-top: 1px solid #dddde2;
+  animation: rise-in var(--duration) var(--ease-out);
+}
+
+.daily-theme-vote .vote-form h1 {
+  margin-top: 0;
+}
+
+.daily-theme-vote .vote-actions {
+  justify-content: center;
+}
+
+/* 投票済みでも、既存の投票表示と同じ色で選択肢を表示する */
+.daily-theme-vote .vote-dot:disabled {
+  opacity: 1;
+}
+
+.daily-theme-after-vote {
+  display: grid;
+  justify-items: center;
+  gap: 14px;
+  margin-top: 24px;
+  padding-top: 22px;
+  border-top: 1px solid #eee;
+  color: var(--ink);
+}
+
+@media (width > 757px) {
+  .daily-theme-screen {
+    padding-inline: 24px;
+  }
+
+  .daily-theme-video-wrap {
+    margin-inline: -24px;
+  }
+}
+
