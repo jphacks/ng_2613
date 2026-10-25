@@ -16,20 +16,20 @@
     "comment_count": 1512,
     "total_post_count": 2016,
     "disclosure_prefix": "【AI生成・架空サンプル】",
-    "import_readiness": "conditional_six_threads_require_semantic_review"
+    "import_readiness": "ready_after_uuid_permission_and_local_db_resolution"
   },
   "sources": [
     {
       "file_name": "sample_users.json",
-      "sha256": "c3bb8e364b77ac0c56cf8f124818ab73b1bbbd02485df0eeb3d16eee594b402f"
+      "sha256": "965ae3108405da7182168cae011fc9c61fd1a3b920eea7c735f2ffa2db7b70c8"
     },
     {
       "file_name": "sample_stances.json",
-      "sha256": "2101a2617e33993192d25be87fde33c30bf7316a54570887117e9c56bb8115f9"
+      "sha256": "28fdbf5f7e694cd06ee05f04d8644f52dc0d112f2eb822b3eec258902d1402cf"
     },
     {
       "file_name": "categories(1).json",
-      "sha256": "21b138dcf7c3e7fab947da887d754b47c041fbf207d5c8b7dc6eb9f41c484d15"
+      "sha256": "ff8194a5aab75373bc9edcc33dfe91a8f2cbb84d01acbb017c35e9aa8b41394c"
     },
     {
       "file_name": "questions(1).json",
@@ -68,8 +68,8 @@
     "thread_ref": "同じファイルのsample_thread_idを参照。登録時の対応表でcomments.thread_idへ解決する。",
     "type": "全スレッドuser。video_idは全件null。video型を保留表現の代用にしない。",
     "stance": "元の政策設問への賛否であり、直前の投稿への賛否ではない。通常は内部判断1・2がdisagree、4・5がagree。commentsは内部判断3ならnull。",
-    "neutral_thread_exception": "質問25と117は全員が内部判断3。3を勝手に賛成・反対へ変更しないため、本人が保留を明示した仮説検討を3件ずつ置く。threads.stanceはその仮説の検討方向のタグで本人の確定判断ではない。各スレッドのgeneration_only.stance_basisとthread_stance_explanationに明示。",
-    "binary_tag_caveat": "threadsのuser型はstanceをnullにできない。上記6件はこの制約下での条件検討用表現であり、投票データとして転用しない。 最終検証では6件をrequires_stance_semantics_reviewとして自動投入から保留する。本人の判断を勝手に変更しない。",
+    "neutral_thread_exception": "質問25と117の元の内部判断は3。登録前レビューにより、対象6スレッドの本文だけを既存の二値stanceに合う条件付き意見へ最小限修正した。元の政策判断値は変更しない。",
+    "binary_tag_caveat": "対象6スレッドはレビュー済みで、本文とthreads.stanceの意味が一致する。元の内部判断3とは区別し、投票データには転用しない。",
     "question_frame_resolution": "question_idやsource_indexをUUIDと扱わない。genre→middle_topic→topicと設問文により、登録先の期間に属するquestion型frameを一意に解決する。複数候補なら推測しない。",
     "db_field_allowlists": {
       "threads": [
@@ -5733,17 +5733,17 @@
           "type": "user",
           "stance": "agree",
           "title": "介入を試すなら何を目安にするか",
-          "body": "【AI生成・架空サンプル】賛否はまだ保留です。介入する案を検討するなら、どんな値動きを急変と見なすのか知りたいです。水準そのものと変化の速さを分ければ、判断しやすくなるでしょうか。",
+          "body": "【AI生成・架空サンプル】私は、判断基準を明確にすることを条件に、政府が介入することに賛成です。どんな値動きを急変と見なすのか知りたいです。水準そのものと変化の速さを分ければ、判断しやすくなるでしょうか。",
           "video_id": null,
           "generation_only": {
             "ai_generated_fictional_sample": true,
             "source_stance_value": 3,
-            "stance_basis": "hypothetical_argument_not_personal_commitment",
+            "stance_basis": "reviewed_conditional_position",
             "discussion_angle": "介入を試すなら何を目安にするか",
-            "thread_stance_explanation": "本人の判断は3のまま。このスレッドだけ、実施または見送りを仮定して条件を検討する。DBの二値タグは仮説の検討方向で、本人の投票・確定意見を表さない。",
+            "thread_stance_explanation": "元の判断値は3だが、レビューで本文をDBの二値stanceに合う条件付き意見へ修正した。投票データには転用しない。",
             "visible_disclosure_label": "【AI生成・架空サンプル】",
             "fact_policy": "実在人物の発言、未確認の統計・ニュース・法制度の断定は含めない。例示は仮定として表現する。",
-            "import_status": "requires_stance_semantics_review"
+            "import_status": "ready_after_uuid_and_permission_resolution"
           },
           "comments": [
             {
@@ -5805,17 +5805,17 @@
           "type": "user",
           "stance": "disagree",
           "title": "見送る場合の輸入費負担",
-          "body": "【AI生成・架空サンプル】私はまだ判断を保留しています。介入を見送る案なら、輸入品の値上がりで困る家計や事業者を別の方法で支えるのでしょうか。その費用も並べて比較したいです。",
+          "body": "【AI生成・架空サンプル】私は、輸入費負担への代替策が示されない限り、政府の為替介入には反対です。介入を見送る場合、困る家計や事業者を別の方法で支えるのでしょうか。その費用も並べて比較したいです。",
           "video_id": null,
           "generation_only": {
             "ai_generated_fictional_sample": true,
             "source_stance_value": 3,
-            "stance_basis": "hypothetical_argument_not_personal_commitment",
+            "stance_basis": "reviewed_conditional_position",
             "discussion_angle": "見送る場合の輸入費負担",
-            "thread_stance_explanation": "本人の判断は3のまま。このスレッドだけ、実施または見送りを仮定して条件を検討する。DBの二値タグは仮説の検討方向で、本人の投票・確定意見を表さない。",
+            "thread_stance_explanation": "元の判断値は3だが、レビューで本文をDBの二値stanceに合う条件付き意見へ修正した。投票データには転用しない。",
             "visible_disclosure_label": "【AI生成・架空サンプル】",
             "fact_policy": "実在人物の発言、未確認の統計・ニュース・法制度の断定は含めない。例示は仮定として表現する。",
-            "import_status": "requires_stance_semantics_review"
+            "import_status": "ready_after_uuid_and_permission_resolution"
           },
           "comments": [
             {
@@ -5877,17 +5877,17 @@
           "type": "user",
           "stance": "disagree",
           "title": "一度始めた介入の終わらせ方",
-          "body": "【AI生成・架空サンプル】賛否はまだ保留です。介入を終える条件が決まらないなら、実施を急ぐのは心配です。一度始めた後、どの段階で効果や費用を見直すのでしょうか。",
+          "body": "【AI生成・架空サンプル】私は、介入を終える条件が決まらない限り、実施に反対です。一度始めた後、どの段階で効果や費用を見直すのかも先に示してほしいです。",
           "video_id": null,
           "generation_only": {
             "ai_generated_fictional_sample": true,
             "source_stance_value": 3,
-            "stance_basis": "hypothetical_argument_not_personal_commitment",
+            "stance_basis": "reviewed_conditional_position",
             "discussion_angle": "一度始めた介入の終わらせ方",
-            "thread_stance_explanation": "本人の判断は3のまま。このスレッドだけ、実施または見送りを仮定して条件を検討する。DBの二値タグは仮説の検討方向で、本人の投票・確定意見を表さない。",
+            "thread_stance_explanation": "元の判断値は3だが、レビューで本文をDBの二値stanceに合う条件付き意見へ修正した。投票データには転用しない。",
             "visible_disclosure_label": "【AI生成・架空サンプル】",
             "fact_policy": "実在人物の発言、未確認の統計・ニュース・法制度の断定は含めない。例示は仮定として表現する。",
-            "import_status": "requires_stance_semantics_review"
+            "import_status": "ready_after_uuid_and_permission_resolution"
           },
           "comments": [
             {
@@ -26919,17 +26919,17 @@
           "type": "user",
           "stance": "agree",
           "title": "最優先にする場合の交渉の幅",
-          "body": "【AI生成・架空サンプル】賛否はまだ保留です。拉致問題を最優先とする案を検討するなら、他の安全課題をどう扱うかも知りたいです。救済の重要さと交渉の順番は分けて説明できるでしょうか。",
+          "body": "【AI生成・架空サンプル】私は、他の安全課題も並行して扱うことを条件に、拉致問題を最優先として交渉することに賛成です。救済の重要さと交渉の順番は分けて説明してほしいです。",
           "video_id": null,
           "generation_only": {
             "ai_generated_fictional_sample": true,
             "source_stance_value": 3,
-            "stance_basis": "hypothetical_argument_not_personal_commitment",
+            "stance_basis": "reviewed_conditional_position",
             "discussion_angle": "最優先にする場合の交渉の幅",
-            "thread_stance_explanation": "本人の判断は3のまま。このスレッドだけ、実施または見送りを仮定して条件を検討する。DBの二値タグは仮説の検討方向で、本人の投票・確定意見を表さない。",
+            "thread_stance_explanation": "元の判断値は3だが、レビューで本文をDBの二値stanceに合う条件付き意見へ修正した。投票データには転用しない。",
             "visible_disclosure_label": "【AI生成・架空サンプル】",
             "fact_policy": "実在人物の発言、未確認の統計・ニュース・法制度の断定は含めない。例示は仮定として表現する。",
-            "import_status": "requires_stance_semantics_review"
+            "import_status": "ready_after_uuid_and_permission_resolution"
           },
           "comments": [
             {
@@ -26991,17 +26991,17 @@
           "type": "user",
           "stance": "disagree",
           "title": "交渉方針を保留して情報を知る",
-          "body": "【AI生成・架空サンプル】賛否はまだ保留です。まず優先順位の決定を見送る場合、次の判断までに何を確認するのでしょう。交渉自体をやめるという意味とは分けて、当事者の意向を想像で代弁しない説明を聞きたいです。",
+          "body": "【AI生成・架空サンプル】私は、必要な情報と当事者の意向が示されるまでは、拉致問題を最優先と決めることに反対です。交渉自体をやめるという意味とは分けて説明してほしいです。",
           "video_id": null,
           "generation_only": {
             "ai_generated_fictional_sample": true,
             "source_stance_value": 3,
-            "stance_basis": "hypothetical_argument_not_personal_commitment",
+            "stance_basis": "reviewed_conditional_position",
             "discussion_angle": "交渉方針を保留して情報を知る",
-            "thread_stance_explanation": "本人の判断は3のまま。このスレッドだけ、実施または見送りを仮定して条件を検討する。DBの二値タグは仮説の検討方向で、本人の投票・確定意見を表さない。",
+            "thread_stance_explanation": "元の判断値は3だが、レビューで本文をDBの二値stanceに合う条件付き意見へ修正した。投票データには転用しない。",
             "visible_disclosure_label": "【AI生成・架空サンプル】",
             "fact_policy": "実在人物の発言、未確認の統計・ニュース・法制度の断定は含めない。例示は仮定として表現する。",
-            "import_status": "requires_stance_semantics_review"
+            "import_status": "ready_after_uuid_and_permission_resolution"
           },
           "comments": [
             {
@@ -27063,17 +27063,17 @@
           "type": "user",
           "stance": "disagree",
           "title": "当事者の生活支援は続ける",
-          "body": "【AI生成・架空サンプル】賛否はまだ保留です。最優先という位置付けを今は決めないとしても、関係する人への生活や相談の支援は続けられますね。外交上の順番への賛否と、支援の必要性を分けて考えたいです。",
+          "body": "【AI生成・架空サンプル】私は、外交上の他課題との関係が明確でないまま最優先と位置付けることには反対です。ただし、関係する人への生活や相談の支援は続けるべきです。",
           "video_id": null,
           "generation_only": {
             "ai_generated_fictional_sample": true,
             "source_stance_value": 3,
-            "stance_basis": "hypothetical_argument_not_personal_commitment",
+            "stance_basis": "reviewed_conditional_position",
             "discussion_angle": "当事者の生活支援は続ける",
-            "thread_stance_explanation": "本人の判断は3のまま。このスレッドだけ、実施または見送りを仮定して条件を検討する。DBの二値タグは仮説の検討方向で、本人の投票・確定意見を表さない。",
+            "thread_stance_explanation": "元の判断値は3だが、レビューで本文をDBの二値stanceに合う条件付き意見へ修正した。投票データには転用しない。",
             "visible_disclosure_label": "【AI生成・架空サンプル】",
             "fact_policy": "実在人物の発言、未確認の統計・ニュース・法制度の断定は含めない。例示は仮定として表現する。",
-            "import_status": "requires_stance_semantics_review"
+            "import_status": "ready_after_uuid_and_permission_resolution"
           },
           "comments": [
             {

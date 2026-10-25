@@ -1,7 +1,7 @@
 import { useId, useRef, useState } from "react";
 import type { DemographicsState } from "../hooks/use-discussion-state";
 import type { TopicFrame } from "../lib/catalog/types";
-import type { ThreadSummary } from "../lib/threads/types";
+import type { PostStance, ThreadSummary } from "../lib/threads/types";
 import type { AgeBucket, GenderBucket, VoteValue } from "../lib/votes/types";
 import InlineVote from "./inline-vote";
 import VoteResultBar from "./vote-result-bar";
@@ -97,6 +97,14 @@ function DemographicChart({ title, data }: { title: string; data: Segment[] }) {
     </figure>
   );
 }
+// 代表に選ばれた意見を順位の順に並べる。順位がない一覧（古い応答）なら、今までどおり先頭から
+function representativesFor(threads: ThreadSummary[], stance: PostStance) {
+  const list = threads.filter((thread) => thread.stance === stance);
+  if (!list.some((thread) => thread.representativeRank != null)) return list;
+  return list
+    .filter((thread) => thread.representativeRank != null)
+    .sort((a, b) => a.representativeRank! - b.representativeRank!);
+}
 export default function TopicSummaryCard({
   color = "cream",
   questionNumber = 1,
@@ -116,8 +124,8 @@ export default function TopicSummaryCard({
   const [drawCount, setDrawCount] = useState(0);
   const titleId = useId();
   const { vote } = frame;
-  const agreeThreads = threads.filter((thread) => thread.stance === "agree");
-  const disagreeThreads = threads.filter((thread) => thread.stance === "disagree");
+  const agreeThreads = representativesFor(threads, "agree");
+  const disagreeThreads = representativesFor(threads, "disagree");
   return (
     <article className={`summary-card ${color}`} aria-labelledby={titleId}>
       <div className="summary-heading">
