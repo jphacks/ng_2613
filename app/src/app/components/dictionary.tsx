@@ -1,11 +1,12 @@
 "use client";
 
 import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
+import glossary from "../../../../supabase/seed/glossary.json";
 import "./dictionary.css";
 
-const entries = [
-  { term: "消費税", definition: "商品を買うとかかるお金です" },
-];
+const entries = glossary.map(({ term, description }) => ({ term, definition: description }));
+// 重なる用語は長いものを優先する。
+const terms = entries.map(({ term }) => term).sort((a, b) => b.length - a.length);
 
 type Popover = { term: string; definition: string; top: number; left: number; placement: "below" | "above" };
 
@@ -246,8 +247,6 @@ export function DictionaryProvider({ children, visible = true }: { children: Rea
 
 // 辞書にある言葉に印を付ける。押せる要素にはせず、クリックは下の行などにそのまま通す。
 export function DictionaryText({ children }: { children: string }) {
-  // Prefer longer terms when dictionary entries overlap.
-  const terms = entries.map(entry => entry.term).sort((a, b) => b.length - a.length);
   const parts: ReactNode[] = [];
   let remaining = children;
   while (remaining) {

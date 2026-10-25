@@ -22,7 +22,7 @@ export function ThreadView({ profile, selectedFrame, selectedFrameNumber, messag
     const [message, setMessage] = useState("");
     const [stance, setStance] = useState("賛成");
     return (<section className="thread">
-    {selectedFrame && <h1>Q{selectedFrameNumber}. {selectedFrame.question}</h1>}
+    {selectedFrame && <h1>Q{selectedFrameNumber}. <DictionaryText>{selectedFrame.question}</DictionaryText></h1>}
     <div className="message-list">
     {messages.map(item => {
         const own = item.author.id === profile.id;
