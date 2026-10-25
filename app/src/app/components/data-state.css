@@ -1,0 +1,96 @@
+.data-state {
+  margin:40px 20px;
+  padding:32px 20px 28px;
+  border:1px solid #d7d7dc;
+  border-radius:16px;
+  color:var(--ink);
+  text-align:center;
+  line-height:1.6;
+  box-shadow:var(--shadow-sm);
+  animation:rise-in var(--duration) var(--ease-out)
+}
+
+.data-state-icon {
+  display:grid;
+  place-items:center;
+  width:40px;
+  height:40px;
+  margin:0 auto 12px;
+  border-radius:50%;
+  background:#f1f1f3;
+  color:var(--ink);
+  font-size:18px;
+  font-weight:700
+}
+
+.data-state-empty {
+  border-style:dashed;
+  box-shadow:none;
+  color:#666
+}
+
+.data-state .secondary {
+  min-height:42px;
+  margin-top:18px;
+  font-size:16px
+}
+
+.visually-hidden {
+  position:absolute;
+  width:1px;
+  height:1px;
+  overflow:hidden;
+  clip-path:inset(50%);
+  white-space:nowrap
+}
+
+.skeleton-circle {
+  width:150px;
+  max-width:100%;
+  aspect-ratio:1;
+  border-radius:50%
+}
+
+.skeleton-hero {
+  margin:0 auto 15px
+}
+
+.skeleton-text {
+  width:64px;
+  height:16px;
+  border-radius:8px
+}
+
+.skeleton-row {
+  height:70px;
+  margin-bottom:14px;
+  border-radius:16px
+}
+
+.skeleton-card {
+  height:249px;
+  border-radius:11px
+}
+
+.skeleton-messages {
+  display:flex;
+  flex-direction:column;
+  gap:20px;
+  padding:16px
+}
+
+.skeleton-title {
+  width:70%;
+  height:24px;
+  margin-bottom:6px
+}
+
+.skeleton-bubble {
+  width:200px;
+  height:59px;
+  border-radius:21px
+}
+
+.skeleton-bubble:nth-child(odd) {
+  align-self:flex-end
+}

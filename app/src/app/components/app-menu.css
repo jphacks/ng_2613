@@ -1,0 +1,54 @@
+.menu-scrim {
+  position:fixed;
+  inset:0;
+  background:#0002;
+  z-index:9
+}
+
+.drawer {
+  position:absolute;
+  top:0;
+  right:0;
+  bottom:0;
+  width:262px;
+  min-height:100dvh;
+  background:white;
+  z-index:10
+}
+
+.drawer button,.desktop-menu button {
+  width:100%;
+  display:block;
+  border-bottom:1px solid #aaa;
+  text-align:left;
+  padding:12px;
+  font-size:20px
+}
+
+.drawer button:disabled,.desktop-menu button:disabled {
+  cursor:not-allowed;
+  color:#888;
+  background:#f5f5f5
+}
+
+.desktop-menu {
+  width:262px;
+  max-width:100%;
+  flex-shrink:0;
+  background:transparent
+}
+
+.desktop-menu button {
+  padding-inline:clamp(0px,calc((100vw - 420px) / 16),12px);
+  overflow-wrap:anywhere
+}
+
+/* --- 手ざわり --- */
+.menu-scrim { animation:fade-in var(--duration) var(--ease-out) }
+.drawer { box-shadow:var(--shadow-lg); animation:drawer-in 260ms var(--ease-out) }
+@keyframes drawer-in { from { transform:translateX(100%) } }
+.drawer button,.desktop-menu button { transition:background-color var(--duration) var(--ease-out), padding-left var(--duration) var(--ease-out) }
+@media (hover:hover) {
+  .drawer button:hover:not(:disabled),.desktop-menu button:hover:not(:disabled) { background:#0000000a; filter:none }
+}
+.drawer button:active:not(:disabled),.desktop-menu button:active:not(:disabled) { background:#00000012 }

@@ -1,0 +1,36 @@
+.login-screen {
+  padding-top:41px
+}
+
+.avatar-placeholder {
+  width:252px;
+  height:242px;
+  border-radius:50%;
+  background:#d9d9d9;
+  margin:0 auto 46px
+}
+
+.login-screen h1 {
+  font-size:32px;
+  text-align:center;
+  margin-bottom:39px
+}
+
+.login-screen .account-field {
+  margin-bottom:31px
+}
+
+.login-screen .account-actions {
+  margin-top:51px
+}
+
+.login-links {
+  margin-top:100px;
+  text-align:center;
+  display:flex;
+  flex-direction:column;
+  color:#399ff1;
+  font-size:20px;
+  line-height:24px
+}
+

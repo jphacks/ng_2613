@@ -1,0 +1,147 @@
+.discussion-list {
+  padding:31px 10px calc(110px + env(safe-area-inset-bottom, 0px))
+}
+
+.discussion-list h1 {
+  margin-bottom:23px
+}
+
+.opinion-row {
+  width:100%;
+  border:1px solid var(--line);
+  border-radius:10px;
+  min-height:59px;
+  margin-bottom:15px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:0 14px;
+  font-size:21px;
+  overflow-wrap:anywhere
+}
+
+.opinion-message {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  flex:1;
+  min-width:0;
+  min-height:48px;
+  text-align:left;
+  background:transparent;
+}
+
+.opinion-reaction {
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  flex-shrink:0;
+  align-items:center;
+  gap:0;
+  min-height:44px;
+  padding:3px 0;
+  border-radius:8px;
+  background:transparent;
+  color:#999;
+  font-size:8px;
+}
+
+.opinion-message:focus-visible,
+.opinion-reaction:focus-visible {
+  outline:2px solid var(--ink);
+  outline-offset:2px;
+}
+
+.opinion-reaction.is-reacted { color:#a76500 }
+.opinion-reaction.is-reacted .reaction-bulb { fill:#ffe16b }
+.opinion-reaction:disabled { cursor:wait; opacity:0.65 }
+
+.reaction-bulb { flex-shrink:0 }
+.reaction-bulb.is-flashing {
+  color:#a76500;
+  fill:#ffe16b;
+  animation:reaction-glow 850ms ease-out;
+}
+
+@keyframes reaction-glow {
+  0%, 65% {
+    color:#a76500;
+    fill:#ffe16b;
+    filter:drop-shadow(0 0 5px #ffcf33) drop-shadow(0 0 9px #fff4b1);
+  }
+  30% { transform:scale(1.2) }
+  100% { color:#a76500; fill:#ffe16b; filter:none; transform:scale(1) }
+}
+
+@media (prefers-reduced-motion:reduce) {
+  @keyframes reaction-glow {
+    0%, 80% { color:#a76500; fill:#ffe16b }
+    100% { color:#a76500; fill:#ffe16b }
+  }
+}
+
+.opinion-text {
+  min-width:0;
+  overflow:hidden;
+  text-overflow:ellipsis
+}
+
+@media(max-width:390px) {
+.opinion-row {
+  font-size:19px;
+  padding-right:20px
+}
+}
+
+@media(max-width:350px) {
+.opinion-row {
+  font-size:16px;
+  padding-inline:10px
+}
+}
+
+.discussion-list .summary-heading h1 { margin-bottom:0 }
+.discussion-opinions { margin-top:24px }
+
+.discussion-opinions h2 {
+  margin:0 0 14px;
+  padding-left:10px;
+  font-size:20px;
+  font-weight:400
+}
+
+.add-opinion {
+  position:fixed;
+  right:16px;
+  bottom:calc(24px + env(safe-area-inset-bottom, 0px));
+  z-index:4;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:48px;
+  height:48px;
+  border-radius:50%;
+  background:var(--ink);
+  color:#fff;
+}
+
+@media (width > 757px) {
+  .add-opinion {
+    right:calc((100% - 420px) / 2 + 16px)
+  }
+}
+
+/* --- 手ざわり --- */
+.opinion-row { box-shadow:var(--shadow-sm); animation:rise-in 320ms var(--ease-out) backwards }
+.opinion-row > span:last-child { flex-shrink:0; margin-left:8px; transition:transform var(--duration) var(--ease-out) }
+@media (hover:hover) {
+  .opinion-row:hover { box-shadow:var(--shadow-md); filter:none }
+  .opinion-row:hover > span:last-child { transform:translateX(4px) }
+}
+.opinion-row:active { transform:scale(.98) }
+.add-opinion { box-shadow:var(--shadow-lg) }
+@media (hover:hover) {
+  .add-opinion:hover { transform:scale(1.06) }
+}
+.add-opinion:active { transform:scale(.94) }

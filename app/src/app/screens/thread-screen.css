@@ -1,0 +1,162 @@
+.thread {
+  min-height: calc(100dvh - 75px);
+  background: #f8f8f8;
+  position: relative;
+  padding: 16px 0 90px;
+}
+
+.thread h1 {
+  margin-bottom: 26px;
+}
+
+.message-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 0 12px;
+}
+
+.message-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.message-row.own {
+  flex-direction: row-reverse;
+}
+
+.sender-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 36px;
+  height: 36px;
+  border-radius: 50%;
+  color: #464554;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.message-content {
+  max-width: calc(100% - 44px);
+  min-width: 0;
+}
+
+.sender-name {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+
+.own .sender-name {
+  text-align: right;
+}
+
+.bubble {
+  border: 1px solid #399ff1;
+  border-radius: 21px;
+  padding: 19px 10px;
+  min-height: 59px;
+  width: 200px;
+  max-width: 100%;
+  font-size: 14px;
+  background: #fff;
+  overflow-wrap: anywhere;
+}
+
+.bubble.disagree {
+  border-color: #ff4c73;
+}
+
+.composer {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(100%, 757px);
+  height: 69px;
+  background: var(--ink);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 16px 10px 2px;
+  z-index: 4;
+}
+
+@media (width > 757px) {
+  .composer {
+    width: 420px;
+  }
+}
+
+.stance-switch {
+  display: flex;
+  border-radius: 20px;
+  background: white;
+  padding: 2px;
+  flex-shrink: 0;
+}
+
+.stance-switch button {
+  font-size: 10px;
+  padding: 2px 10px;
+  border-radius: 20px;
+}
+
+.stance-switch .selected {
+  background: var(--blue);
+  color: #fff;
+}
+
+.stance-switch .disagree {
+  background: var(--pink);
+}
+
+.composer input {
+  width: 0;
+  flex: 1;
+  border: 0;
+  border-radius: 20px;
+  height: 24px;
+  background: white;
+  padding: 0 10px;
+  font-size: 14px;
+}
+
+.send {
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.screen-thread .app-header,
+.screen-new-thread .app-header {
+  margin-bottom: 0;
+}
+
+.composer-error {
+  position: absolute;
+  right: 12px;
+  bottom: 2px;
+  max-width: 250px;
+  color: #ffb4b4;
+  font-size: 10px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* --- 手ざわり --- */
+.thread h1 { padding-inline:16px; line-height:1.4 }
+.message-row { animation:rise-in 260ms var(--ease-out) backwards }
+.bubble { box-shadow:var(--shadow-sm); line-height:1.6; padding-inline:14px }
+.composer { box-shadow:0 -4px 16px #4645541f }
+.composer input:focus { box-shadow:0 0 0 3px #ffffff40 }
+.send:active:not(:disabled) { transform:scale(.9) }
+.send:disabled { opacity:.5 }
+.stance-switch button:active { transform:scale(.94) }
