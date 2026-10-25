@@ -147,7 +147,7 @@ SNSはその特性上、ユーザーの好みの投稿が表示される。同�
     
     [論点まとめカード](app/src/app/components/topic-summary-card.tsx)／[投票結果の表示](app/src/app/components/vote-result-bar.tsx)
     
-- **議論の文脈を保ったまま調べられる辞書レンズ**
+- **辞書レンズ**
     
     用語にレンズを重ねて解説を表示するので、読んでいる画面を離れずに意味を確かめられる。
     
